@@ -1,7 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import ClientArea from './components/ClientArea';
 
 const root = createRoot(document.body);
-root.render( (<>
-    <h1>Hello from React!</h1>
-    <p>Ola mundo </p>
-</> ));
+root.render( <ClientArea/> );

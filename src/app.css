@@ -1,0 +1,24 @@
+.panel {
+    background-color: red;
+}
+
+.panel-left {
+
+}
+
+.panel-middle {
+
+}
+
+.panel-right {
+    height: 100%;
+}
+
+.web-preview {
+    height: 100%;
+}
+
+.panel-resizer-handle {
+    width: 10px;
+    background-color: yellow;
+}
