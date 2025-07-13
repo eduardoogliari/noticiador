@@ -9,17 +9,17 @@ export default function ClientArea() {
     const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
     const webviewRef = useRef<Electron.WebviewTag>(null);
 
-    useEffect(() => {
-        async function fetchFeed() {
-            try {
-                const feed = await window.rssAPI.getFeed();
-                console.log(feed);
-                setFeedItems(feed);
-            } catch (err) {
-                console.error('Failed to load RSS feed:', err);
-                // setError(err);
-            }
+    async function fetchFeed() {
+        try {
+            const feed = await window.rssAPI.getFeed();
+            console.log(feed);
+            setFeedItems(feed);
+        } catch (err) {
+            console.error('Failed to load RSS feed after retries:', err);
         }
+    }
+
+    useEffect(() => {
         fetchFeed();
     }, []);
 
