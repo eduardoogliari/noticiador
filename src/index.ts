@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import Parser from 'rss-parser';
 import { FeedItem } from './types/FeedItem';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
@@ -23,7 +23,7 @@ const createWindow = () : void => {
     width: 800,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-       contextIsolation: true,
+      contextIsolation: true,
       nodeIntegration: false,
       webviewTag: true,
     },
@@ -39,13 +39,18 @@ const createWindow = () : void => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
-
 app.whenReady().then( async () => {
   const blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch);
-  blocker.enableBlockingInSession(Electron.session.defaultSession);
-  // blocker.enableBlockingInSession(Electron.session.fromPartition('persist:adblocked'));
+  blocker.enableBlockingInSession(session.defaultSession);
 
+  blocker.on('request-blocked', (req) => {
+    console.log('[BLOCKED]', req.url);
+  });
+
+  createWindow();
+
+}).catch( (err) =>{
+  console.error( "Failed at startup: ", err );
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -80,13 +85,18 @@ const parser: Parser<CustomFeed, CustomItem> = new Parser({
 
 
 ipcMain.handle('get-rss-feed', async () => {
-  const feed = await parser.parseURL('https://news.ycombinator.com/rss');
+  try {
+    const feed = await parser.parseURL('https://news.ycombinator.com/rss');
 
-  let items : FeedItem[] = [];
-  feed.items.forEach(i => {
-    console.log(i);
-    const f : FeedItem = { 'title': i.title, 'link': i.link, 'pubDate': i.pubDate, 'content': i.content, 'media': i['media:thumbnail'] };
-    items.push(f);
-  });
-  return items;
+    let items : FeedItem[] = [];
+    feed.items.forEach(i => {
+      console.log(i);
+      const f : FeedItem = { 'title': i.title, 'link': i.link, 'pubDate': i.pubDate, 'content': i.content, 'media': i['media:thumbnail'] };
+      items.push(f);
+    });
+    return items;
+
+  } catch( err ) {
+    console.error(err);
+  }
 });
