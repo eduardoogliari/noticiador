@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FeedItem } from "../types/FeedItem";
 import FeedListItem from "./FeedListItem";
 
@@ -7,12 +8,17 @@ export type FeedListProp = {
 };
 
 export default function FeedList( props : FeedListProp ) {
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+
     const items = props.feedItems.map( (item, index) => {
-        return <FeedListItem key={index} title={item.title} url={item.link} onClick={props.onClick}></FeedListItem>
+        return <FeedListItem key={index} title={item.title} url={item.link} isSelected={index == selectedIndex} onClick={(url:string) => {
+            setSelectedIndex(index);
+            props.onClick(url);
+        }}></FeedListItem>
     });
 
     return (
-        <ul>
+        <ul className="feed-list">
             {items}
         </ul>
     );

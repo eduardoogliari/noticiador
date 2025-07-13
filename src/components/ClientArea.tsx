@@ -33,18 +33,18 @@ export default function ClientArea() {
     }
 
     return (<>
-        <PanelGroup autoSaveId="conditional" direction="horizontal">
+        <PanelGroup  autoSaveId="conditional" direction="horizontal">
             {
                 showLeftPanel && (
                     <>
-                        <Panel id="left" className={'panel'} order={1} minSize={10}>
+                        <Panel id="left" className={'panel-left'} order={1} minSize={10}>
                             left
                         </Panel>
                         <PanelResizeHandle className='panel-resizer-handle'/>
                     </>
                 )
             }
-            <Panel id="center" order={2} minSize={10}>
+            <Panel id="center" className={'panel-middle'} order={2} minSize={10}>
                 <FeedList feedItems={feedItems} onClick={onFeedItemClick} ></FeedList>
 
             </Panel>
