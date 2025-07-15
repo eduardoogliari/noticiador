@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/FeedItem';
 import FeedList from './FeedList';
+import { Subscription } from '../types/Subscription';
 
 export default function ClientArea() {
     const [showLeftPanel, setShowLeftPanel] = useState(true);
@@ -9,9 +10,11 @@ export default function ClientArea() {
     const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
     const webviewRef = useRef<Electron.WebviewTag>(null);
 
-    async function fetchFeed() {
+    async function updateAllFeeds() {
         try {
-            const feed = await window.rssAPI.getFeed();
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+
+            const feed = await window.rssAPI.getFeed(subs);
             console.log(feed);
             setFeedItems(feed);
         } catch (err) {
@@ -20,7 +23,7 @@ export default function ClientArea() {
     }
 
     useEffect(() => {
-        fetchFeed();
+        updateAllFeeds();
     }, []);
 
     function onFeedItemClick( url : string ) {

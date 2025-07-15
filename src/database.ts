@@ -1,0 +1,51 @@
+import { app } from 'electron';
+import { NewSubscription, Subscription } from './types/Subscription';
+const path = require('path');
+const Database = require('better-sqlite3');
+
+const dbPath = path.join(app.getPath('userData'), 'feeds.sqlite');
+// const db = new Database(dbPath);
+const db = new Database(':memory:');
+
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS subscription (
+    id      INTEGER PRIMARY KEY,
+    name   TEXT NOT NULL,
+    url     TEXT NOT NULL UNIQUE,
+    last_updated TEXT
+  )
+`).run();
+
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS feed_item (
+    id      INTEGER PRIMARY KEY,
+    feed_id INTEGER NOT NULL,
+    title   TEXT NOT NULL,
+    url     TEXT NOT NULL,
+    pub_date TEXT,
+    FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE
+  )
+`).run();
+
+const insertFeed = db.prepare(`
+  INSERT INTO subscription(name, url, last_updated) VALUES ( ?, ?, ?)
+`);
+
+const subscriptions : NewSubscription[] = [
+  { name: 'Hacker News', url: 'https://news.ycombinator.com/rss' },
+  { name: 'Gematsu', url: 'https://www.gematsu.com/feed' },
+];
+
+// Wrap inserts in a transaction
+const insertMany = db.transaction((subs : NewSubscription[]) => {
+  for (const s of subs) {
+    insertFeed.run(s.name, s.url, new Date().toISOString());
+  }
+});
+
+// Run the transaction
+insertMany(subscriptions);
+
+
+
+export default db;

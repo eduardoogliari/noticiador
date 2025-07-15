@@ -3,7 +3,8 @@ import { FeedItem } from './FeedItem';
 declare global {
   interface Window {
     rssAPI: {
-      getFeed: () => Promise<FeedItem[]>;
+      getFeed: (subs : Subscription[]) => Promise<FeedItem[]>;
+      getSubscriptions: () => Subscription[];
     };
   }
 }
