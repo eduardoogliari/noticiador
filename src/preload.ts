@@ -5,6 +5,7 @@ import { contextBridge, IpcMainInvokeEvent, ipcRenderer } from "electron";
 import { Subscription } from "./types/Subscription";
 
 contextBridge.exposeInMainWorld('rssAPI', {
-  getFeed: (subs : Subscription[]) => ipcRenderer.invoke('get-rss-feed', subs),
+  refreshFeeds: (subs : Subscription[]) => ipcRenderer.invoke('refresh-feeds', subs),
+  getFeeds: (subs : Subscription[]) => ipcRenderer.invoke( 'get-feeds', subs ),
   getSubscriptions: () => ipcRenderer.invoke( 'get-subscriptions' ),
 });

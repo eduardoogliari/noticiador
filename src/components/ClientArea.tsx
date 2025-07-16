@@ -14,9 +14,11 @@ export default function ClientArea() {
         try {
             const subs : Subscription[] = await window.rssAPI.getSubscriptions();
 
-            const feed = await window.rssAPI.getFeed(subs);
-            console.log(feed);
-            setFeedItems(feed);
+            const results = await window.rssAPI.refreshFeeds(subs);
+            console.log(results);
+            const items = await window.rssAPI.getFeeds(subs);
+            console.log(items);
+            setFeedItems(items);
         } catch (err) {
             console.error('Failed to load RSS feed after retries:', err);
         }

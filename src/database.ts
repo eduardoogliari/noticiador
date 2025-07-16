@@ -19,11 +19,11 @@ db.prepare(`
 db.prepare(`
   CREATE TABLE IF NOT EXISTS feed_item (
     id      INTEGER PRIMARY KEY,
-    feed_id INTEGER NOT NULL,
+    sub_id  INTEGER NOT NULL,
     title   TEXT NOT NULL,
     url     TEXT NOT NULL,
     pub_date TEXT,
-    FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE
+    FOREIGN KEY (sub_id) REFERENCES subscription(id) ON DELETE CASCADE
   )
 `).run();
 

@@ -1,11 +1,13 @@
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, session } from 'electron';
 import Parser from 'rss-parser';
-import { FeedItem } from './types/FeedItem';
+import { FeedItem, NewFeedItem } from './types/FeedItem';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
 import fetch from 'cross-fetch';
 import { Subscription } from './types/Subscription';
 import Store from 'electron-store';
 import db from './database';
+import { RefreshFeedResultsMap } from './types/RefreshFeedResult';
+import { RunResult, Statement } from 'better-sqlite3';
 
 const store = new Store();
 
@@ -92,27 +94,59 @@ const parser: Parser<CustomFeed, CustomItem> = new Parser({
 });
 
 
-ipcMain.handle('get-rss-feed', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  let items : FeedItem[] = [];
+ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
+  // type FeedResponse = {
+  //   title   : string;
+  //   link     : string;
+  //   pubDate?: string;
+  // };
+
+  const results : RefreshFeedResultsMap = {};
+  let items : NewFeedItem[] = [];
+
   for( const s of subs ) {
     try {
       const feed = await parser.parseURL( s.url );
 
       feed.items.forEach(i => {
         console.log(i);
-        const f : FeedItem = { 'title': i.title, 'link': i.link, 'pubDate': i.pubDate, 'content': i.content, 'media': i['media:thumbnail'] };
+        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': i.link, 'pub_date': i.pubDate };
         items.push(f);
       });
+      results[s.id] = { success: true, errorMessage: '' };
 
     } catch( err ) {
       console.error(err);
+      results[s.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
     }
   }
-  return items;
+
+  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, pub_date) VALUES (?, ?, ?, ?)');
+  for( const i of items ) {
+    try {
+      const res: RunResult = stmt.run( i.id, i.title, i.url, i.pub_date );
+      console.log(res);
+    } catch( err ) {
+      results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
+    }
+  }
+  return results;
 });
 
 
 ipcMain.handle( 'get-subscriptions', () => {
    const stmt = db.prepare('SELECT * FROM subscription');
    return stmt.all() as Subscription[];
+});
+
+ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
+  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ?');
+
+  let items : FeedItem[] = [];
+  for( const s of subs ) {
+    console.log(s);
+    items = items.concat( stmt.all(s.id) as FeedItem[] );
+  }
+  console.log(items);
+  return items;
 });
