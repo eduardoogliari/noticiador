@@ -30,7 +30,7 @@ export default function ClientArea() {
         console.log( "Clicked on " + url );
 
         const webview = document.getElementById('page-preview') as Electron.WebviewTag;
-        if (webviewRef.current) {
+        if (webviewRef.current && webviewRef.current?.src !== url ) {
             webviewRef.current.src = url;
         }
     }
