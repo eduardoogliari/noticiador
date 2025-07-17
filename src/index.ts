@@ -140,7 +140,7 @@ ipcMain.handle( 'get-subscriptions', () => {
 });
 
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ?');
+  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ? ORDER BY pub_date DESC');
 
   let items : FeedItem[] = [];
   for( const s of subs ) {
