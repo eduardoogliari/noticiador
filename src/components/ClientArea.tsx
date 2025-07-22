@@ -9,16 +9,38 @@ export default function ClientArea() {
     const [showLeftPanel, setShowLeftPanel] = useState(true);
     const [showRightPanel, setShowRightPanel] = useState(true);
     const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache] = useState<Record<number, string>>({});
     const webviewRef = useRef<Electron.WebviewTag>(null);
+
+    const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
+
+    async function regenerateFavicons() {
+        let favicons : Record<number, string> = {};
+        const subs = await window.rssAPI.getSubscriptions();
+        for( const s of subs ) {
+            try {
+                const buffer = await window.rssAPI.getFaviconData(s.id);
+                if( buffer ) {
+                    const uint8       = new Uint8Array(buffer);
+                    const blob        = new Blob([uint8.buffer], {type: 'image/png'});
+                    const faviconData = URL.createObjectURL(blob);
+
+                    favicons[s.id] = faviconData;
+
+                    console.log( `Created favicon for sub id ${s.id}` );
+                }
+            } catch(err) {
+                console.error( `Failed at regenerateFavicons() for sub id ${s.id}`, err );
+            }
+        }
+        return favicons;
+    }
 
     async function updateAllFeeds() {
         try {
             const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-
             const results = await window.rssAPI.refreshFeeds(subs);
-            console.log(results);
             const items = await window.rssAPI.getFeeds(subs);
-            console.log(items);
             setFeedItems(items);
         } catch (err) {
             console.error('Failed to load RSS feed after retries:', err);
@@ -60,6 +82,14 @@ export default function ClientArea() {
             setFinishedCreatingSubs(true);
         })();
     }, []);
+
+    useEffect(() => {
+        (async () => {
+            const favicons = await regenerateFavicons();
+            setFaviconCache(favicons);
+        })();
+    }, [finishedCreatingSubs]);
+
     useEffect(() => {
         (async () => {
             await updateAllFeeds();
@@ -88,7 +118,7 @@ export default function ClientArea() {
                 )
             }
             <Panel id="center" className={'panel-middle'} order={2} minSize={10}>
-                <FeedList feedItems={feedItems} onClick={onFeedItemClick} ></FeedList>
+                <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} ></FeedList>
 
             </Panel>
             {
@@ -96,7 +126,7 @@ export default function ClientArea() {
                     <>
                     <PanelResizeHandle className='panel-resizer-handle' />
                         <Panel id="right" className={'panel-right'} order={3} minSize={10}>
-                            <webview ref={webviewRef} className={'web-preview'} id='page-preview'></webview>
+                            <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
                         </Panel>
                     </>
                 )
