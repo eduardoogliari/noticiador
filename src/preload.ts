@@ -2,10 +2,15 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, IpcMainInvokeEvent, ipcRenderer } from "electron";
-import { Subscription } from "./types/Subscription";
+import { Subscription, NewSubscription } from "./types/Subscription";
 
 contextBridge.exposeInMainWorld('rssAPI', {
-  refreshFeeds: (subs : Subscription[]) => ipcRenderer.invoke('refresh-feeds', subs),
-  getFeeds: (subs : Subscription[]) => ipcRenderer.invoke( 'get-feeds', subs ),
+  findFeedURL     : (url : string) => ipcRenderer.invoke('find-feed-url', url),
+  getFeedFavicon  : (url : string) => ipcRenderer.invoke('get-feed-favicon', url),
+  getFeedTitle    : (url : string) => ipcRenderer.invoke('get-feed-title', url),
+  refreshFeeds    : (subs : Subscription[]) => ipcRenderer.invoke('refresh-feeds', subs),
+  getFeeds        : (subs : Subscription[]) => ipcRenderer.invoke( 'get-feeds', subs ),
   getSubscriptions: () => ipcRenderer.invoke( 'get-subscriptions' ),
+  addSubscriptions: (newSubs: NewSubscription[]) => ipcRenderer.invoke( 'add-subscriptions', newSubs ),
+  getFaviconData  : (subId : number) => ipcRenderer.invoke( 'get-favicon-data', subId ),
 });

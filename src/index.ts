@@ -3,13 +3,16 @@ import Parser from 'rss-parser';
 import { FeedItem, NewFeedItem } from './types/FeedItem';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
 import fetch from 'cross-fetch';
-import { Subscription } from './types/Subscription';
+import { NewSubscription, Subscription } from './types/Subscription';
 import Store from 'electron-store';
 import db from './database';
 import { RefreshFeedResultsMap } from './types/RefreshFeedResult';
 import { RunResult, Statement } from 'better-sqlite3';
+import * as cheerio from "cheerio";
+import sharp from 'sharp/lib';
 
 const store = new Store();
+const parser : Parser = new Parser();
 
 
 
@@ -80,27 +83,119 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
 
-type CustomFeed = {foo: string};
-type CustomItem = {'media:thumbnail' : string};
+// ------------------------------------------------------------------------------------------------------
+async function urlContainsFeed( url : string ) : Promise<boolean> {
+    try {
+        const feedRes = await fetch(
+            url,
+            {
+                method: 'GET',
+                headers: { 'Accept': 'application/rss+xml, application/atom+xml, application/xml' }
+            }
+        );
 
-const parser: Parser<CustomFeed, CustomItem> = new Parser({
-  customFields: {
-    feed: ['foo'],
-    item: ['media:thumbnail']
-  }
+        if( feedRes.ok ) {
+            const contentType = feedRes.headers.get("content-type") || "";
+
+            return contentType.includes("application/rss+xml") ||
+                    contentType.includes("application/atom+xml") ||
+                    contentType.includes("application/xml") ||
+                    contentType.includes("text/xml");
+        }
+
+    } catch( err ) {
+        console.error(err);
+    }
+    return false;
+}
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-subscriptions', () => {
+   return getSubscriptions();
 });
 
 
-ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  // type FeedResponse = {
-  //   title   : string;
-  //   link     : string;
-  //   pubDate?: string;
-  // };
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string ) => {
+    try {
+        if( await urlContainsFeed(url) ) {
+            console.log(`Provided URL '${url}' contains a feed`);
+            return url;
+        }
+        console.log(`URL '${url}' does not contain a feed. Will parse document to find links`);
 
+        const res = await fetch(url);
+        const html = await res.text();
+        const $ = cheerio.load(html);
+
+        let feedURL = null;
+
+        const alternateLinks = $('link[rel="alternate"]');
+        if( alternateLinks.length > 0 ) {
+            const feedLink = alternateLinks.filter((_, el) => {
+                const type = ($(el).attr("type") || "").toLowerCase();
+                return type.includes("rss") || type.includes("atom");
+            }).first();
+
+            if (feedLink && feedLink.attr("href") ) {
+                feedURL = feedLink.attr("href");
+            } else {
+                console.error('Could not resolve feed href');
+            }
+        }
+
+        if( !feedURL ) {
+            console.warn(`No <link> elements for rss feeds were found. Will scan for other elements that may point to a rss feed (e.g. <a>)`);
+
+            // Fallback
+            const aTags = $('a[href]').filter((_, el) => {
+                const href = $(el).attr('href') || '';
+                return /feed|rss|atom/i.test(href);  // matches /feed.xml, /rss, etc
+            });
+
+            if (aTags.length > 0) {
+                feedURL = aTags.first().attr("href")!;
+            }
+        }
+
+        if( feedURL ) {
+            const rssURL = new URL(feedURL, url).toString();
+            console.log( `Found ${rssURL}` );
+            return rssURL;
+        }
+
+    } catch (err) {
+        console.error("Error fetching or parsing HTML:", err);
+    }
+    console.warn(`Favicon could not be found for ${url}`);
+    return null;
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-feed-title', async ( event: IpcMainInvokeEvent, url : string ) => {
+    try {
+        const res = await fetch(url);
+        const txt = await res.text();
+        const $ = cheerio.load(txt, { xmlMode: true });
+
+        // RSS
+        let title = $('rss > channel > title').first().text();
+
+        // Atom
+        if (!title) {
+            title = $('feed > title').first().text();
+        }
+        return title ? title.trim() : url;
+
+    } catch( err ) {
+        console.error( err );
+        return url;
+  }
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
   const results : RefreshFeedResultsMap = {};
   let items : NewFeedItem[] = [];
 
@@ -109,8 +204,15 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
       const feed = await parser.parseURL( s.url );
 
       feed.items.forEach(i => {
-        console.log(i);
-        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': i.link, 'pub_date': i.pubDate };
+        let isRelativeLink = false;
+        try {
+            new URL(i.link).origin === new URL(s.url).origin;
+        } catch( err ) {
+            isRelativeLink = true;
+        }
+        const absoluteURL = (isRelativeLink) ? new URL(i.link, s.url).toString() : i.link;
+
+        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'pub_date': i.pubDate };
         items.push(f);
       });
       results[s.id] = { success: true, errorMessage: '' };
@@ -133,20 +235,35 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
   return results;
 });
 
-
-ipcMain.handle( 'get-subscriptions', () => {
+// ------------------------------------------------------------------------------------------------------
+function getSubscriptions() {
    const stmt = db.prepare('SELECT * FROM subscription');
    return stmt.all() as Subscription[];
-});
+}
 
+// ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ? ORDER BY pub_date DESC');
+  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ?');
 
   let items : FeedItem[] = [];
   for( const s of subs ) {
-    console.log(s);
     items = items.concat( stmt.all(s.id) as FeedItem[] );
   }
-  console.log(items);
+
+  items.sort( (a, b) => {
+    const aTime = a.pub_date ? new Date(a.pub_date).getTime() : -Infinity;
+    const bTime = b.pub_date ? new Date(b.pub_date).getTime() : -Infinity;
+    if( aTime === bTime ) { return 0; }
+    return bTime - aTime;
+  });
   return items;
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'add-subscriptions', ( event: IpcMainInvokeEvent, newSubs : NewSubscription[] ) => {
+    const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, last_updated, favicon) VALUES ( ?, ?, ?, ?)' );
+    for( const s of newSubs ) {
+        stmt.run( s.name, s.url, s.last_updated, s.favicon );
+    }
+    refreshFaviconBlobRecord();
 });

@@ -5,11 +5,17 @@ import { RefreshFeedResultsMap } from "./RefreshFeedResult";
 declare global {
   interface Window {
     rssAPI: {
-      refreshFeeds: (subs : Subscription[]) => Promise<RefreshFeedResultsMap>;
-      getFeeds: (subs : Subscription[]) => FeedItem[];
-      getSubscriptions: () => Subscription[];
+        findFeedURL     : (url : string) => Promise<string>,
+        getFeedFavicon  : (url : string) => Promise<Buffer | null>,
+        getFeedTitle    : (url : string) => Promise<string>,
+        refreshFeeds    : (subs : Subscription[]) => Promise<RefreshFeedResultsMap>;
+        getFeeds        : (subs : Subscription[]) => FeedItem[];
+        getSubscriptions: () => Subscription[];
+        addSubscriptions: (newSubs: NewSubscription[]) => void;
+        getFaviconData  : (subId : number) => Buffer | null;
     };
   }
 }
+
 
 export {};

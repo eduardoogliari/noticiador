@@ -4,9 +4,6 @@ export type FeedItem = {
   title    : string;
   url      : string;
   pub_date?: string;
-  // description?: string;
-  // content    ?: string;
-  // media      ?: string;
 };
 
 export type NewFeedItem = {

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/FeedItem';
 import FeedList from './FeedList';
-import { Subscription } from '../types/Subscription';
+import { NewSubscription, Subscription } from '../types/Subscription';
+import  { isValidURL } from '../utils';
 
 export default function ClientArea() {
     const [showLeftPanel, setShowLeftPanel] = useState(true);
@@ -25,8 +26,45 @@ export default function ClientArea() {
     }
 
     useEffect(() => {
-        updateAllFeeds();
+        ( async () => {
+            const linkArr = [
+                'https://news.ycombinator.com/rss',
+                'https://alain.xyz',
+                'https://brevzin.github.io/',
+                'https://kevingal.com',
+                'https://www.vincentparizet.com/blog/',
+                'https://www.modernescpp.com',
+            ];
+
+            for( const url of linkArr ) {
+                if( isValidURL( url ) ) {
+                    const feedUrl = await window.rssAPI.findFeedURL( url );
+                    console.log(feedUrl);
+
+                    if( feedUrl ) {
+                        const title = await window.rssAPI.getFeedTitle( feedUrl );
+                        const faviconBlob = await window.rssAPI.getFeedFavicon( feedUrl );
+
+                        const s : NewSubscription = { name: title, url: feedUrl,  last_updated: new Date().toISOString(), favicon: faviconBlob  };
+                        console.log( s );
+                        await window.rssAPI.addSubscriptions(
+                            [
+                                s
+                            ]
+                        )
+                    }
+                } else {
+                    console.warn(`No feed found for ${url}`);
+                }
+            }
+            setFinishedCreatingSubs(true);
+        })();
     }, []);
+    useEffect(() => {
+        (async () => {
+            await updateAllFeeds();
+        })();
+    }, [finishedCreatingSubs]);
 
     function onFeedItemClick( url : string ) {
         console.log( "Clicked on " + url );
