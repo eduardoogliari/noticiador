@@ -62,9 +62,9 @@ export default function ClientArea() {
             for( const url of linkArr ) {
                 if( isValidURL( url ) ) {
                     const feedUrl = await window.rssAPI.findFeedURL( url );
-                    console.log(feedUrl);
-
+                    
                     if( feedUrl ) {
+                        console.log(feedUrl);
                         const title = await window.rssAPI.getFeedTitle( feedUrl );
                         const faviconBlob = await window.rssAPI.getFeedFavicon( feedUrl );
 
@@ -75,6 +75,8 @@ export default function ClientArea() {
                                 s
                             ]
                         )
+                    } else {
+                        console.warn(`No feed found for ${url}`);
                     }
                 } else {
                     console.warn(`No feed found for ${url}`);
@@ -104,7 +106,7 @@ export default function ClientArea() {
 
             setSelectedItemId(itemId);
 
-        const webview = document.getElementById('page-preview') as Electron.WebviewTag;
+            const webview = document.getElementById('page-preview') as Electron.WebviewTag;
             if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
                 webviewRef.current.src = foundItem.url;
             }
@@ -124,13 +126,12 @@ export default function ClientArea() {
                 )
             }
             <Panel id="center" className={'panel-middle'} order={2} minSize={10}>
-                <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} ></FeedList>
-
+                <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
             </Panel>
             {
                 showRightPanel && (
                     <>
-                    <PanelResizeHandle className='panel-resizer-handle' />
+                        <PanelResizeHandle className='panel-resizer-handle' />
                         <Panel id="right" className={'panel-right'} order={3} minSize={10}>
                             <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
                         </Panel>

@@ -238,61 +238,61 @@ ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : str
     }
 
     try {
-    const googleRes = await fetch(`https://www.google.com/s2/favicons?domain=${baseURL}&size=32`);
-    if( googleRes.ok ) {
-        return Buffer.from( await googleRes.arrayBuffer() );
+        const googleRes = await fetch(`https://www.google.com/s2/favicons?domain=${baseURL}&size=32`);
+        if( googleRes.ok ) {
+            return Buffer.from( await googleRes.arrayBuffer() );
         }
     } catch( err ) {
         console.error('Failed to fetch favicon from google', err);
     }
 
-        const res = await fetch(baseURL);
-        const text = await res.text();
-        const $ = cheerio.load(text);
+    const res = await fetch(baseURL);
+    const text = await res.text();
+    const $ = cheerio.load(text);
 
-        // Find favicon
-        let faviconURL = '';
+    // Find favicon
+    let faviconURL = '';
 
-        const iconLink = $('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]').first();
-        let iconHref = iconLink.attr("href");
+    const iconLink = $('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]').first();
+    let iconHref = iconLink.attr("href");
 
-        if( iconHref ) {
-            try {
-                faviconURL = new URL(iconHref, baseURL).toString();
-            } catch( err ) {
-                console.warn(`Failed to build URL with ${iconHref}, will attempt /favicon.ico`, err);
-            }
-        }
-
-        // Fallback
-        if( !faviconURL ) {
-            try {
-                faviconURL = new URL( '/favicon.ico', baseURL).toString();
-            } catch( err ) {
-                console.error(`Failed to build favicon URL`, err);
-                return null;
-            }
-        }
-
-        // Favicon binary data
+    if( iconHref ) {
         try {
-            const iconRes = await fetch(faviconURL);
-
-            if (iconRes.ok) {
-                const buffer = Buffer.from( await iconRes.arrayBuffer() );
-                const pngBuffer = await sharp(buffer)
-                        .resize(32, 32, { fit: 'contain' }) // optional resize
-                        .png()
-                        .toBuffer();
-                return Buffer.from(pngBuffer);
-
-            } else {
-                console.error(iconRes.text);
-            }
-        } catch (err) {
-            console.warn("Failed to fetch favicon:", err);
+            faviconURL = new URL(iconHref, baseURL).toString();
+        } catch( err ) {
+            console.warn(`Failed to build URL with ${iconHref}, will attempt /favicon.ico`, err);
         }
     }
+
+    // Fallback
+    if( !faviconURL ) {
+        try {
+            faviconURL = new URL( '/favicon.ico', baseURL).toString();
+        } catch( err ) {
+            console.error(`Failed to build favicon URL`, err);
+            return null;
+        }
+    }
+
+    // Favicon binary data
+    try {
+        const iconRes = await fetch(faviconURL);
+
+        if (iconRes.ok) {
+            const buffer = Buffer.from( await iconRes.arrayBuffer() );
+            const pngBuffer = await sharp(buffer)
+                    .resize(32, 32, { fit: 'contain' }) // optional resize
+                    .png()
+                    .toBuffer();
+            return Buffer.from(pngBuffer);
+
+        } else {
+            console.error(iconRes.text);
+        }
+    } catch (err) {
+        console.warn("Failed to fetch favicon:", err);
+    }
+    
     console.warn('Could not find favicon');
     return null;
 });
