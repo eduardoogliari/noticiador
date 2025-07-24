@@ -237,11 +237,15 @@ ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : str
         return null;
     }
 
+    try {
     const googleRes = await fetch(`https://www.google.com/s2/favicons?domain=${baseURL}&size=32`);
     if( googleRes.ok ) {
         return Buffer.from( await googleRes.arrayBuffer() );
+        }
+    } catch( err ) {
+        console.error('Failed to fetch favicon from google', err);
+    }
 
-    } else {
         const res = await fetch(baseURL);
         const text = await res.text();
         const $ = cheerio.load(text);
