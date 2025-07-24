@@ -10,6 +10,7 @@ export default function ClientArea() {
     const [showRightPanel, setShowRightPanel] = useState(true);
     const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache] = useState<Record<number, string>>({});
+    const [selectedItemId, setSelectedItemId] = useState(-1);
     const webviewRef = useRef<Electron.WebviewTag>(null);
 
     const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
@@ -96,12 +97,17 @@ export default function ClientArea() {
         })();
     }, [finishedCreatingSubs]);
 
-    function onFeedItemClick( url : string ) {
-        console.log( "Clicked on " + url );
+    function onFeedItemClick( itemId : number ) {
+        const foundItem = feedItems.find( (item) => item.id == itemId );
+        if( foundItem ){            
+            console.log( "Clicked on " + foundItem.url );
+
+            setSelectedItemId(itemId);
 
         const webview = document.getElementById('page-preview') as Electron.WebviewTag;
-        if (webviewRef.current && webviewRef.current?.src !== url ) {
-            webviewRef.current.src = url;
+            if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
+                webviewRef.current.src = foundItem.url;
+            }
         }
     }
 
