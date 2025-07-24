@@ -2,7 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, IpcMainInvokeEvent, ipcRenderer } from "electron";
-import { Subscription, NewSubscription } from "./types/Subscription";
+import { Subscription, NewSubscription } from "./types/subscription";
 
 contextBridge.exposeInMainWorld('rssAPI', {
   findFeedURL     : (url : string) => ipcRenderer.invoke('find-feed-url', url),

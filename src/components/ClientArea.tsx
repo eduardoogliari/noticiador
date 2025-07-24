@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
-import { FeedItem } from '../types/FeedItem';
+import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
-import { NewSubscription, Subscription } from '../types/Subscription';
+import { NewSubscription, Subscription } from '../types/subscription';
 import  { isValidURL } from '../utils';
 
 export default function ClientArea() {

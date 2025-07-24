@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { FeedItem } from "../types/FeedItem";
-import FeedListItem from "./FeedListItem";
+import { FeedItem } from "../types/feed-item";
 
 export type FeedListProp = {
     feedItems : FeedItem[];

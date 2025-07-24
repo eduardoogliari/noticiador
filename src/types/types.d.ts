@@ -1,6 +1,6 @@
 // import { FeedItem } from './FeedItem';
-import { FeedItem } from "./FeedItem";
-import { RefreshFeedResultsMap } from "./RefreshFeedResult";
+import { FeedItem } from "./feed-item";
+import { RefreshFeedResultsMap } from "./refresh-feed-result";
 
 declare global {
   interface Window {

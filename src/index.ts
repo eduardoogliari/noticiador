@@ -1,12 +1,12 @@
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, session, webContents } from 'electron';
 import Parser from 'rss-parser';
-import { FeedItem, NewFeedItem } from './types/FeedItem';
+import { FeedItem, NewFeedItem } from './types/feed-item';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
 import fetch from 'cross-fetch';
-import { NewSubscription, Subscription } from './types/Subscription';
+import { NewSubscription, Subscription } from './types/subscription';
 import Store from 'electron-store';
 import db from './database';
-import { RefreshFeedResultsMap } from './types/RefreshFeedResult';
+import { RefreshFeedResultsMap } from './types/refresh-feed-result';
 import { RunResult, Statement } from 'better-sqlite3';
 import * as cheerio from "cheerio";
 import sharp from 'sharp/lib';
