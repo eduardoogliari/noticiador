@@ -4,14 +4,17 @@ import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
 import { NewSubscription, Subscription } from '../types/subscription';
 import  { isValidURL } from '../utils';
+import ExpandableGroup from './ExpandableGroup';
+import SubscriptionsList from './SubscriptionsList';
 
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel] = useState(true);
+    const [showLeftPanel, setShowLeftPanel]   = useState(true);
     const [showRightPanel, setShowRightPanel] = useState(true);
-    const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache] = useState<Record<number, string>>({});
+    const [feedItems, setFeedItems]           = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]     = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId] = useState(-1);
-    const webviewRef = useRef<Electron.WebviewTag>(null);
+    const [subscriptions, setSubscriptions]   = useState<Subscription[]>([]);
+    const webviewRef                          = useRef<Electron.WebviewTag>(null);
 
     const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
 
@@ -62,7 +65,7 @@ export default function ClientArea() {
             for( const url of linkArr ) {
                 if( isValidURL( url ) ) {
                     const feedUrl = await window.rssAPI.findFeedURL( url );
-                    
+
                     if( feedUrl ) {
                         console.log(feedUrl);
                         const title = await window.rssAPI.getFeedTitle( feedUrl );
@@ -87,6 +90,13 @@ export default function ClientArea() {
     }, []);
 
     useEffect(() => {
+        (async() => {
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+            setSubscriptions(subs);
+        })();
+    }, [finishedCreatingSubs] );
+
+    useEffect(() => {
         (async () => {
             const favicons = await regenerateFavicons();
             setFaviconCache(favicons);
@@ -101,7 +111,7 @@ export default function ClientArea() {
 
     function onFeedItemClick( itemId : number ) {
         const foundItem = feedItems.find( (item) => item.id == itemId );
-        if( foundItem ){            
+        if( foundItem ){
             console.log( "Clicked on " + foundItem.url );
 
             setSelectedItemId(itemId);
@@ -119,7 +129,22 @@ export default function ClientArea() {
                 showLeftPanel && (
                     <>
                         <Panel id="left" className={'panel-left'} order={1} minSize={10}>
-                            left
+                            <p>All feeds</p>
+
+                            <ExpandableGroup title='Subscriptions'>
+                                <SubscriptionsList faviconCache={faviconCache} subscriptions={subscriptions}></SubscriptionsList>
+                            </ExpandableGroup>
+
+                            <ExpandableGroup title='Favorites'>
+                                <p>Favorite 1</p>
+                                <p>Favorite 2</p>
+                            </ExpandableGroup>
+
+                            <ExpandableGroup title='Categories'>
+                                <p>Technology</p>
+                                <p>Movies</p>
+                                <p>Music</p>
+                            </ExpandableGroup>
                         </Panel>
                         <PanelResizeHandle className='panel-resizer-handle'/>
                     </>

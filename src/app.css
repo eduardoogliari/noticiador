@@ -1,5 +1,5 @@
 .panel-left {
-    background-color: red;
+    /* background-color: red; */
 }
 
 .panel-middle {
@@ -20,20 +20,20 @@
 }
 
 .feed-list {
-    list-style: none;    
+    list-style: none;
     margin: 0;
     padding: 0px 0px;
 }
 
 .feed-date-list {
-    list-style: none;    
+    list-style: none;
     margin: 0;
     padding: 0px 0px;
     height: 100%;
     overflow-y: scroll;
 }
 
-.feed-date-header {    
+.feed-date-header {
     padding: 5px;
     background-color: rgb(232, 232, 232);
     color: rgb(0, 0, 0);
@@ -41,6 +41,26 @@
     margin: 0;
 }
 
+.constrained-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.subscription-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+        display: flex;
+        flex-direction: row;
+        gap : 10px;
+        border-bottom: 1px solid rgb(205, 205, 205);
+        padding: 5px;
+    }
+}
 
 .feed-item {
     display: flex;
