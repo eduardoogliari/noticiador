@@ -1,9 +1,19 @@
 .panel-left {
-    /* background-color: red; */
+    padding: 0px 10px;
 }
 
 .panel-middle {
-    height: "100%";
+    display:flex;
+    flex-direction: column;
+    height: 100%;
+
+    > h3 {
+        text-align: center;
+        padding: 10px;
+        margin: 0px;
+        background-color: rgb(214, 214, 214);
+        border-bottom: solid black 1px;
+    }
 }
 
 .panel-right {
@@ -17,6 +27,52 @@
 .panel-resizer-handle {
     width: 10px;
     background-color: yellow;
+}
+
+.panel-resizer-handle-vertical {
+    height: 10px;
+    background-color: yellow;
+}
+
+.feed-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    height: 50px;
+    font-size: larger;
+    padding: 10px 10px;
+    gap: 0.5rem;
+    font-weight: bold;
+    background-color: rgb(230, 230, 230);
+    border-bottom: 1px solid rgb(139, 139, 139);
+
+    > img {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.all-feeds {
+    list-style: none;
+    margin: 5px 0px;
+    padding: 0px;
+    /* border: 1px solid black; */
+
+    > li {
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    > li:hover {
+        background-color: rgb(221, 221, 221);
+    }
+}
+
+.all-feeds.selected {
+    > li {
+        background-color: rgb(221, 221, 221);
+    }
 }
 
 .feed-list {
@@ -34,7 +90,12 @@
 }
 
 .feed-date-header {
+    position: sticky;
+    top: 0;
     padding: 5px;
+    z-index: 1;
+
+    padding: 5px 10px;
     background-color: rgb(232, 232, 232);
     color: rgb(0, 0, 0);
     border-bottom: 1px solid gray;
@@ -52,13 +113,53 @@
     list-style: none;
     margin: 0;
     padding: 0;
+}
 
-    > li {
-        display: flex;
-        flex-direction: row;
-        gap : 10px;
-        border-bottom: 1px solid rgb(205, 205, 205);
-        padding: 5px;
+.subscription-list-item {
+    display: flex;
+    flex-direction: row;
+    gap : 10px;
+    border-bottom: 1px solid rgb(205, 205, 205);
+    padding: 5px;
+    margin: 0px 5px;
+    cursor: pointer;
+
+    > img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.subscription-list-item.selected {
+    background-color: rgba(0, 0, 0, 0.138);
+}
+
+.subscription-list-item:hover {
+    background-color: rgba(0, 0, 0, 0.138);
+}
+
+.expandable-group {
+    margin: 0px;
+}
+
+.expandable-group-header {
+    display        : flex;
+    flex-direction : row;
+    border         : 1px solid black;
+    justify-content: space-between;
+    align-items    : center;
+    padding        : 5px 5px;
+    font-size      : medium;
+    font-weight    : bold;
+    margin: 0px 0px 5px 0px;
+
+    span {
+        justify-self: start;
+    }
+
+    button {
+        justify-self: end;
+        min-width: 1.5rem;
     }
 }
 
@@ -71,7 +172,6 @@
     border-bottom: 1px solid rgb(193, 193, 193);
     background-color: rgb(249, 249, 249);
     font-size: 0.9rem;
-    /* font-weight: bold; */
 
     img {
         width: 16px;
@@ -80,7 +180,6 @@
     }
 
     span {
-        /* padding: 8px; */
         margin: 0 0 0 10px;
         font-weight: bold;
     }

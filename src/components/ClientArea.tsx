@@ -8,13 +8,15 @@ import ExpandableGroup from './ExpandableGroup';
 import SubscriptionsList from './SubscriptionsList';
 
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel]   = useState(true);
-    const [showRightPanel, setShowRightPanel] = useState(true);
-    const [feedItems, setFeedItems]           = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache]     = useState<Record<number, string>>({});
-    const [selectedItemId, setSelectedItemId] = useState(-1);
-    const [subscriptions, setSubscriptions]   = useState<Subscription[]>([]);
-    const webviewRef                          = useRef<Electron.WebviewTag>(null);
+    const [showLeftPanel, setShowLeftPanel]                   = useState(true);
+    const [showRightPanel, setShowRightPanel]                 = useState(true);
+    const [feedItems, setFeedItems]                           = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]                     = useState<Record<number, string>>({});
+    const [selectedItemId, setSelectedItemId]                 = useState(-1);
+    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(-1);
+    const [subscriptions, setSubscriptions]                   = useState<Subscription[]>([]);
+    const [subscriptionsSubset, setSubscriptionsSubset]       = useState<Subscription[]>([]);
+    const webviewRef                                          = useRef<Electron.WebviewTag>(null);
 
     const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
 
@@ -55,11 +57,11 @@ export default function ClientArea() {
         ( async () => {
             const linkArr = [
                 'https://news.ycombinator.com/rss',
-                'https://alain.xyz',
+                // 'https://alain.xyz',
                 'https://brevzin.github.io/',
-                'https://kevingal.com',
-                'https://www.vincentparizet.com/blog/',
-                'https://www.modernescpp.com',
+                // 'https://kevingal.com',
+                // 'https://www.vincentparizet.com/blog/',
+                // 'https://www.modernescpp.com',
             ];
 
             for( const url of linkArr ) {
@@ -123,17 +125,46 @@ export default function ClientArea() {
         }
     }
 
+    async function onSubscriptionItemClick( subId : number ) {
+        const foundItem = subscriptions.find( (item) => item.id == subId );
+        if( foundItem ){
+            console.log( "Clicked on SUB" + foundItem.url );
+
+            const items = await window.rssAPI.getFeeds([foundItem]);
+
+            setSelectedSubscriptionId(subId);
+            setSubscriptionsSubset( [foundItem] );
+            setFeedItems(items);
+        }
+    }
+
+    async function onAllFeedsItemClick() {
+        const items = await window.rssAPI.getFeeds(subscriptions);
+
+        setSelectedSubscriptionId(-1);
+        setSubscriptionsSubset( subscriptions );
+        setFeedItems(items);
+    }
+
+    function getFeedName( subId : number ) {
+        let name = <span>🌐 Showing all feeds</span>;
+
+        const foundItem = subscriptions.find( (item) => item.id == subId );
+        if( foundItem ){
+            return <><img src={faviconCache[subId]}></img><span>{foundItem.name}</span></>
+        }
+        return name;
+    }
+
     return (<>
         <PanelGroup  autoSaveId="conditional" direction="horizontal">
             {
                 showLeftPanel && (
                     <>
-                        <Panel id="left" className={'panel-left'} order={1} minSize={10}>
-                            <p>All feeds</p>
-
-                            <ExpandableGroup title='Subscriptions'>
-                                <SubscriptionsList faviconCache={faviconCache} subscriptions={subscriptions}></SubscriptionsList>
-                            </ExpandableGroup>
+                        <Panel id="left" className={'panel-left'} order={1} minSize={15}>
+                            <ul className={`all-feeds ${selectedSubscriptionId == -1 ? 'selected' : ''}`}>
+                                <li onClick={onAllFeedsItemClick}>🌐 Show all feeds</li>
+                            </ul>
 
                             <ExpandableGroup title='Favorites'>
                                 <p>Favorite 1</p>
@@ -145,12 +176,17 @@ export default function ClientArea() {
                                 <p>Movies</p>
                                 <p>Music</p>
                             </ExpandableGroup>
+
+                            <ExpandableGroup title='Subscriptions'>
+                                <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>
+                            </ExpandableGroup>
                         </Panel>
                         <PanelResizeHandle className='panel-resizer-handle'/>
                     </>
                 )
             }
             <Panel id="center" className={'panel-middle'} order={2} minSize={10}>
+                <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
                 <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
             </Panel>
             {
