@@ -11,7 +11,7 @@ export default function ExpandableGroup( props : ExpandableGroup ) {
     return (
         <div className="expandable-group">
             <div className="expandable-group-header">
-                <span>{props.title}</span>
+                <span title={props.title}>{props.title}</span>
                 <button onClick={() => setShowContents( !showContents )}>{ showContents ? '-' : '+' }</button>
             </div>
             { (showContents)? props.children : <></> }
