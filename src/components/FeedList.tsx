@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { FeedItem } from "../types/feed-item";
 import FeedListDateHeader from "./FeedListDateHeader";
 import { startOfWeek, endOfWeek, subDays, isSameDay } from 'date-fns'
@@ -17,6 +18,8 @@ export type FeedListProp = {
 };
 
 export default function FeedList( props : FeedListProp ) {
+    const listRef = useRef(null);
+
     const itemsMap : Record<string, FeedItem[]> = { 'Today': [], 'Yesterday' : [], 'This week' : [], 'Last week' : [] };
 
     for( const i of props.feedItems ) {
@@ -42,8 +45,14 @@ export default function FeedList( props : FeedListProp ) {
         }
     }
 
+    useEffect(() => {
+        if (listRef.current) {
+            listRef.current.scrollTo({ top: 0 });
+        }
+    }, [props.feedItems]);
+
     return (
-        <ul className="feed-date-list">
+        <ul ref={listRef} className="feed-date-list">
             {
                 Object.entries(itemsMap).filter( ([key, value]) => value.length > 0 ).map( ([key, value]) => {
                     return (

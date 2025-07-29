@@ -88,60 +88,61 @@ export default function ClientArea() {
                 }
             }
             setFinishedCreatingSubs(true);
+
+            (async() => {
+                const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+                setSubscriptions(subs);
+            })();
+
+            (async () => {
+                const favicons = await regenerateFavicons();
+                setFaviconCache(favicons);
+            })();
+
+            (async () => {
+                await updateAllFeeds();
+            })();
+
         })();
     }, []);
 
-    useEffect(() => {
-        (async() => {
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-            setSubscriptions(subs);
-        })();
-    }, [finishedCreatingSubs] );
-
-    useEffect(() => {
-        (async () => {
-            const favicons = await regenerateFavicons();
-            setFaviconCache(favicons);
-        })();
-    }, [finishedCreatingSubs]);
-
-    useEffect(() => {
-        (async () => {
-            await updateAllFeeds();
-        })();
-    }, [finishedCreatingSubs]);
-
     function onFeedItemClick( itemId : number ) {
-        const foundItem = feedItems.find( (item) => item.id == itemId );
-        if( foundItem ){
-            console.log( "Clicked on " + foundItem.url );
+        if( itemId != selectedItemId ) {
+            const foundItem = feedItems.find( (item) => item.id == itemId );
+            if( foundItem ){
+                console.log( "Clicked on " + foundItem.url );
 
-            setSelectedItemId(itemId);
+                setSelectedItemId(itemId);
 
-            const webview = document.getElementById('page-preview') as Electron.WebviewTag;
-            if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
-                webviewRef.current.src = foundItem.url;
+                const webview = document.getElementById('page-preview') as Electron.WebviewTag;
+                if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
+                    webviewRef.current.src = foundItem.url;
+                }
             }
         }
     }
 
     async function onSubscriptionItemClick( subId : number ) {
-        const foundItem = subscriptions.find( (item) => item.id == subId );
-        if( foundItem ){
-            console.log( "Clicked on SUB" + foundItem.url );
+        if( subId != selectedSubscriptionId ) {
+            const foundItem = subscriptions.find( (item) => item.id == subId );
+            if( foundItem ){
+                console.log( "Clicked on SUB" + foundItem.url );
 
-            const items = await window.rssAPI.getFeeds([foundItem]);
+                const items = await window.rssAPI.getFeeds([foundItem]);
 
-            setSelectedSubscriptionId(subId);
-            setFeedItems(items);
+                setSelectedSubscriptionId(subId);
+                setFeedItems(items);
+            }
         }
     }
 
     async function onAllFeedsItemClick() {
-        const items = await window.rssAPI.getFeeds(subscriptions);
+        if( selectedSubscriptionId != -1 ) {
+            const items = await window.rssAPI.getFeeds(subscriptions);
 
-        setSelectedSubscriptionId(-1);
-        setFeedItems(items);
+            setSelectedSubscriptionId(-1);
+            setFeedItems(items);
+        }
     }
 
     function getFeedName( subId : number ) {
@@ -194,12 +195,12 @@ export default function ClientArea() {
                     <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
                 </Panel>
                 {
-                        <>
-                            <PanelResizeHandle className='panel-resizer-handle' />
-                            <Panel id="right" className={'panel-right'} order={3} minSize={30}>
-                                <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
-                            </Panel>
-                        </>
+                    <>
+                        <PanelResizeHandle className='panel-resizer-handle' />
+                        <Panel id="right" className={'panel-right'} order={3} minSize={30}>
+                            <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
+                        </Panel>
+                    </>
                 }
             </PanelGroup>
             <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
