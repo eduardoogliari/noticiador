@@ -111,7 +111,6 @@ export default function ClientArea() {
 
                 setSelectedItemId(itemId);
 
-                const webview = document.getElementById('page-preview') as Electron.WebviewTag;
                 if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
                     webviewRef.current.src = foundItem.url;
                 }
@@ -195,7 +194,7 @@ export default function ClientArea() {
                     <>
                         <PanelResizeHandle className='panel-resizer-handle' />
                         <Panel id="right" className={'panel-right'} order={3} minSize={30}>
-                            <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
+                            <webview ref={webviewRef} className={'web-preview'} partition="persist:custom-partition"></webview>
                         </Panel>
                     </>
                 }
