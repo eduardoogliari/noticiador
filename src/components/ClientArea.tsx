@@ -11,13 +11,11 @@ import StatusBar from './StatusBar';
 
 export default function ClientArea() {
     const [showLeftPanel, setShowLeftPanel]                   = useState(true);
-    const [showRightPanel, setShowRightPanel]                 = useState(true);
     const [feedItems, setFeedItems]                           = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                     = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                 = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(-1);
     const [subscriptions, setSubscriptions]                   = useState<Subscription[]>([]);
-    const [subscriptionsSubset, setSubscriptionsSubset]       = useState<Subscription[]>([]);
     const webviewRef                                          = useRef<Electron.WebviewTag>(null);
 
     const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
@@ -135,7 +133,6 @@ export default function ClientArea() {
             const items = await window.rssAPI.getFeeds([foundItem]);
 
             setSelectedSubscriptionId(subId);
-            setSubscriptionsSubset( [foundItem] );
             setFeedItems(items);
         }
     }
@@ -144,7 +141,6 @@ export default function ClientArea() {
         const items = await window.rssAPI.getFeeds(subscriptions);
 
         setSelectedSubscriptionId(-1);
-        setSubscriptionsSubset( subscriptions );
         setFeedItems(items);
     }
 
@@ -198,14 +194,12 @@ export default function ClientArea() {
                     <FeedList feedItems={feedItems} onClick={onFeedItemClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
                 </Panel>
                 {
-                    showRightPanel && (
                         <>
                             <PanelResizeHandle className='panel-resizer-handle' />
                             <Panel id="right" className={'panel-right'} order={3} minSize={30}>
                                 <webview ref={webviewRef} className={'web-preview'} id='page-preview'  partition="persist:custom-partition"></webview>
                             </Panel>
                         </>
-                    )
                 }
             </PanelGroup>
             <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
