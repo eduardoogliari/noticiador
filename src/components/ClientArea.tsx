@@ -18,8 +18,6 @@ export default function ClientArea() {
     const [subscriptions, setSubscriptions]                   = useState<Subscription[]>([]);
     const webviewRef                                          = useRef<Electron.WebviewTag>(null);
 
-    const [finishedCreatingSubs, setFinishedCreatingSubs] = useState(false);
-
     async function regenerateFavicons() {
         let favicons : Record<number, string> = {};
         const subs = await window.rssAPI.getSubscriptions();
@@ -87,7 +85,6 @@ export default function ClientArea() {
                     console.warn(`No feed found for ${url}`);
                 }
             }
-            setFinishedCreatingSubs(true);
 
             (async() => {
                 const subs : Subscription[] = await window.rssAPI.getSubscriptions();
