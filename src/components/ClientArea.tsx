@@ -9,14 +9,45 @@ import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
 
+type MainOptionInfo = {
+    title : string;
+    icon : string;
+    onClick: () => void;
+};
+
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel]                   = useState(true);
-    const [feedItems, setFeedItems]                           = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache]                     = useState<Record<number, string>>({});
-    const [selectedItemId, setSelectedItemId]                 = useState(-1);
-    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(-1);
-    const [subscriptions, setSubscriptions]                   = useState<Subscription[]>([]);
-    const webviewRef                                          = useRef<Electron.WebviewTag>(null);
+    const [showLeftPanel, setShowLeftPanel]                     = useState(true);
+    const [feedItems, setFeedItems]                             = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
+    const [selectedItemId, setSelectedItemId]                   = useState(-1);
+    const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
+    const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
+    const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
+    const webviewRef                                            = useRef<Electron.WebviewTag>(null);
+
+
+
+    const mainOptions : MainOptionInfo[] = [
+        { title: '🌐 Show all feeds', icon: '', onClick: showAllFeeds },
+        { title: '⭐ Favorites', icon: '', onClick: showFavorites },
+        { title: '📁 Archive', icon: '', onClick: showArchive },
+        // { title: '🗑️ Trash', icon: '' },
+    ];
+
+    async function showAllFeeds() {
+        const items = await window.rssAPI.getFeeds(subscriptions);
+        setFeedItems( items );
+    }
+
+    async function showFavorites() {
+        const items : FeedItem[] = [];
+        setFeedItems(items);
+    }
+
+    async function showArchive() {
+        const items : FeedItem[] = [];
+        setFeedItems(items);
+    }
 
     async function regenerateFavicons() {
         let favicons : Record<number, string> = {};
@@ -126,33 +157,35 @@ export default function ClientArea() {
 
                 const items = await window.rssAPI.getFeeds([foundItem]);
 
+                setSelectedMainOptionIndex(-1);
                 setSelectedSubscriptionId(subId);
                 setFeedItems(items);
             }
         }
     }
 
-    async function onAllFeedsItemClick() {
-        if( selectedSubscriptionId != -1 ) {
-            const items = await window.rssAPI.getFeeds(subscriptions);
-
-            setSelectedSubscriptionId(-1);
-            setFeedItems(items);
-        }
-    }
-
     function getFeedName( subId : number ) {
-        let name = <span>🌐 Showing all feeds</span>;
 
-        const foundItem = subscriptions.find( (item) => item.id == subId );
-        if( foundItem ){
-            return <><img src={faviconCache[subId]}></img><span>{foundItem.name}</span></>
+        if( selectedSubscriptionId != -1 ) {
+            const foundItem = subscriptions.find( (item) => item.id == subId );
+            if( foundItem ){
+                return <><img src={faviconCache[subId]}></img><span>{foundItem.name}</span></>
+            }
         }
-        return name;
+        return mainOptions[selectedMainOptionIndex].title;
     }
 
     function onToggleSidePanelClick() {
         setShowLeftPanel(!showLeftPanel);
+    }
+
+    async function onClickMainOption( index : number ) {
+        const wrappedIndex = index % mainOptions.length;
+        setSelectedMainOptionIndex( wrappedIndex );
+        setSelectedSubscriptionId(-1);
+
+        console.log(wrappedIndex);
+        await mainOptions[wrappedIndex].onClick();
     }
 
     return (
@@ -163,14 +196,22 @@ export default function ClientArea() {
                     showLeftPanel && (
                         <>
                             <Panel id="left" className={'panel-left'} order={1} minSize={20}>
-                                <ul className={`all-feeds ${selectedSubscriptionId == -1 ? 'selected' : ''}`}>
-                                    <li title={"Show all feeds"} onClick={onAllFeedsItemClick}>🌐 Show all feeds</li>
+                                <ul className="main-options-list">
+                                    {
+                                        mainOptions.map( (item, index) => {
+                                            return (
+                                                <li key={index}
+                                                    className={`main-options-list-item ${selectedMainOptionIndex === index ? 'selected' : ''}`}
+                                                    title={item.title}
+                                                    onClick={() => onClickMainOption(index)}
+                                                >
+                                                    <img src={item.icon}></img>
+                                                    <span>{item.title}</span>
+                                                </li>
+                                            );
+                                        } )
+                                    }
                                 </ul>
-
-                                <ExpandableGroup title='Favorites'>
-                                    <p>Favorite1</p>
-                                    <p>Favorite2</p>
-                                </ExpandableGroup>
 
                                 <ExpandableGroup title='Categories'>
                                     <p>Technology</p>

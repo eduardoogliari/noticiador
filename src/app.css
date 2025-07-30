@@ -94,29 +94,27 @@
     }
 }
 
-.all-feeds {
+.main-options-list {
     list-style: none;
     margin: 5px 0px;
     padding: 0px;
     user-select: none;
-
-    > li {
-        padding: 5px;
-        cursor: pointer;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    > li:hover {
-        background-color: rgb(221, 221, 221);
-    }
 }
 
-.all-feeds.selected {
-    > li {
-        background-color: rgb(221, 221, 221);
-    }
+.main-options-list-item {
+    padding: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.main-options-list-item:hover {
+    background-color: rgb(221, 221, 221);
+}
+
+.main-options-list-item.selected {
+    background-color: rgb(221, 221, 221);
 }
 
 .feed-list {
