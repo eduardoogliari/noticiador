@@ -11,7 +11,7 @@ db.prepare(`
     id            INTEGER PRIMARY KEY,
     name          TEXT NOT NULL,
     url           TEXT NOT NULL UNIQUE,
-    last_updated  TEXT,
+    last_updated  DATETIME,
     favicon       BLOB
   )
 `).run();
@@ -22,7 +22,7 @@ db.prepare(`
     sub_id  INTEGER NOT NULL,
     title   TEXT NOT NULL,
     url     TEXT NOT NULL UNIQUE,
-    pub_date TEXT,
+    pub_date DATETIME,
     FOREIGN KEY (sub_id) REFERENCES subscription(id) ON DELETE CASCADE
   )
 `).run();
