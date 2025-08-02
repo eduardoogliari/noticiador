@@ -13,6 +13,7 @@ type MainOptionInfo = {
     title : string;
     icon : string;
     onClick: () => void;
+    getCount: () => number;
 };
 
 export default function ClientArea() {
@@ -28,9 +29,9 @@ export default function ClientArea() {
 
 
     const mainOptions : MainOptionInfo[] = [
-        { title: '🌐 Show all feeds', icon: '', onClick: showAllFeeds },
-        { title: '⭐ Favorites', icon: '', onClick: showFavorites },
-        { title: '📁 Archive', icon: '', onClick: showArchive },
+        { title: '🌐 All Feeds', icon: '', onClick: showAllFeeds, getCount: () => 0 },
+        { title: '⭐ Favorites', icon: '', onClick: showFavorites, getCount: () => 0 },
+        { title: '📁 Archive', icon: '', onClick: showArchive, getCount: () => 0 },
         // { title: '🗑️ Trash', icon: '' },
     ];
 
@@ -206,7 +207,7 @@ export default function ClientArea() {
                                                     onClick={() => onClickMainOption(index)}
                                                 >
                                                     <img src={item.icon}></img>
-                                                    <span>{item.title}</span>
+                                                    <span>{`${item.title} (${item.getCount()})`}</span>
                                                 </li>
                                             );
                                         } )
