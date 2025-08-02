@@ -6,12 +6,27 @@ export type FeedListDateHeaderProps = {
     name          : string;
     feedItems     : FeedItem[];
     onClick       : (itemId : number) => void;
+    onFavoriteClick : (itemId : number, event: React.MouseEvent) => void;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
 };
 
 export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
-    const items = props.feedItems.map( (item, index) => <FeedListItem id={item.id} key={item.id} title={item.title} url={item.url} favicon={props.faviconCache[item.sub_id]} isSelected={item.id === props.selectedItemId}  onClick={(itemId : number) => { props.onClick(itemId);}}></FeedListItem>);
+    const items = props.feedItems.map( (item, index) => {
+        return (
+            <FeedListItem
+                id={item.id}
+                key={item.id}
+                title={item.title}
+                url={item.url}
+                favicon={props.faviconCache[item.sub_id]}
+                isSelected={item.id === props.selectedItemId}
+                onClick={ (itemId : number) => { props.onClick(itemId);} }
+                isFavorite={item.is_favorite}
+                onFavoriteClick={props.onFavoriteClick}
+            ></FeedListItem>
+        );
+    });
 
     useEffect(() => {
         console.log( 'props', props );

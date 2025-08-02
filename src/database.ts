@@ -12,17 +12,21 @@ db.prepare(`
     name          TEXT NOT NULL,
     url           TEXT NOT NULL UNIQUE,
     last_updated  DATETIME,
-    favicon       BLOB
+    favicon       BLOB,
+    deleted_at    DATETIME
   )
 `).run();
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS feed_item (
-    id      INTEGER PRIMARY KEY,
-    sub_id  INTEGER NOT NULL,
-    title   TEXT NOT NULL,
-    url     TEXT NOT NULL UNIQUE,
-    pub_date DATETIME,
+    id              INTEGER   PRIMARY KEY,
+    sub_id          INTEGER   NOT NULL,
+    title           TEXT      NOT NULL,
+    url             TEXT      NOT NULL UNIQUE,
+    pub_date        DATETIME,
+    is_favorite     INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
+    is_read         INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
+    pending_removal INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
     FOREIGN KEY (sub_id) REFERENCES subscription(id) ON DELETE CASCADE
   )
 `).run();

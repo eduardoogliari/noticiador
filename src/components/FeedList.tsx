@@ -13,8 +13,10 @@ const lastWeekEnd      = subDays(currentWeekEnd, 7);
 export type FeedListProp = {
     feedItems     : FeedItem[];
     onClick       : (itemId : number) => void;
+    onFavoriteClick : (itemId : number, event: React.MouseEvent) => void;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
+    scrollToTopKey : number;
 };
 
 export default function FeedList( props : FeedListProp ) {
@@ -49,7 +51,7 @@ export default function FeedList( props : FeedListProp ) {
         if (listRef.current) {
             listRef.current.scrollTo({ top: 0 });
         }
-    }, [props.feedItems]);
+    }, [props.scrollToTopKey]);
 
     return (
         <ul ref={listRef} className="feed-date-list">
@@ -61,6 +63,7 @@ export default function FeedList( props : FeedListProp ) {
                                 faviconCache={props.faviconCache}
                                 feedItems={value}
                                 onClick={props.onClick}
+                                onFavoriteClick={props.onFavoriteClick}
                                 name={key}
                                 selectedItemId={props.selectedItemId}
                             ></FeedListDateHeader>

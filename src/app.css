@@ -240,17 +240,30 @@
     }
 }
 
+.feed-item-favorite {
+    visibility: hidden;
+    /* background-color: red; */
+    /* padding: 8px; */
+    /* margin: 0px; */
+    /* text-align: center; */
+}
+
+.feed-item-favorite.favorite {
+    visibility: visible;
+}
+
 .feed-item:hover {
     background-color: rgb(255, 255, 255);
     cursor: pointer;
+
+    .feed-item-favorite {
+        visibility: visible;
+    }
 }
 
 .feed-item.selected {
     background-color: rgba(0, 0, 0, 0.138);
 }
-
-
-
 
 @container (width < 200px) {
     .expandable-group-header {

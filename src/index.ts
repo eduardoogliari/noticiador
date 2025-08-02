@@ -171,7 +171,11 @@ async function rebuildAdblock( filterLists : string[] ) {
 function refreshFaviconBlobRecord() {
     console.log('Refreshing favicon blobs');
 
-    const subs = getSubscriptions();
+    // const subs = getSubscriptions();
+
+    const stmt = db.prepare('SELECT * FROM subscription'); // Intentionally including deleted subs because of favorites
+    const subs = stmt.all() as Subscription[];
+
     for( const s of subs ) {
         faviconBlobRecord[s.id] = s.favicon;
     }
@@ -381,10 +385,10 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
     }
   }
 
-  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, pub_date) VALUES (?, ?, ?, ?)');
+  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, pub_date, is_favorite, is_read, pending_removal) VALUES (?, ?, ?, ?, ?, ?, ?)');
   for( const i of items ) {
     try {
-      const res: RunResult = stmt.run( i.id, i.title, i.url, i.pub_date );
+      const res: RunResult = stmt.run( i.id, i.title, i.url, i.pub_date, 0, 0, 0 );
       console.log(res);
     } catch( err ) {
       results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
@@ -395,7 +399,7 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
 
 // ------------------------------------------------------------------------------------------------------
 function getSubscriptions() {
-   const stmt = db.prepare('SELECT * FROM subscription');
+   const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
    return stmt.all() as Subscription[];
 }
 
@@ -419,9 +423,9 @@ ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] 
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'add-subscriptions', ( event: IpcMainInvokeEvent, newSubs : NewSubscription[] ) => {
-    const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, last_updated, favicon) VALUES ( ?, ?, ?, ?)' );
+    const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, last_updated, favicon, deleted_at ) VALUES ( ?, ?, ?, ?, ?)' );
     for( const s of newSubs ) {
-        stmt.run( s.name, s.url, s.last_updated, s.favicon );
+        stmt.run( s.name, s.url, s.last_updated, s.favicon, null );
     }
     refreshFaviconBlobRecord();
 });
@@ -429,4 +433,16 @@ ipcMain.handle( 'add-subscriptions', ( event: IpcMainInvokeEvent, newSubs : NewS
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-favicon-data', ( event: IpcMainInvokeEvent, subId : number ) => {
     return faviconBlobRecord[subId];
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'set-favorite', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
+    const stmt = db.prepare( 'UPDATE feed_item SET is_favorite = ? WHERE id = ?' );
+    stmt.run( value ? 1 : 0, itemId );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-favorites', ( event: IpcMainInvokeEvent ) => {
+    const stmt = db.prepare( 'SELECT * FROM feed_item WHERE is_favorite = 1' );
+    return stmt.all();
 });

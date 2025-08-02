@@ -13,6 +13,8 @@ declare global {
         getSubscriptions: () => Subscription[];
         addSubscriptions: (newSubs: NewSubscription[]) => void;
         getFaviconData  : (subId : number) => Buffer | null;
+        setFavorite : (itemId : number, value : boolean) => void;
+        getFavorites : () => FeedItem[]
     };
   }
 }

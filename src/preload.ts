@@ -13,4 +13,6 @@ contextBridge.exposeInMainWorld('rssAPI', {
   getSubscriptions: () => ipcRenderer.invoke( 'get-subscriptions' ),
   addSubscriptions: (newSubs: NewSubscription[]) => ipcRenderer.invoke( 'add-subscriptions', newSubs ),
   getFaviconData  : (subId : number) => ipcRenderer.invoke( 'get-favicon-data', subId ),
+  setFavorite : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
+  getFavorites : () => ipcRenderer.invoke('get-favorites'),
 });
