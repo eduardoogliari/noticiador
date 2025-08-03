@@ -5,8 +5,8 @@ import FeedListItem from "./FeedListItem";
 export type FeedListDateHeaderProps = {
     name          : string;
     feedItems     : FeedItem[];
-    onClick       : (itemId : number) => void;
-    onFavoriteClick : (itemId : number, event: React.MouseEvent) => void;
+    onClick       : (itemId : number, url : string) => void;
+    onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
 };
@@ -21,8 +21,9 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 url={item.url}
                 favicon={props.faviconCache[item.sub_id]}
                 isSelected={item.id === props.selectedItemId}
-                onClick={ (itemId : number) => { props.onClick(itemId);} }
+                onClick={ props.onClick }
                 isFavorite={item.is_favorite}
+                isRead={item.is_read}
                 onFavoriteClick={props.onFavoriteClick}
             ></FeedListItem>
         );

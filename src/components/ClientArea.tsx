@@ -19,9 +19,10 @@ type MainOptionInfo = {
 
 export default function ClientArea() {
     const [showLeftPanel, setShowLeftPanel]                     = useState(true);
+    const [allFeedItems, setAllFeedItems]                       = useState<FeedItem[]>([]);
     const [feedItems, setFeedItems]                             = useState<FeedItem[]>([]);
     const [favoriteItems, setFavoriteItems]                     = useState<FeedItem[]>([]);
-    const [feedBinItems, setFeedBinItems]                     = useState<FeedItem[]>([]);
+    const [feedBinItems, setFeedBinItems]                       = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                   = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
@@ -34,16 +35,14 @@ export default function ClientArea() {
 
 
     const mainOptions : MainOptionInfo[] = [
-        { title: '🌐 All Feeds', itemSource: feedItems, icon: '', onClick: showAllFeeds, getCount: () => 0 },
+        { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () => allFeedItems.length },
         { title: '⭐ Favorites', itemSource: favoriteItems, icon: '', onClick: showFavorites, getCount: () => favoriteItems.length },
-        { title: '🗑️ Feed Bin', itemSource: feedBinItems, icon: '', onClick: showArchive, getCount: () => 0 },
-        // { title: '📁 Archive', icon: '', onClick: showArchive, getCount: () => 0 },
-        // { title: '🗑️ Trash', icon: '' },
+        { title: '🗑️ Feed Bin', itemSource: feedBinItems, icon: '', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
 
     async function showAllFeeds() {
         const items = await window.rssAPI.getFeeds(subscriptions);
-        setFeedItems( items );
+        setAllFeedItems( items );
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -53,7 +52,7 @@ export default function ClientArea() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
-    async function showArchive() {
+    async function showFeedBin() {
         const items : FeedItem[] = [];
         setFeedBinItems(items);
         setScrollToTopKey( (prev) => prev+1 );
@@ -84,9 +83,10 @@ export default function ClientArea() {
     async function updateAllFeeds() {
         try {
             const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-            const results = await window.rssAPI.refreshFeeds(subs);
-            const items = await window.rssAPI.getFeeds(subs);
-            setFeedItems(items);
+            // const results = await window.rssAPI.refreshFeeds(subs);
+            const results = window.rssAPI.refreshFeeds(subs);
+            // const items = await window.rssAPI.getFeeds(subs);
+            // setFeedItems(items);
         } catch (err) {
             console.error('Failed to load RSS feed after retries:', err);
         }
@@ -156,36 +156,37 @@ export default function ClientArea() {
             setFavoriteItems( favorites );
 
             const items = await window.rssAPI.getFeeds(subs);
-            setFeedItems(items);
+            setAllFeedItems(items);
 
             setFetchDataFromDb(false);
         })();
     }, [fetchDataFromDb] );
 
-    function onFeedItemClick( itemId : number ) {
+    async function onFeedItemClick( itemId : number, url : string ) {
         if( itemId != selectedItemId ) {
-            const foundItem = feedItems.find( (item) => item.id == itemId );
-            if( foundItem ){
-                console.log( "onFeedItemClick: ", foundItem.url );
+            // const foundItem = feedItems.find( (item) => item.id == itemId );
+            // if( foundItem ){
+                console.log( "onFeedItemClick: ", url );
 
                 setSelectedItemId(itemId);
 
-                if (webviewRef.current && webviewRef.current?.src !== foundItem.url ) {
-                    webviewRef.current.src = foundItem.url;
+                await window.rssAPI.setRead( itemId, true );
+
+                if (webviewRef.current && webviewRef.current?.src !== url ) {
+                    webviewRef.current.src = url;
                 }
-            }
+
+                setFetchDataFromDb(true);
+            // }
         }
     }
 
-    async function onFeedItemFavoriteClick( itemId : number,  event: React.MouseEvent ) {
+    async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
         event.stopPropagation();
 
-        const foundItem = feedItems.find( (item) => item.id == itemId );
-        if( foundItem ){
-            console.log( "onFeedItemFavoriteClick: ", foundItem.url );
-            await window.rssAPI.setFavorite( itemId, !foundItem.is_favorite );
-            setFetchDataFromDb(true);
-        }
+        console.log( "onFeedItemFavoriteClick: ", itemId );
+        await window.rssAPI.setFavorite( itemId, value);
+        setFetchDataFromDb(true);
     }
 
     async function onSubscriptionItemClick( subId : number ) {
@@ -270,7 +271,7 @@ export default function ClientArea() {
                 }
                 <Panel id="center" className={'panel-middle'} order={2} minSize={30}>
                     <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
-                    <FeedList feedItems={mainOptions[selectedMainOptionIndex].itemSource} scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick}  faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
+                    <FeedList feedItems={ (selectedMainOptionIndex >= 0) ? mainOptions[selectedMainOptionIndex].itemSource : feedItems } scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick}  faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
                 </Panel>
                 {
                     <>

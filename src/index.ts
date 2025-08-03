@@ -446,3 +446,9 @@ ipcMain.handle( 'get-favorites', ( event: IpcMainInvokeEvent ) => {
     const stmt = db.prepare( 'SELECT * FROM feed_item WHERE is_favorite = 1' );
     return stmt.all();
 });
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'set-read', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
+    const stmt = db.prepare( 'UPDATE feed_item SET is_read = ? WHERE id = ?' );
+    stmt.run( value ? 1 : 0, itemId );
+});

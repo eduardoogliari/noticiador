@@ -12,8 +12,8 @@ const lastWeekEnd      = subDays(currentWeekEnd, 7);
 
 export type FeedListProp = {
     feedItems     : FeedItem[];
-    onClick       : (itemId : number) => void;
-    onFavoriteClick : (itemId : number, event: React.MouseEvent) => void;
+    onClick       : (itemId : number, url : string) => void;
+    onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
     scrollToTopKey : number;

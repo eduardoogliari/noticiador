@@ -15,4 +15,5 @@ contextBridge.exposeInMainWorld('rssAPI', {
   getFaviconData  : (subId : number) => ipcRenderer.invoke( 'get-favicon-data', subId ),
   setFavorite : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
   getFavorites : () => ipcRenderer.invoke('get-favorites'),
+  setRead : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
 });
