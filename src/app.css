@@ -124,7 +124,7 @@
 }
 
 .main-options-list-item {
-    padding: 5px;
+    padding: 3px;
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -180,7 +180,7 @@
     /* border-top: 1px dashed black; */
     font-weight: bold;
     border-bottom: 1px solid black;
-    margin: 20px 0 10px 0;
+    margin: 20px 0 5px 0;
     padding: 5px 0px;
 
 }
@@ -196,8 +196,8 @@
     flex-direction: row;
     gap : 10px;
     border-bottom: 1px solid rgb(205, 205, 205);
-    padding: 5px 15px;
-    /* padding: 5px; */
+    /* padding: 5px 10px; */
+    padding: 3px;
     /* margin: 0px 5px; */
     margin: 0px;
     cursor: pointer;
@@ -346,7 +346,7 @@
         font-size      : small;
     }
 
-    .subscription-list-item {
+    /* .subscription-list-item {
         font-size: small;
-    }
+    } */
 }

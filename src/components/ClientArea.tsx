@@ -243,7 +243,7 @@ export default function ClientArea() {
                 {
                     showLeftPanel && (
                         <>
-                            <Panel id="left" className={'panel-left'} order={1} minSize={20}>
+                            <Panel id="left" className={'panel-left'} order={1} minSize={16}>
                                 <ul className="main-options-list">
                                     {
                                         mainOptions.map( (item, index) => {
@@ -278,7 +278,7 @@ export default function ClientArea() {
                         </>
                     )
                 }
-                <Panel id="center" className={'panel-middle'} order={2} minSize={30}>
+                <Panel id="center" className={'panel-middle'} order={2} minSize={26}>
                     <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
                     <FeedList feedItems={ (selectedMainOptionIndex >= 0) ? mainOptions[selectedMainOptionIndex].itemSource : feedItems } scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick}  faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
                 </Panel>
