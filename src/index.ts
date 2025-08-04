@@ -265,7 +265,7 @@ ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string
     } catch (err) {
         console.error("Error fetching or parsing HTML:", err);
     }
-    console.warn(`Favicon could not be found for ${url}`);
+    console.warn(`Feed could not be found for ${url}`);
     return null;
 });
 
@@ -423,9 +423,9 @@ ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] 
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'add-subscriptions', ( event: IpcMainInvokeEvent, newSubs : NewSubscription[] ) => {
-    const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, last_updated, favicon, deleted_at ) VALUES ( ?, ?, ?, ?, ?)' );
+    const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, category_id, last_updated, favicon, deleted_at ) VALUES ( ?, ?, ?, ?, ?, ?)' );
     for( const s of newSubs ) {
-        stmt.run( s.name, s.url, s.last_updated, s.favicon, null );
+        stmt.run( s.name, s.url, s.category_id, s.last_updated, s.favicon, null );
     }
     refreshFaviconBlobRecord();
 });

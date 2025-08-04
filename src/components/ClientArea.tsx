@@ -8,6 +8,7 @@ import ExpandableGroup from './ExpandableGroup';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
+import AddSubscriptionModal from './AddSubscriptionModal';
 
 type MainOptionInfo = {
     title : string;
@@ -31,6 +32,7 @@ export default function ClientArea() {
     const webviewRef                                            = useRef<Electron.WebviewTag>(null);
     const [fetchDataFromDb, setFetchDataFromDb] = useState(false);
     const [scrollToTopKey, setScrollToTopKey] = useState(0);
+    const [isAddSubscriptionModalOpen, SetIsAddSubscriptionModalOpen] = useState(false);
 
 
 
@@ -90,6 +92,10 @@ export default function ClientArea() {
         } catch (err) {
             console.error('Failed to load RSS feed after retries:', err);
         }
+    }
+
+    async function onClickAddSubscription() {
+        SetIsAddSubscriptionModalOpen(true);
     }
 
     useEffect(() => {
@@ -232,7 +238,7 @@ export default function ClientArea() {
 
     return (
         <div className={'client-area'}>
-            <Toolbar></Toolbar>
+            <Toolbar onClickAddSubscription={onClickAddSubscription}></Toolbar>
             <PanelGroup autoSaveId="conditional" direction="horizontal">
                 {
                     showLeftPanel && (
@@ -255,15 +261,18 @@ export default function ClientArea() {
                                     }
                                 </ul>
 
-                                <ExpandableGroup title='Categories'>
+                                {/* <ExpandableGroup title='Categories'>
                                     <p>Technology</p>
                                     <p>Movies</p>
                                     <p>Music</p>
-                                </ExpandableGroup>
+                                </ExpandableGroup> */}
 
-                                <ExpandableGroup title='Subscriptions'>
+                                <div className='subscriptions-header'>Subscriptions</div>
+                                <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>
+
+                                {/* <ExpandableGroup title='Subscriptions'>
                                     <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>
-                                </ExpandableGroup>
+                                </ExpandableGroup> */}
                             </Panel>
                             <PanelResizeHandle className='panel-resizer-handle'/>
                         </>
@@ -283,6 +292,8 @@ export default function ClientArea() {
                 }
             </PanelGroup>
             <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
+
+            <AddSubscriptionModal isOpen={isAddSubscriptionModalOpen}></AddSubscriptionModal>
         </div>
     );
 }
