@@ -209,7 +209,8 @@ async function urlContainsFeed( url : string ) : Promise<boolean> {
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-subscriptions', () => {
-   return getSubscriptions();
+   const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
+   return stmt.all() as Subscription[];
 });
 
 
@@ -398,10 +399,10 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
 });
 
 // ------------------------------------------------------------------------------------------------------
-function getSubscriptions() {
-   const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
-   return stmt.all() as Subscription[];
-}
+// function getSubscriptions() {
+//    const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
+//    return stmt.all() as Subscription[];
+// }
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {

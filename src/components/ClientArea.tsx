@@ -30,7 +30,6 @@ export default function ClientArea() {
     const [selectedMainOptionIndex, setSelectedMainOptionIndex]       = useState(0);
     const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
     const webviewRef                                                  = useRef<Electron.WebviewTag>(null);
-    const [fetchDataFromDb, setFetchDataFromDb]                       = useState(false);
     const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
     const [isAddSubscriptionModalOpen, SetIsAddSubscriptionModalOpen] = useState(false);
 
@@ -43,20 +42,22 @@ export default function ClientArea() {
     ];
 
     async function showAllFeeds() {
-        const items = await window.rssAPI.getFeeds(subscriptions);
-        setAllFeedItems( items );
+        // const items = await window.rssAPI.getFeeds(subscriptions);
+        // setAllFeedItems( items );
+
         setScrollToTopKey( (prev) => prev+1 );
     }
 
     async function showFavorites() {
-        const items = await window.rssAPI.getFavorites();
-        setFavoriteItems(items);
+        // const items = await window.rssAPI.getFavorites();
+        // setFavoriteItems(items);
+        // setFavoriteItems( favoriteItems );
         setScrollToTopKey( (prev) => prev+1 );
     }
 
     async function showFeedBin() {
-        const items : FeedItem[] = [];
-        setFeedBinItems(items);
+        // const items : FeedItem[] = [];
+        // setFeedBinItems(items);
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -133,59 +134,48 @@ export default function ClientArea() {
                 }
             }
 
-            // (async() => {
-            //     const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-            //     setSubscriptions(subs);
+            const favicons = await regenerateFavicons();
+            setFaviconCache(favicons);
 
-            //     const favorites : FeedItem[] = await window.rssAPI.getFavorites();
-            //     setFavoriteItems( favorites );
-            // })();
-
-            (async () => {
-                const favicons = await regenerateFavicons();
-                setFaviconCache(favicons);
-            })();
-
-            (async () => {
-                await updateAllFeeds();
-            })();
-
-            setFetchDataFromDb(true);
-
-        })();
-    }, []);
-
-    useEffect( () => {
-        (async() => {
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+                const subs : Subscription[] = await window.rssAPI.getSubscriptions();
             setSubscriptions(subs);
 
             const favorites : FeedItem[] = await window.rssAPI.getFavorites();
             setFavoriteItems( favorites );
 
+            await updateAllFeeds();
+
             const items = await window.rssAPI.getFeeds(subs);
             setAllFeedItems(items);
-
-            setFetchDataFromDb(false);
         })();
-    }, [fetchDataFromDb] );
+    }, [] );
+
+    useEffect( () => {
+        (async () => {
+            if( selectedSubscriptionId != -1 ) {
+                const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
+                if( foundItem ){
+                    const items = await window.rssAPI.getFeeds([foundItem]);
+                    setFeedItems(items);
+                }
+            }
+            const items = await window.rssAPI.getFeeds(subscriptions);
+            setAllFeedItems(items);
+
+        })();
+    }, [favoriteItems] );
 
     async function onFeedItemClick( itemId : number, url : string ) {
         if( itemId != selectedItemId ) {
-            // const foundItem = feedItems.find( (item) => item.id == itemId );
-            // if( foundItem ){
-                console.log( "onFeedItemClick: ", url );
+            console.log( "onFeedItemClick: ", url );
 
-                setSelectedItemId(itemId);
+            setSelectedItemId(itemId);
 
-                await window.rssAPI.setRead( itemId, true );
+            await window.rssAPI.setRead( itemId, true );
 
-                if (webviewRef.current && webviewRef.current?.src !== url ) {
-                    webviewRef.current.src = url;
-                }
-
-                setFetchDataFromDb(true);
-            // }
+            if (webviewRef.current && webviewRef.current?.src !== url ) {
+                webviewRef.current.src = url;
+            }
         }
     }
 
@@ -194,7 +184,8 @@ export default function ClientArea() {
 
         console.log( "onFeedItemFavoriteClick: ", itemId );
         await window.rssAPI.setFavorite( itemId, value);
-        setFetchDataFromDb(true);
+        const items = await window.rssAPI.getFavorites();
+        setFavoriteItems(items);
     }
 
     async function onSubscriptionItemClick( subId : number ) {
