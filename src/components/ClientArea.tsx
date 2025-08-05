@@ -19,19 +19,19 @@ type MainOptionInfo = {
 };
 
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel]                     = useState(true);
-    const [allFeedItems, setAllFeedItems]                       = useState<FeedItem[]>([]);
-    const [feedItems, setFeedItems]                             = useState<FeedItem[]>([]);
-    const [favoriteItems, setFavoriteItems]                     = useState<FeedItem[]>([]);
-    const [feedBinItems, setFeedBinItems]                       = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
-    const [selectedItemId, setSelectedItemId]                   = useState(-1);
-    const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
-    const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
-    const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
-    const webviewRef                                            = useRef<Electron.WebviewTag>(null);
-    const [fetchDataFromDb, setFetchDataFromDb] = useState(false);
-    const [scrollToTopKey, setScrollToTopKey] = useState(0);
+    const [showLeftPanel, setShowLeftPanel]                           = useState(true);
+    const [allFeedItems, setAllFeedItems]                             = useState<FeedItem[]>([]);
+    const [feedItems, setFeedItems]                                   = useState<FeedItem[]>([]);
+    const [favoriteItems, setFavoriteItems]                           = useState<FeedItem[]>([]);
+    const [feedBinItems, setFeedBinItems]                             = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]                             = useState<Record<number, string>>({});
+    const [selectedItemId, setSelectedItemId]                         = useState(-1);
+    const [selectedSubscriptionId, setSelectedSubscriptionId]         = useState(-1);
+    const [selectedMainOptionIndex, setSelectedMainOptionIndex]       = useState(0);
+    const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
+    const webviewRef                                                  = useRef<Electron.WebviewTag>(null);
+    const [fetchDataFromDb, setFetchDataFromDb]                       = useState(false);
+    const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
     const [isAddSubscriptionModalOpen, SetIsAddSubscriptionModalOpen] = useState(false);
 
 
@@ -85,8 +85,8 @@ export default function ClientArea() {
     async function updateAllFeeds() {
         try {
             const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-            // const results = await window.rssAPI.refreshFeeds(subs);
-            const results = window.rssAPI.refreshFeeds(subs);
+            const results = await window.rssAPI.refreshFeeds(subs);
+            // const results = window.rssAPI.refreshFeeds(subs);
             // const items = await window.rssAPI.getFeeds(subs);
             // setFeedItems(items);
         } catch (err) {
@@ -149,6 +149,8 @@ export default function ClientArea() {
             (async () => {
                 await updateAllFeeds();
             })();
+
+            setFetchDataFromDb(true);
 
         })();
     }, []);
@@ -253,7 +255,7 @@ export default function ClientArea() {
                                                     title={item.title}
                                                     onClick={() => onClickMainOption(index)}
                                                 >
-                                                    <img src={item.icon}></img>
+                                                    {/* <img src={item.icon}></img> */}
                                                     <span>{`${item.title} (${item.getCount()})`}</span>
                                                 </li>
                                             );
