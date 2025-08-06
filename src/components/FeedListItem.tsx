@@ -13,15 +13,13 @@ export type FeedListItemProp = {
 export default function FeedListItem( props : FeedListItemProp ) {
     return (
         <li className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`} onClick={() => props.onClick(props.id, props.url)}>
-            <span
-                className={`feed-item-favorite
-                            ${props.isFavorite || props.isSelected ? 'favorite' : ''}
-
-                        `}
-                onClick={(e) => props.onFavoriteClick(props.id, !props.isFavorite, e)}>{props.isFavorite ? '★' : '☆' }
+            <span className={`feed-item-favorite-container ${props.isFavorite || props.isSelected ? 'favorite' : ''}`} onClick={(e) => props.onFavoriteClick(props.id, !props.isFavorite, e)} >
+                <span className={'feed-item-favorite'}>
+                    {props.isFavorite ? '★' : '☆' }
+                </span>
             </span>
-            {(props.favicon) ? <img src={props.favicon}></img> : <span></span>}
-            <span>{props.title}</span>
+            {(props.favicon) ? <img src={props.favicon}></img> : '' }
+            <span className="feed-item-title">{props.title}</span>
         </li>
     );
 }

@@ -139,33 +139,7 @@
     background-color: rgb(221, 221, 221);
 }
 
-.feed-list {
-    list-style: none;
-    margin: 0;
-    padding: 0px 0px;
-}
 
-.feed-date-list {
-    list-style: none;
-    margin: 0;
-    padding: 0px 0px;
-    height: 100%;
-    overflow-y: scroll;
-}
-
-.feed-date-header {
-    position: sticky;
-    top: 0;
-    padding: 5px;
-    z-index: 1;
-    user-select: none;
-
-    padding: 5px 10px;
-    background-color: rgb(232, 232, 232);
-    color: rgb(0, 0, 0);
-    border-bottom: 1px solid gray;
-    margin: 0;
-}
 
 .constrained-label {
     white-space: nowrap;
@@ -263,12 +237,40 @@
     background-color: rgba(218, 218, 218, 0.52);
 }
 
+.feed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0px 0px;
+}
+
+.feed-date-list {
+    list-style: none;
+    margin: 0;
+    padding: 0px 0px;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.feed-date-header {
+    position: sticky;
+    top: 0;
+    padding: 5px;
+    z-index: 1;
+    user-select: none;
+
+    padding: 5px 10px;
+    background-color: rgb(232, 232, 232);
+    color: rgb(0, 0, 0);
+    border-bottom: 1px solid gray;
+    margin: 0;
+}
+
 .feed-item {
     display: flex;
     flex-direction: row;
     justify-content: left;
     align-items: center;
-    padding: 10px 0px;
+    /* padding: 10px 0px; */
     border-bottom: 1px solid rgb(193, 193, 193);
     background-color: rgb(249, 249, 249);
     font-size: 0.9rem;
@@ -277,19 +279,25 @@
     img {
         width: 16px;
         height: 16px;
-        margin-left: 10px;
-    }
-
-    span {
-        margin: 0 0 0 10px;
-        font-weight: bold;
+        /* margin-left: 10px; */
     }
 }
 
-.feed-item-favorite {
+.feed-item-title {
+    margin: 0 0 0 10px;
+    font-weight: bold;
+    padding: 10px 0px;
+}
+
+.feed-item-favorite-container {
+    display: flex;
+    flex-direction: column;
     visibility: hidden;
-    font-weight: bolder
+    align-self: stretch;
     /* background-color: red; */
+    justify-content: center;
+    align-content: center;
+    padding: 0 10px 0 10px;
     /* padding: 8px; */
     /* margin: 0px; */
     /* text-align: center; */
@@ -299,7 +307,11 @@
     filter: drop-shadow(0px 0px 6px rgb(17, 176, 255));
 } */
 
-.feed-item-favorite.favorite {
+/* .feed-item-favorite {
+    font-weight: bolder;
+} */
+
+.feed-item-favorite-container.favorite {
     visibility: visible;
 }
 
@@ -307,7 +319,7 @@
     background-color: rgb(255, 255, 255);
     cursor: pointer;
 
-    .feed-item-favorite {
+    .feed-item-favorite-container {
         visibility: visible;
     }
 }
