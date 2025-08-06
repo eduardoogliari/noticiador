@@ -22,7 +22,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
             {(props.favicon) ? <img src={props.favicon}></img> : '' }
             <span className="feed-item-title">{props.title}</span>
 
-            <span className={'feed-item-options-container'} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
+            <span className={`feed-item-options-container ${props.isSelected ? 'selected' : ''}`} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
                 <span>...</span>
             </span>
         </li>
