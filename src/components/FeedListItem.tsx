@@ -4,6 +4,7 @@ export type FeedListItemProp = {
     title     : string;
     onClick   : (itemId : number, url : string) => void;
     onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
+    onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
     isSelected: boolean;
     favicon   : string;
     isFavorite : boolean;
@@ -20,6 +21,10 @@ export default function FeedListItem( props : FeedListItemProp ) {
             </span>
             {(props.favicon) ? <img src={props.favicon}></img> : '' }
             <span className="feed-item-title">{props.title}</span>
+
+            <span className={'feed-item-options-container'} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
+                <span>...</span>
+            </span>
         </li>
     );
 }

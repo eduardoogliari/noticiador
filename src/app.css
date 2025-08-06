@@ -270,6 +270,7 @@
     flex-direction: row;
     justify-content: left;
     align-items: center;
+    /* width: 100%; */
     /* padding: 10px 0px; */
     border-bottom: 1px solid rgb(193, 193, 193);
     background-color: rgb(249, 249, 249);
@@ -315,11 +316,29 @@
     visibility: visible;
 }
 
+.feed-item-options-container {
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    align-self: stretch;
+    /* background-color: red; */
+    justify-content: center;
+    align-content: center;
+    /* justify-self: end; */
+    padding: 0 10px 0 10px;
+    margin-left: auto;
+}
+
+
 .feed-item:hover {
     background-color: rgb(255, 255, 255);
     cursor: pointer;
 
     .feed-item-favorite-container {
+        visibility: visible;
+    }
+
+    .feed-item-options-container {
         visibility: visible;
     }
 }

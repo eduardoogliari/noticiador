@@ -188,6 +188,10 @@ export default function ClientArea() {
         setFavoriteItems(items);
     }
 
+    async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
+        event.stopPropagation();
+    }
+
     async function onSubscriptionItemClick( subId : number ) {
         if( subId != selectedSubscriptionId ) {
             const foundItem = subscriptions.find( (item) => item.id == subId );
@@ -273,7 +277,7 @@ export default function ClientArea() {
                 }
                 <Panel id="center" className={'panel-middle'} order={2} minSize={26}>
                     <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
-                    <FeedList feedItems={ (selectedMainOptionIndex >= 0) ? mainOptions[selectedMainOptionIndex].itemSource : feedItems } scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick}  faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
+                    <FeedList feedItems={ (selectedMainOptionIndex >= 0) ? mainOptions[selectedMainOptionIndex].itemSource : feedItems } scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick} onMoreOptionsClick={onMoreOptionsClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
                 </Panel>
                 {
                     <>

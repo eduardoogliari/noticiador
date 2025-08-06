@@ -7,6 +7,7 @@ export type FeedListDateHeaderProps = {
     feedItems     : FeedItem[];
     onClick       : (itemId : number, url : string) => void;
     onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
+    onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
 };
@@ -25,6 +26,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 isFavorite={item.is_favorite}
                 isRead={item.is_read}
                 onFavoriteClick={props.onFavoriteClick}
+                onMoreOptionsClick={props.onMoreOptionsClick}
             ></FeedListItem>
         );
     });
