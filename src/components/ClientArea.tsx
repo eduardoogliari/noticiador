@@ -28,6 +28,8 @@ export default function ClientArea() {
     const [selectedItemId, setSelectedItemId]                         = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]         = useState(-1);
     const [selectedMainOptionIndex, setSelectedMainOptionIndex]       = useState(0);
+    const [commentsActiveId, setCommentsActiveId]       = useState(-1);
+    const [moreOptionsActive, setMoreOptionsActive]       = useState(false);
     const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
     const webviewRef                                                  = useRef<Electron.WebviewTag>(null);
     const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
@@ -36,10 +38,38 @@ export default function ClientArea() {
 
 
     const mainOptions : MainOptionInfo[] = [
-        { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () => allFeedItems.length },
+        { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () =>  allFeedItems.filter( (i) => !i.is_read ).length },
         { title: '⭐ Favorites', itemSource: favoriteItems, icon: '', onClick: showFavorites, getCount: () => favoriteItems.length },
         { title: '🗑️ Feed Bin', itemSource: feedBinItems, icon: '', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
+
+    function getCurrentlyVisibleFeedItems() : FeedItem[] {
+        return (selectedMainOptionIndex >= 0)
+                    ? mainOptions[selectedMainOptionIndex].itemSource
+                    : feedItems;
+    }
+
+    function markItemAsRead( itemId : number ) {
+        const items : FeedItem[] = getCurrentlyVisibleFeedItems();
+        const foundItem = items.find( (i) => i.id === itemId );
+
+        if( foundItem && !foundItem.is_read ) {
+            window.rssAPI.setRead( itemId, true );
+            updateFeedItemsFromDb();
+        }
+    }
+
+    async function updateFeedItemsFromDb() {
+        if( selectedSubscriptionId != -1 ) {
+            const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
+            if( foundItem ){
+                const items = await window.rssAPI.getFeeds([foundItem]);
+                setFeedItems(items);
+            }
+        }
+        const items = await window.rssAPI.getFeeds(subscriptions);
+        setAllFeedItems(items);
+    }
 
     async function showAllFeeds() {
         // const items = await window.rssAPI.getFeeds(subscriptions);
@@ -105,6 +135,7 @@ export default function ClientArea() {
                 'https://news.ycombinator.com/rss',
                 // 'https://alain.xyz',
                 'https://brevzin.github.io/',
+                'https://lobste.rs/rss',
                 // 'https://kevingal.com',
                 // 'https://www.vincentparizet.com/blog/',
                 // 'https://www.modernescpp.com',
@@ -152,16 +183,7 @@ export default function ClientArea() {
 
     useEffect( () => {
         (async () => {
-            if( selectedSubscriptionId != -1 ) {
-                const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
-                if( foundItem ){
-                    const items = await window.rssAPI.getFeeds([foundItem]);
-                    setFeedItems(items);
-                }
-            }
-            const items = await window.rssAPI.getFeeds(subscriptions);
-            setAllFeedItems(items);
-
+            await updateFeedItemsFromDb();
         })();
     }, [favoriteItems] );
 
@@ -171,12 +193,24 @@ export default function ClientArea() {
 
             setSelectedItemId(itemId);
 
-            await window.rssAPI.setRead( itemId, true );
+            // const items : FeedItem[] = getCurrentlyVisibleFeedItems();
+            // const foundItem = items.find( (i) => i.id === itemId );
 
-            if (webviewRef.current && webviewRef.current?.src !== url ) {
-                webviewRef.current.src = url;
-            }
+            // if( foundItem && !foundItem.is_read ) {
+            //     window.rssAPI.setRead( itemId, true );
+            //     updateFeedItemsFromDb();
+            // }
+
+            markItemAsRead( itemId );
+
         }
+
+        if (webviewRef.current && webviewRef.current?.src !== url ) {
+            webviewRef.current.src = url;
+        }
+
+        setCommentsActiveId(-1);
+        setMoreOptionsActive(false);
     }
 
     async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
@@ -233,6 +267,33 @@ export default function ClientArea() {
         await mainOptions[wrappedIndex].onClick();
     }
 
+    async function onCommentsClick(itemId : number, url : string, commentsUrl: string, event: React.MouseEvent) {
+        event.stopPropagation();
+
+        if( webviewRef.current ) {
+            if(webviewRef.current?.src !== commentsUrl ) {
+                setCommentsActiveId( itemId );
+                webviewRef.current.src = commentsUrl;
+
+            } else {
+                // Toggle
+                const newCommentActiveValue = commentsActiveId === itemId ? -1 : commentsActiveId;
+
+                setCommentsActiveId( newCommentActiveValue );
+
+                if( newCommentActiveValue === -1 ) {
+                    webviewRef.current.src = url;
+                    markItemAsRead(itemId);
+
+                } else {
+                    webviewRef.current.src = commentsUrl;
+                }
+            }
+            setSelectedItemId(itemId);
+            setMoreOptionsActive(false);
+        }
+    }
+
     return (
         <div className={'client-area'}>
             <Toolbar onClickAddSubscription={onClickAddSubscription}></Toolbar>
@@ -277,7 +338,17 @@ export default function ClientArea() {
                 }
                 <Panel id="center" className={'panel-middle'} order={2} minSize={26}>
                     <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
-                    <FeedList feedItems={ (selectedMainOptionIndex >= 0) ? mainOptions[selectedMainOptionIndex].itemSource : feedItems } scrollToTopKey={scrollToTopKey} onClick={onFeedItemClick} onFavoriteClick={onFeedItemFavoriteClick} onMoreOptionsClick={onMoreOptionsClick} faviconCache={faviconCache} selectedItemId={selectedItemId} ></FeedList>
+                    <FeedList
+                        feedItems={ getCurrentlyVisibleFeedItems() }
+                        scrollToTopKey={scrollToTopKey}
+                        onClick={onFeedItemClick}
+                        onFavoriteClick={onFeedItemFavoriteClick}
+                        onMoreOptionsClick={onMoreOptionsClick}
+                        onCommentsClick={onCommentsClick}
+                        faviconCache={faviconCache}
+                        selectedItemId={selectedItemId}
+                        commentsActiveId={commentsActiveId}
+                    ></FeedList>
                 </Panel>
                 {
                     <>

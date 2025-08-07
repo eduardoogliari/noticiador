@@ -15,6 +15,8 @@ export type FeedListProp = {
     onClick       : (itemId : number, url : string) => void;
     onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
+    onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    commentsActiveId : number;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
     scrollToTopKey : number;
@@ -68,6 +70,8 @@ export default function FeedList( props : FeedListProp ) {
                                 name={key}
                                 selectedItemId={props.selectedItemId}
                                 onMoreOptionsClick={props.onMoreOptionsClick}
+                                onCommentsClick={props.onCommentsClick}
+                                commentsActiveId={props.commentsActiveId}
                             ></FeedListDateHeader>
                         </li>
                     )

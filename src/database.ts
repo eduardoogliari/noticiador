@@ -33,6 +33,7 @@ db.prepare(`
     sub_id          INTEGER   NOT NULL,
     title           TEXT      NOT NULL,
     url             TEXT      NOT NULL UNIQUE,
+    comments_url    TEXT,
     pub_date        DATETIME,
     is_favorite     INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
     is_read         INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),

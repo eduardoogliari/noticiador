@@ -8,6 +8,8 @@ export type FeedListDateHeaderProps = {
     onClick       : (itemId : number, url : string) => void;
     onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
+    onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    commentsActiveId : number;
     faviconCache  : Record<number, string>;
     selectedItemId: number;
 };
@@ -20,6 +22,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 key={item.id}
                 title={item.title}
                 url={item.url}
+                commentsUrl={item.comments_url}
                 favicon={props.faviconCache[item.sub_id]}
                 isSelected={item.id === props.selectedItemId}
                 onClick={ props.onClick }
@@ -27,6 +30,8 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 isRead={item.is_read}
                 onFavoriteClick={props.onFavoriteClick}
                 onMoreOptionsClick={props.onMoreOptionsClick}
+                onCommentsClick={props.onCommentsClick}
+                commentsActiveId={props.commentsActiveId}
             ></FeedListItem>
         );
     });
