@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export type FeedListItemProp = {
     id        : number;
     url       : string;
@@ -15,6 +17,8 @@ export type FeedListItemProp = {
 };
 
 export default function FeedListItem( props : FeedListItemProp ) {
+    useEffect( () => { console.log('props.commentsActiveId: ', props.commentsActiveId); }, [props.commentsActiveId]);
+
     return (
         <li className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`} onClick={() => props.onClick(props.id, props.url)}>
             <span className={`feed-item-favorite-container ${props.isFavorite || props.isSelected ? 'favorite' : ''}`} onClick={(e) => props.onFavoriteClick(props.id, !props.isFavorite, e)} >
@@ -27,14 +31,16 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
             <span className={`feed-item-options-container ${props.isSelected ? 'selected' : ''}`} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
                 {/* <span className={`feed-item-options}`} > */}
-                    <span className="feed-item-comments-container" onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}>
-                    {
-                        props.commentsUrl
-                            ? <span className={`feed-item-comments ${props.commentsActiveId === props.id ? 'selected' : ''}`} >💬</span>
-                            : ''
-                    }
-                    </span>
-                    <span className="feed-items-more-options-container">
+                    {props.commentsUrl ?
+                        <span className={`feed-item-comments-container ${props.commentsActiveId === props.id ? 'selected' : ''}`} onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}>
+                        {
+                            props.commentsUrl
+                                ? <span className={`feed-item-comments`} >💬</span>
+                                : ''
+                        }
+                        </span>
+                        : ''}
+                    <span className={`feed-items-more-options-container`}>
                         <span>...</span>
                     </span>
                 {/* </span> */}
