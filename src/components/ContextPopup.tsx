@@ -1,0 +1,81 @@
+import { createPortal } from "react-dom";
+import { useEffect, useRef, useState } from "react";
+
+export type ContextPopupProp = {
+    anchorRef: React.RefObject<HTMLElement>;
+    onClose: () => void;
+};
+
+type PopupPosition = {
+    top : number;
+    left : number;
+};
+
+export default function ContextPopup( props : ContextPopupProp ) {
+    const popupRef = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState<PopupPosition>( { top: 0, left: 0} );
+
+    function calculatePopupPosition() {
+        let pos : PopupPosition = { top: 0, left: 0 };
+
+        if( props.anchorRef && popupRef && popupRef.current ) {
+            const anchorRect = props.anchorRef.current.getBoundingClientRect();
+            const popupRect = popupRef.current.getBoundingClientRect();
+
+            pos.top = anchorRect.top;
+            pos.left = anchorRect.right;
+
+            if( anchorRect.top + popupRect.height > window.innerHeight ) {
+                pos.top = window.innerHeight - popupRect.height;
+            }
+        }
+        return pos;
+    }
+
+
+    useEffect(() => {
+        setPosition(calculatePopupPosition());
+
+        window.addEventListener("resize", () => props.onClose() );
+
+        return () => {
+            window.removeEventListener("resize", () => props.onClose());
+        };
+    }, [props.anchorRef]);
+
+    return  (
+
+            createPortal(
+                    <>
+                    <div style={{width: '100%', height: '100%', position: 'fixed', top: '0', left: '0', zIndex: '9998'}}></div>
+                    <div
+                        onClick={(e) => e.stopPropagation() }
+                        ref={popupRef}
+                        style={
+                            {
+                                visibility: (popupRef.current) ? 'visible' : 'hidden',
+                                position: "fixed",
+                                top: position.top,
+                                left: position.left,
+                                zIndex: 9999,
+                                backgroundColor: 'white',
+                                border: '1px solid gray',
+                                padding: '5px',
+                                // transform: "translate(-50%, -100%)",
+                                borderRadius: "4px",
+                                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                            }
+                        }
+                    >
+                        <p>Ola mundo 1</p>
+                        <p>Ola mundo 2</p>
+                        <p>Ola mundo 3</p>
+                        <p>Ola mundo 4</p>
+                        <p>Ola mundo 5</p>
+                    </div>
+                    </>,
+                    document.body
+            )
+
+    );
+}

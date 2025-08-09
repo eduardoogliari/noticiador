@@ -3,15 +3,17 @@ import { FeedItem } from "../types/feed-item";
 import FeedListItem from "./FeedListItem";
 
 export type FeedListDateHeaderProps = {
-    name          : string;
-    feedItems     : FeedItem[];
-    onClick       : (itemId : number, url : string) => void;
-    onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
-    onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
-    onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
-    commentsActiveId : number;
-    faviconCache  : Record<number, string>;
-    selectedItemId: number;
+    name                   : string;
+    feedItems              : FeedItem[];
+    onClick                : (itemId : number, url : string) => void;
+    onFavoriteClick        : (itemId : number, value : boolean, event: React.MouseEvent) => void;
+    onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
+    onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    OnCloseFeedOptionsPopup: () => void;
+    commentsActiveId       : number;
+    moreOptionsActiveId    : number;
+    faviconCache           : Record<number, string>;
+    selectedItemId         : number;
 };
 
 export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
@@ -31,14 +33,16 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 onFavoriteClick={props.onFavoriteClick}
                 onMoreOptionsClick={props.onMoreOptionsClick}
                 onCommentsClick={props.onCommentsClick}
+                OnCloseFeedOptionsPopup={props.OnCloseFeedOptionsPopup}
                 commentsActiveId={props.commentsActiveId}
+                moreOptionsActiveId={props.moreOptionsActiveId}
             ></FeedListItem>
         );
     });
 
-    useEffect(() => {
-        console.log( 'props', props );
-    }, [props.feedItems]);
+    // useEffect(() => {
+    //     console.log( 'props', props );
+    // }, [props.feedItems]);
 
     return (
         <>

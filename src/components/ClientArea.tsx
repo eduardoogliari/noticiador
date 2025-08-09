@@ -27,9 +27,9 @@ export default function ClientArea() {
     const [faviconCache, setFaviconCache]                             = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                         = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]         = useState(-1);
-    const [selectedMainOptionIndex, setSelectedMainOptionIndex]       = useState(0);
-    const [commentsActiveId, setCommentsActiveId]       = useState(-1);
-    const [moreOptionsActive, setMoreOptionsActive]       = useState(false);
+    const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
+    const [commentsActiveId, setCommentsActiveId]               = useState(-1);
+    const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
     const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
     const webviewRef                                                  = useRef<Electron.WebviewTag>(null);
     const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
@@ -129,6 +129,10 @@ export default function ClientArea() {
         SetIsAddSubscriptionModalOpen(true);
     }
 
+    async function OnCloseFeedOptionsPopup() {
+        setMoreOptionsActiveId(-1);
+    }
+
     useEffect(() => {
         ( async () => {
             const linkArr = [
@@ -210,7 +214,7 @@ export default function ClientArea() {
         }
 
         setCommentsActiveId(-1);
-        setMoreOptionsActive(false);
+        setMoreOptionsActiveId(-1);
     }
 
     async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
@@ -224,6 +228,21 @@ export default function ClientArea() {
 
     async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
         event.stopPropagation();
+
+        if( moreOptionsActiveId === itemId ) {
+            setMoreOptionsActiveId(-1);
+        } else {
+            // setCommentsActiveId(-1);
+            setMoreOptionsActiveId(itemId);
+            // setSelectedItemId(itemId);
+        }
+
+        // if( webviewRef.current ) {
+        //     if(webviewRef.current?.src !== url && commentsActiveId === -1 ) {
+        //         webviewRef.current.src = url;
+        //         markItemAsRead( itemId );
+        //     }
+        // }
     }
 
     async function onSubscriptionItemClick( subId : number ) {
@@ -290,7 +309,7 @@ export default function ClientArea() {
                 }
             }
             setSelectedItemId(itemId);
-            setMoreOptionsActive(false);
+            // setMoreOptionsActiveId(-1);
         }
     }
 
@@ -348,6 +367,8 @@ export default function ClientArea() {
                         faviconCache={faviconCache}
                         selectedItemId={selectedItemId}
                         commentsActiveId={commentsActiveId}
+                        moreOptionsActiveId={moreOptionsActiveId}
+                        OnCloseFeedOptionsPopup={OnCloseFeedOptionsPopup}
                     ></FeedList>
                 </Panel>
                 {
