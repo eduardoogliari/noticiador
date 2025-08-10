@@ -16,7 +16,9 @@ export type FeedListProp = {
     onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
-    OnCloseFeedOptionsPopup : () => void;
+    openInExternalBrowser   : (url : string) => void;
+    copyToClipboard   : (url : string) => void;
+    onCloseFeedOptionsPopup : () => void;
     commentsActiveId : number;
     moreOptionsActiveId : number;
     faviconCache  : Record<number, string>;
@@ -75,7 +77,9 @@ export default function FeedList( props : FeedListProp ) {
                                 onCommentsClick={props.onCommentsClick}
                                 commentsActiveId={props.commentsActiveId}
                                 moreOptionsActiveId={props.moreOptionsActiveId}
-                                OnCloseFeedOptionsPopup={props.OnCloseFeedOptionsPopup}
+                                onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
+                                openInExternalBrowser={props.openInExternalBrowser}
+                                copyToClipboard={props.copyToClipboard}
                             ></FeedListDateHeader>
                         </li>
                     )

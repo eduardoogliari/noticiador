@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, session, webContents } from 'electron';
+import { app, BrowserWindow, clipboard, ipcMain, IpcMainInvokeEvent, session, shell, webContents } from 'electron';
 import Parser from 'rss-parser';
 import { FeedItem, NewFeedItem } from './types/feed-item';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
@@ -457,4 +457,14 @@ ipcMain.handle( 'get-favorites', ( event: IpcMainInvokeEvent ) => {
 ipcMain.handle( 'set-read', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
     const stmt = db.prepare( 'UPDATE feed_item SET is_read = ? WHERE id = ?' );
     stmt.run( value ? 1 : 0, itemId );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'open-external-browser', ( event: IpcMainInvokeEvent, url : string ) => {
+    shell.openExternal(url);
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'copy-to-clipboard', ( event: IpcMainInvokeEvent, text : string ) => {
+    clipboard.writeText(text);
 });

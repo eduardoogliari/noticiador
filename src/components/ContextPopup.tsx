@@ -1,9 +1,15 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 
+export type ContextPopupOption = {
+    optionTitle : string;
+    action : (...args : unknown[]) => void;
+};
+
 export type ContextPopupProp = {
     anchorRef: React.RefObject<HTMLElement>;
     onClose: () => void;
+    options: ContextPopupOption[];
 };
 
 type PopupPosition = {
@@ -63,15 +69,15 @@ export default function ContextPopup( props : ContextPopupProp ) {
                                 padding: '5px',
                                 // transform: "translate(-50%, -100%)",
                                 borderRadius: "4px",
-                                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                                boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.62)",
                             }
                         }
                     >
-                        <p>Ola mundo 1</p>
-                        <p>Ola mundo 2</p>
-                        <p>Ola mundo 3</p>
-                        <p>Ola mundo 4</p>
-                        <p>Ola mundo 5</p>
+                        <ul className="context-popup">
+                            {
+                               props.options.map( (item, index) => <li key={index} onClick={item.action}>{item.optionTitle}</li> )
+                            }
+                        </ul>
                     </div>
                     </>,
                     document.body

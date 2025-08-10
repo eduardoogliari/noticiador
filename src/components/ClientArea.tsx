@@ -9,6 +9,7 @@ import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
 import AddSubscriptionModal from './AddSubscriptionModal';
+import { ipcRenderer } from 'electron';
 
 type MainOptionInfo = {
     title : string;
@@ -78,6 +79,14 @@ export default function ClientArea() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
+    async function openInExternalBrowser( url : string ) {
+        window.rssAPI.openInExternalBrowser(url);
+    }
+
+    async function copyToClipboard( text : string ) {
+        window.rssAPI.copyToClipboard(text);
+    }
+
     async function showFavorites() {
         // const items = await window.rssAPI.getFavorites();
         // setFavoriteItems(items);
@@ -129,7 +138,7 @@ export default function ClientArea() {
         SetIsAddSubscriptionModalOpen(true);
     }
 
-    async function OnCloseFeedOptionsPopup() {
+    async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
 
@@ -368,7 +377,9 @@ export default function ClientArea() {
                         selectedItemId={selectedItemId}
                         commentsActiveId={commentsActiveId}
                         moreOptionsActiveId={moreOptionsActiveId}
-                        OnCloseFeedOptionsPopup={OnCloseFeedOptionsPopup}
+                        onCloseFeedOptionsPopup={onCloseFeedOptionsPopup}
+                        openInExternalBrowser={openInExternalBrowser}
+                        copyToClipboard={copyToClipboard}
                     ></FeedList>
                 </Panel>
                 {

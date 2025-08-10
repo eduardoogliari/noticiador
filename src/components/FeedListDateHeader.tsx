@@ -9,7 +9,9 @@ export type FeedListDateHeaderProps = {
     onFavoriteClick        : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
-    OnCloseFeedOptionsPopup: () => void;
+    openInExternalBrowser   : (url : string) => void;
+    copyToClipboard   : (url : string) => void;
+    onCloseFeedOptionsPopup: () => void;
     commentsActiveId       : number;
     moreOptionsActiveId    : number;
     faviconCache           : Record<number, string>;
@@ -33,9 +35,11 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 onFavoriteClick={props.onFavoriteClick}
                 onMoreOptionsClick={props.onMoreOptionsClick}
                 onCommentsClick={props.onCommentsClick}
-                OnCloseFeedOptionsPopup={props.OnCloseFeedOptionsPopup}
+                onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
                 commentsActiveId={props.commentsActiveId}
                 moreOptionsActiveId={props.moreOptionsActiveId}
+                openInExternalBrowser={props.openInExternalBrowser}
+                copyToClipboard={props.copyToClipboard}
             ></FeedListItem>
         );
     });

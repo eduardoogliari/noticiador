@@ -431,6 +431,26 @@
     background-color: rgba(0, 0, 0, 0.217);
 }
 
+.context-popup {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+        padding: 5px;
+    }
+
+    > li:hover {
+        background-color: rgba(200, 200, 200, 0.585);
+        cursor: pointer;
+    }
+
+    > li:not(:last-child) {
+        border-bottom: 1px solid rgba(175, 175, 175, 0.775);
+    }
+}
+
+
 @container (width < 200px) {
     .expandable-group-header {
         font-size      : small;

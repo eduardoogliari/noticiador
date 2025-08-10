@@ -16,6 +16,8 @@ declare global {
         setFavorite : (itemId : number, value : boolean) => void;
         getFavorites : () => FeedItem[];
         setRead : (itemId : number, value : boolean) => void;
+        openInExternalBrowser : (url : string) => void;
+        copyToClipboard : (text : string) => void;
     };
   }
 }

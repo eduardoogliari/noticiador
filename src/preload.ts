@@ -16,4 +16,6 @@ contextBridge.exposeInMainWorld('rssAPI', {
   setFavorite : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
   getFavorites : () => ipcRenderer.invoke('get-favorites'),
   setRead : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
+  openInExternalBrowser : (url : string) => ipcRenderer.invoke( 'open-external-browser', url ),
+  copyToClipboard : (text : string) => ipcRenderer.invoke( 'copy-to-clipboard', text ),
 });
