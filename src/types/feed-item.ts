@@ -7,7 +7,7 @@ export type FeedItem = {
   pub_date       ?: string;
   is_favorite     : boolean;
   is_read         : boolean;
-  pending_removal : boolean;
+  in_feed_bin     : boolean;
 };
 
 export type NewFeedItem = {

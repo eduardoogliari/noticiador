@@ -50,17 +50,24 @@ export default function ClientArea() {
                     : feedItems;
     }
 
-    function markItemAsRead( itemId : number ) {
+    async function markItemAsRead( itemId : number ) {
         const items : FeedItem[] = getCurrentlyVisibleFeedItems();
         const foundItem = items.find( (i) => i.id === itemId );
 
         if( foundItem && !foundItem.is_read ) {
-            window.rssAPI.setRead( itemId, true );
+            await window.rssAPI.setRead( itemId, true );
             updateFeedItemsFromDb();
         }
     }
 
-    async function updateFeedItemsFromDb() {
+    async function setInFeedBin( itemId : number, value : boolean ) {
+        await window.rssAPI.setInFeedBin( itemId, value );
+
+        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+        setFeedBinItems( binItems );
+    }
+
+    async function syncSelectedSubscriptionFeedItems() {
         if( selectedSubscriptionId != -1 ) {
             const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
             if( foundItem ){
@@ -68,8 +75,22 @@ export default function ClientArea() {
                 setFeedItems(items);
             }
         }
+    }
+
+    async function syncFeedBinItems() {
+        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+        setFeedBinItems( binItems );
+    }
+
+    async function syncAllFeedItems() {
         const items = await window.rssAPI.getFeeds(subscriptions);
         setAllFeedItems(items);
+    }
+
+    async function updateFeedItemsFromDb() {
+        syncSelectedSubscriptionFeedItems();
+        syncFeedBinItems();
+        syncAllFeedItems();
     }
 
     async function showAllFeeds() {
@@ -181,11 +202,14 @@ export default function ClientArea() {
             const favicons = await regenerateFavicons();
             setFaviconCache(favicons);
 
-                const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
             setSubscriptions(subs);
 
             const favorites : FeedItem[] = await window.rssAPI.getFavorites();
             setFavoriteItems( favorites );
+
+            const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+            setFeedBinItems( binItems );
 
             await updateAllFeeds();
 
@@ -198,7 +222,7 @@ export default function ClientArea() {
         (async () => {
             await updateFeedItemsFromDb();
         })();
-    }, [favoriteItems] );
+    }, [favoriteItems, feedBinItems] );
 
     async function onFeedItemClick( itemId : number, url : string ) {
         if( itemId != selectedItemId ) {
@@ -226,14 +250,22 @@ export default function ClientArea() {
         setMoreOptionsActiveId(-1);
     }
 
-    async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
-        event.stopPropagation();
-
-        console.log( "onFeedItemFavoriteClick: ", itemId );
+    async function setIsFeedFavorite( itemId : number, value : boolean ) {
         await window.rssAPI.setFavorite( itemId, value);
+
         const items = await window.rssAPI.getFavorites();
         setFavoriteItems(items);
     }
+
+    // async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
+    //     event.stopPropagation();
+
+    //     console.log( "onFeedItemFavoriteClick: ", itemId );
+    //     await window.rssAPI.setFavorite( itemId, value);
+
+    //     const items = await window.rssAPI.getFavorites();
+    //     setFavoriteItems(items);
+    // }
 
     async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
         event.stopPropagation();
@@ -370,7 +402,8 @@ export default function ClientArea() {
                         feedItems={ getCurrentlyVisibleFeedItems() }
                         scrollToTopKey={scrollToTopKey}
                         onClick={onFeedItemClick}
-                        onFavoriteClick={onFeedItemFavoriteClick}
+                        // onFavoriteClick={onFeedItemFavoriteClick}
+                        setIsFeedFavorite={setIsFeedFavorite}
                         onMoreOptionsClick={onMoreOptionsClick}
                         onCommentsClick={onCommentsClick}
                         faviconCache={faviconCache}
@@ -380,6 +413,7 @@ export default function ClientArea() {
                         onCloseFeedOptionsPopup={onCloseFeedOptionsPopup}
                         openInExternalBrowser={openInExternalBrowser}
                         copyToClipboard={copyToClipboard}
+                        setInFeedBin={setInFeedBin}
                     ></FeedList>
                 </Panel>
                 {

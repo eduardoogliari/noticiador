@@ -67,7 +67,6 @@ export default function ContextPopup( props : ContextPopupProp ) {
                                 backgroundColor: 'white',
                                 border: '1px solid gray',
                                 padding: '5px',
-                                // transform: "translate(-50%, -100%)",
                                 borderRadius: "4px",
                                 boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.62)",
                             }
@@ -75,7 +74,7 @@ export default function ContextPopup( props : ContextPopupProp ) {
                     >
                         <ul className="context-popup">
                             {
-                               props.options.map( (item, index) => <li key={index} onClick={item.action}>{item.optionTitle}</li> )
+                                props.options.map( (item, index) => { return <li key={index} onClick={item.action}>{item.optionTitle}</li> })
                             }
                         </ul>
                     </div>

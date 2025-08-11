@@ -272,6 +272,7 @@
     align-items: center;
     /* width: 100%; */
     /* padding: 10px 0px; */
+    padding: 0px 0px 0px 10px;
     border-bottom: 1px solid rgb(193, 193, 193);
     background-color: rgb(249, 249, 249);
     font-size: 0.9rem;
@@ -445,11 +446,25 @@
         cursor: pointer;
     }
 
-    > li:not(:last-child) {
-        border-bottom: 1px solid rgba(175, 175, 175, 0.775);
+    /* > li:not(:last-child, :first-child) {
+        margin-top: 2px;
+        margin-bottom: 2px;
     }
+
+    > li:not(:first-child) {
+        margin-top: 2px;
+    }
+
+    > li:not(:last-child) {
+        margin-bottom: 2px;
+    } */
 }
 
+/* .horizontal-separator {
+    width: 100%;
+    height: 1px;
+    border-top: 1px solid rgba(175, 175, 175, 0.775);
+} */
 
 @container (width < 200px) {
     .expandable-group-header {

@@ -37,7 +37,7 @@ db.prepare(`
     pub_date        DATETIME,
     is_favorite     INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
     is_read         INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
-    pending_removal INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
+    in_feed_bin     INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
 
     FOREIGN KEY (sub_id) REFERENCES subscription(id) ON DELETE CASCADE
   )

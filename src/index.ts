@@ -391,7 +391,7 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
     }
   }
 
-  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, comments_url, pub_date, is_favorite, is_read, pending_removal) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, comments_url, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
   for( const i of items ) {
     try {
       const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.pub_date, 0, 0, 0 );
@@ -411,7 +411,7 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ?');
+  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ? AND in_feed_bin = 0 AND is_favorite = 0');
 
   let items : FeedItem[] = [];
   for( const s of subs ) {
@@ -449,13 +449,25 @@ ipcMain.handle( 'set-favorite', ( event: IpcMainInvokeEvent, itemId : number, va
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-favorites', ( event: IpcMainInvokeEvent ) => {
-    const stmt = db.prepare( 'SELECT * FROM feed_item WHERE is_favorite = 1' );
+    const stmt = db.prepare( 'SELECT * FROM feed_item WHERE is_favorite = 1 AND in_feed_bin = 0' );
+    return stmt.all();
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-feed-bin-items', ( event: IpcMainInvokeEvent ) => {
+    const stmt = db.prepare( 'SELECT * FROM feed_item WHERE in_feed_bin = 1 AND is_favorite = 0' );
     return stmt.all();
 });
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'set-read', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
     const stmt = db.prepare( 'UPDATE feed_item SET is_read = ? WHERE id = ?' );
+    stmt.run( value ? 1 : 0, itemId );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'set-in-feed-bin', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
+    const stmt = db.prepare( 'UPDATE feed_item SET in_feed_bin = ? WHERE id = ?' );
     stmt.run( value ? 1 : 0, itemId );
 });
 

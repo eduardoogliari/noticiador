@@ -13,11 +13,13 @@ const lastWeekEnd      = subDays(currentWeekEnd, 7);
 export type FeedListProp = {
     feedItems     : FeedItem[];
     onClick       : (itemId : number, url : string) => void;
-    onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
+    // onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
+    setIsFeedFavorite : (itemId : number, value : boolean) => void;
     onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
     copyToClipboard   : (url : string) => void;
+    setInFeedBin : (itemId: number, value : boolean) => void;
     onCloseFeedOptionsPopup : () => void;
     commentsActiveId : number;
     moreOptionsActiveId : number;
@@ -70,7 +72,8 @@ export default function FeedList( props : FeedListProp ) {
                                 faviconCache={props.faviconCache}
                                 feedItems={value}
                                 onClick={props.onClick}
-                                onFavoriteClick={props.onFavoriteClick}
+                                // onFavoriteClick={props.onFavoriteClick}
+                                setIsFeedFavorite={props.setIsFeedFavorite}
                                 name={key}
                                 selectedItemId={props.selectedItemId}
                                 onMoreOptionsClick={props.onMoreOptionsClick}
@@ -80,6 +83,7 @@ export default function FeedList( props : FeedListProp ) {
                                 onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
                                 openInExternalBrowser={props.openInExternalBrowser}
                                 copyToClipboard={props.copyToClipboard}
+                                setInFeedBin={props.setInFeedBin}
                             ></FeedListDateHeader>
                         </li>
                     )
