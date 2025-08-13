@@ -77,10 +77,10 @@ export default function ClientArea() {
         }
     }
 
-    async function syncFeedBinItems() {
-        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-        setFeedBinItems( binItems );
-    }
+    // async function syncFeedBinItems() {
+    //     const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+    //     setFeedBinItems( binItems );
+    // }
 
     async function syncAllFeedItems() {
         const items = await window.rssAPI.getFeeds(subscriptions);
@@ -89,7 +89,7 @@ export default function ClientArea() {
 
     async function updateFeedItemsFromDb() {
         syncSelectedSubscriptionFeedItems();
-        syncFeedBinItems();
+        // syncFeedBinItems();
         syncAllFeedItems();
     }
 
@@ -208,8 +208,8 @@ export default function ClientArea() {
             const favorites : FeedItem[] = await window.rssAPI.getFavorites();
             setFavoriteItems( favorites );
 
-            const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-            setFeedBinItems( binItems );
+            // const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+            // setFeedBinItems( binItems );
 
             await updateAllFeeds();
 
