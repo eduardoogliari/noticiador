@@ -160,6 +160,11 @@ export default function ClientArea() {
     async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
+
+    function closeModal() {
+        SetIsAddSubscriptionModalOpen(false);
+    }
+
     useEffect(() => {
         if( !containerRef.current ) { return; }
 
@@ -246,6 +251,7 @@ export default function ClientArea() {
     useEffect( () => {
         (async () => {
             await updateFeedItemsFromDb();
+            console.log('useEffect ----------------------------------------');
         })();
     }, [favoriteItems, feedBinItems] );
 
@@ -353,20 +359,20 @@ export default function ClientArea() {
         event.stopPropagation();
 
         if( await window.electronApi.getWebviewURL() !== commentsUrl ) {
-                setCommentsActiveId( itemId );
+            setCommentsActiveId( itemId );
             window.electronApi.setWebviewURL( commentsUrl );
 
-            } else {
-                // Toggle
-                const newCommentActiveValue = commentsActiveId === itemId ? -1 : commentsActiveId;
+        } else {
+            // Toggle
+            const newCommentActiveValue = commentsActiveId === itemId ? -1 : commentsActiveId;
 
-                setCommentsActiveId( newCommentActiveValue );
+            setCommentsActiveId( newCommentActiveValue );
 
-                if( newCommentActiveValue === -1 ) {
+            if( newCommentActiveValue === -1 ) {
                 window.electronApi.setWebviewURL( url );
-                    markItemAsRead(itemId);
+                markItemAsRead(itemId);
 
-                } else {
+            } else {
                 window.electronApi.setWebviewURL( commentsUrl );
             }
         }
@@ -447,7 +453,7 @@ export default function ClientArea() {
             </PanelGroup>
             <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
 
-            <AddSubscriptionModal isOpen={isAddSubscriptionModalOpen}></AddSubscriptionModal>
+            <AddSubscriptionModal isOpen={isAddSubscriptionModalOpen} onClose={closeModal}></AddSubscriptionModal>
         </div>
     );
 }
