@@ -10,6 +10,7 @@ import { RefreshFeedResultsMap } from './types/refresh-feed-result';
 import { RunResult, Statement } from 'better-sqlite3';
 import * as cheerio from "cheerio";
 import sharp from 'sharp/lib';
+import { WebContentsView } from 'electron';
 
 const store = new Store();
 const parser : Parser = new Parser({
@@ -34,33 +35,13 @@ const defaultFilterList : string[] = [
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+let wcView : WebContentsView | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-app.on('web-contents-created', (event, contents) => {
-//   if (contents.getType() === 'webview') {
-
-    contents.setWindowOpenHandler(({ url }) => {
-        console.log('Webview requested new window:', url);
-
-        return {
-            action: 'allow',
-            overrideBrowserWindowOptions: {
-                webPreferences: {
-                    partition: 'persist:custom-partition',
-                    nodeIntegration: false,
-                    contextIsolation: true,
-                    sandbox: true,
-                },
-                autoHideMenuBar: true,
-            }
-        };
-    });
-//   }
-});
 
 const createWindow = () : void => {
     // Create the browser window.
@@ -71,13 +52,43 @@ const createWindow = () : void => {
             preload         : MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
             contextIsolation: true,
             nodeIntegration : false,
-            webviewTag      : true,
         },
         autoHideMenuBar: true,
     });
 
     // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+    wcView = new WebContentsView({
+        webPreferences: {
+            partition: 'persist:custom-partition',
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: true,
+        }
+    });
+    wcView?.setBounds({ x: 0, y: 0, width: 800, height: 600 });
+    wcView?.webContents.loadURL('https://www.google.com');
+
+    wcView.webContents.setWindowOpenHandler((details) => {
+        console.log('Blocked window.open attempt:', details.url);
+        return { action: 'deny' };
+
+        // return {
+        //     action: 'allow',
+        //     overrideBrowserWindowOptions: {
+        //         webPreferences: {
+        //             partition: 'persist:custom-partition',
+        //             nodeIntegration: false,
+        //             contextIsolation: true,
+        //             sandbox: true,
+        //         },
+        //         autoHideMenuBar: true,
+        //     }
+        // };
+    });
+
+    mainWindow.contentView.addChildView( wcView );
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
@@ -479,4 +490,23 @@ ipcMain.handle( 'open-external-browser', ( event: IpcMainInvokeEvent, url : stri
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'copy-to-clipboard', ( event: IpcMainInvokeEvent, text : string ) => {
     clipboard.writeText(text);
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.on( 'set-webview-bounds', ( event: IpcMainInvokeEvent, x : number, y : number, width : number, height : number) => {
+    wcView?.setBounds( { x: x, y: y, width: width, height: height } );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.on( 'set-webview-url', ( event: IpcMainInvokeEvent, url: string ) => {
+    console.log( 'set-webview-url: ', url );
+    if( wcView?.webContents.getURL() !== url ) {
+        wcView?.webContents.loadURL( url );
+    }
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-webview-url', ( event: IpcMainInvokeEvent ) => {
+    console.log( 'get-webview-url: ', wcView?.webContents.getURL() ?? '' );
+    return wcView?.webContents.getURL() ?? '';
 });

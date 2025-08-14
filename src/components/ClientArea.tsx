@@ -4,12 +4,10 @@ import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
 import { NewSubscription, Subscription } from '../types/subscription';
 import  { isValidURL } from '../utils';
-import ExpandableGroup from './ExpandableGroup';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
 import AddSubscriptionModal from './AddSubscriptionModal';
-import { ipcRenderer } from 'electron';
 
 type MainOptionInfo = {
     title : string;
@@ -32,7 +30,7 @@ export default function ClientArea() {
     const [commentsActiveId, setCommentsActiveId]               = useState(-1);
     const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
     const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
-    const webviewRef                                                  = useRef<Electron.WebviewTag>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
     const [isAddSubscriptionModalOpen, SetIsAddSubscriptionModalOpen] = useState(false);
 
@@ -101,11 +99,11 @@ export default function ClientArea() {
     }
 
     async function openInExternalBrowser( url : string ) {
-        window.rssAPI.openInExternalBrowser(url);
+        window.electronApi.openInExternalBrowser(url);
     }
 
     async function copyToClipboard( text : string ) {
-        window.rssAPI.copyToClipboard(text);
+        window.electronApi.copyToClipboard(text);
     }
 
     async function showFavorites() {
@@ -162,6 +160,33 @@ export default function ClientArea() {
     async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
+    useEffect(() => {
+        if( !containerRef.current ) { return; }
+
+        const resizeObserver = new ResizeObserver(() => {
+            const rect = containerRef.current.getBoundingClientRect();
+
+            window.electronApi.setWebviewBounds(
+                rect.left,
+                rect.top,
+                rect.width,
+                rect.height
+            );
+        });
+
+        resizeObserver.observe(containerRef.current);
+
+        const rect = containerRef.current.getBoundingClientRect();
+
+        window.electronApi.setWebviewBounds(
+            rect.left,
+            rect.top,
+            rect.width,
+            rect.height
+        );
+
+        return () => resizeObserver.disconnect();
+  }, []);
 
     useEffect(() => {
         ( async () => {
@@ -241,10 +266,7 @@ export default function ClientArea() {
             markItemAsRead( itemId );
 
         }
-
-        if (webviewRef.current && webviewRef.current?.src !== url ) {
-            webviewRef.current.src = url;
-        }
+        window.electronApi.setWebviewURL( url );
 
         setCommentsActiveId(-1);
         setMoreOptionsActiveId(-1);
@@ -330,10 +352,9 @@ export default function ClientArea() {
     async function onCommentsClick(itemId : number, url : string, commentsUrl: string, event: React.MouseEvent) {
         event.stopPropagation();
 
-        if( webviewRef.current ) {
-            if(webviewRef.current?.src !== commentsUrl ) {
+        if( await window.electronApi.getWebviewURL() !== commentsUrl ) {
                 setCommentsActiveId( itemId );
-                webviewRef.current.src = commentsUrl;
+            window.electronApi.setWebviewURL( commentsUrl );
 
             } else {
                 // Toggle
@@ -342,16 +363,15 @@ export default function ClientArea() {
                 setCommentsActiveId( newCommentActiveValue );
 
                 if( newCommentActiveValue === -1 ) {
-                    webviewRef.current.src = url;
+                window.electronApi.setWebviewURL( url );
                     markItemAsRead(itemId);
 
                 } else {
-                    webviewRef.current.src = commentsUrl;
-                }
+                window.electronApi.setWebviewURL( commentsUrl );
             }
-            setSelectedItemId(itemId);
-            // setMoreOptionsActiveId(-1);
         }
+        setSelectedItemId(itemId);
+        // setMoreOptionsActiveId(-1);
     }
 
     return (
@@ -420,7 +440,7 @@ export default function ClientArea() {
                     <>
                         <PanelResizeHandle className='panel-resizer-handle' />
                         <Panel id="right" className={'panel-right'} order={3} minSize={30}>
-                            <webview ref={webviewRef} className={'web-preview'} partition="persist:custom-partition"></webview>
+                            <div ref={containerRef} style={{width: '100%', height: '100%'}}></div>
                         </Panel>
                     </>
                 }
