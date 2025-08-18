@@ -155,7 +155,27 @@ export default function ClientArea() {
             onCloseSubscriptionOptionsPopup();
         });
     }, []);
+
+    useEffect(() => {
+        return window.webAPI.onURLChanged((url) => {
+            console.log("navigated to", url);
+            setCurrentURL( url );
+        });
     }, []);
+
+    useEffect(() => {
+         if( selectedItemId != -1 ) {
+                const foundItem = getCurrentlyVisibleFeedItems().find( (item) => item.id === selectedItemId );
+                if( foundItem ) {
+                    if( foundItem.comments_url === currentURL ) {
+                        setCommentsActiveId( foundItem.id );
+                    } else {
+                        setCommentsActiveId( -1 );
+                    }
+                }
+            }
+
+    }, [currentURL]);
 
     useEffect(() => {
         if( !containerRef.current ) { return; }
@@ -266,8 +286,8 @@ export default function ClientArea() {
         }
         window.electronApi.setWebviewURL( url );
 
-        setCommentsActiveId(-1);
-        setMoreOptionsActiveId(-1);
+        // setCommentsActiveId(-1);
+        // setMoreOptionsActiveId(-1);
     }
 
     async function setIsFeedFavorite( itemId : number, value : boolean ) {
@@ -355,6 +375,7 @@ export default function ClientArea() {
         event.stopPropagation();
 
         if( await window.electronApi.getWebviewURL() !== commentsUrl ) {
+            // Different item's comment button
             setCommentsActiveId( itemId );
             window.electronApi.setWebviewURL( commentsUrl );
 
@@ -364,6 +385,7 @@ export default function ClientArea() {
 
             setCommentsActiveId( newCommentActiveValue );
 
+
             if( newCommentActiveValue === -1 ) {
                 window.electronApi.setWebviewURL( url );
                 markItemAsRead(itemId);
@@ -372,7 +394,9 @@ export default function ClientArea() {
                 window.electronApi.setWebviewURL( commentsUrl );
             }
         }
+
         setSelectedItemId(itemId);
+
         // setMoreOptionsActiveId(-1);
     }
 

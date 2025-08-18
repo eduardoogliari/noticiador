@@ -31,3 +31,11 @@ contextBridge.exposeInMainWorld('electronApi', {
   closeAddSubscriptionModal: () => ipcRenderer.send( 'close-add-subscription-modal' ),
   onClosePopups: ( callback: () => void ) => { ipcRenderer.on( 'close-popups', callback ); return () => ipcRenderer.removeListener( 'close-popups', callback ); },
 });
+
+contextBridge.exposeInMainWorld('webAPI', {
+    onURLChanged: (callback: (url : string) => void) => {
+      const handler = (_event: Electron.IpcRendererEvent, url: string) => { callback(url); };
+      ipcRenderer.on("on-url-changed", handler);
+      return () => { ipcRenderer.removeListener("on-url-changed", handler); };
+    },
+});

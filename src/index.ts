@@ -93,6 +93,10 @@ const createWindow = () : void => {
         // };
     });
 
+    wcView.webContents.addListener('did-navigate', (event, url, responseCode, statusText) => {
+        mainWindow.webContents.send( 'on-url-changed', url );
+    });
+
     wcView.webContents.addListener('before-mouse-event', (event, mouse) => {
         if( mouse.type == 'mouseDown' ) {
             mainWindow.webContents.send( 'close-popups' );
