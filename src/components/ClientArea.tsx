@@ -326,7 +326,8 @@ export default function ClientArea() {
         // }
     }
 
-    async function onSubscriptionOptionsClick( subId : number ) {
+    async function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
+        event.stopPropagation();
         setSelectedSubscriptionOptionsId(subId);
     }
 
@@ -439,6 +440,7 @@ export default function ClientArea() {
                                     selectedSubscriptionOptionsId={selectedSubscriptionOptionsId}
                                     subscriptions={subscriptions}
                                     selectedSubscriptionId={selectedSubscriptionId}
+                                    onCloseSubOptions={onCloseSubscriptionOptionsPopup}
                                 ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>

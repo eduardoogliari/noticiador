@@ -213,7 +213,9 @@
     background-color: rgb(221, 221, 221);
 }
 
+.subscription-list-item-options-button {
 
+}
 
 .constrained-label {
     white-space: nowrap;
@@ -264,22 +266,22 @@
 .subscription-list-item:hover {
     background-color: rgba(0, 0, 0, 0.138);
 
-    .subscription-list-item-options-button {
+    .subscription-list-item-options-container {
         visibility: visible;
     }
 }
 
-.subscription-list-item-options-button {
+.subscription-list-item-options-container {
     margin-left: auto;
     cursor: pointer;
     visibility: hidden;
 }
 
-.subscription-list-item-options-button:hover {
+.subscription-list-item-options-container:hover {
     background-color: rgba(0, 0, 0, 0.138);
 }
 
-.subscription-list-item-options-button.selected {
+.subscription-list-item-options-container.selected {
     background-color: rgba(0, 0, 0, 0.138);
     visibility: visible;
 }

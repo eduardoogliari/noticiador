@@ -1,5 +1,5 @@
 import { Subscription } from "../types/subscription";
-import ConstrainedLabel from "./ConstrainedLabel";
+import SubscriptionListItem from "./SubscriptionListItem";
 
 export type SubscriptionsListProp = {
     subscriptions : Subscription[];
@@ -7,7 +7,8 @@ export type SubscriptionsListProp = {
     selectedSubscriptionId : number;
     selectedSubscriptionOptionsId : number;
     onClickSubTitle : (subId : number) => void;
-    onClickSubOptions : (subId : number) => void;
+    onClickSubOptions : (subId : number, event: React.MouseEvent) => void;
+    onCloseSubOptions : () => void;
 };
 
 export default function SubscriptionsList( props : SubscriptionsListProp ) {
@@ -16,18 +17,17 @@ export default function SubscriptionsList( props : SubscriptionsListProp ) {
             {
                 props.subscriptions.map( (item) => {
                     return (
-                        <li
-                            onClick={() => props.onClickSubTitle(item.id)}
-                            className={`subscription-list-item ${props.selectedSubscriptionId == item.id ? 'selected' : ''}`}
+                        <SubscriptionListItem
+                            faviconCache={props.faviconCache}
+                            id={item.id}
+                            name={item.name}
+                            onClickSubOptions={props.onClickSubOptions}
+                            onClickSubTitle={props.onClickSubTitle}
+                            onCloseSubOptions={props.onCloseSubOptions}
+                            selectedSubscriptionId={props.selectedSubscriptionId}
+                            selectedSubscriptionOptionsId={props.selectedSubscriptionOptionsId}
                             key={item.id}
-                        >
-                            <img src={props.faviconCache[item.id]}></img>
-                            <ConstrainedLabel title={item.name}></ConstrainedLabel>
-                            <span
-                                className={`subscription-list-item-options-button ${props.selectedSubscriptionOptionsId == item.id ? 'selected' : ''}`}
-                                onClick={(e) => { e.stopPropagation(); props.onClickSubOptions(item.id); }}
-                            >⋮</span>
-                        </li>
+                        ></SubscriptionListItem>
                     );
                 })
             }

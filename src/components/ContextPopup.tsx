@@ -10,6 +10,7 @@ export type ContextPopupProp = {
     anchorRef: React.RefObject<HTMLElement>;
     onClose: () => void;
     options: ContextPopupOption[];
+    alignment : 'top' | 'right';
 };
 
 type PopupPosition = {
@@ -30,18 +31,22 @@ export default function ContextPopup( props : ContextPopupProp ) {
 
             const horizontalOffset = 5; // 5 pixels
 
-            // pos.top = anchorRect.top;
-            // pos.left = anchorRect.right;
-            pos.top = anchorRect.top - popupRect.height;
-            pos.left = anchorRect.right - popupRect.width - horizontalOffset;
+            if( props.alignment === 'top' ) {
+                pos.top = anchorRect.top - popupRect.height;
+                pos.left = anchorRect.right - popupRect.width - horizontalOffset;
 
-            if( anchorRect.top - popupRect.height < window.screenTop ) {
-                pos.top = anchorRect.bottom;
+                if( anchorRect.top - popupRect.height < window.screenTop ) {
+                    pos.top = anchorRect.bottom;
+                }
+            } else if( props.alignment === 'right' ) {
+                pos.top = anchorRect.top;
+                pos.left = anchorRect.right + horizontalOffset;
+
+                if( anchorRect.top + popupRect.height > window.innerHeight ) {
+                    pos.top = window.innerHeight - popupRect.height;
+                }
             }
 
-            // if( anchorRect.top + popupRect.height > window.innerHeight ) {
-            //     pos.top = window.innerHeight - popupRect.height;
-            // }
         }
         return pos;
     }
@@ -57,11 +62,17 @@ export default function ContextPopup( props : ContextPopupProp ) {
         };
     }, [props.anchorRef]);
 
+
     return  (
 
             createPortal(
                     <>
-                    <div style={{width: '100%', height: '100%', position: 'fixed', top: '0', left: '0', zIndex: '9998'}}></div>
+                    <div style={{width: '100%', height: '100%', position: 'fixed', top: '0', left: '0', zIndex: '9998'}} onClick={
+                        (e) => {
+                            e.stopPropagation();
+                            console.log('aaaaaaa');
+                            props.onClose();
+                             }}></div>
                     <div
                         onClick={(e) => e.stopPropagation() }
                         ref={popupRef}

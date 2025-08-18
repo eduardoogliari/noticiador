@@ -71,13 +71,15 @@ export default function FeedListItem( props : FeedListItemProp ) {
     );
 
     return (
-        <li className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`} onClick={() => props.onClick(props.id, props.url)}>
-            {/* <span className={`feed-item-favorite-container ${props.isFavorite || props.isSelected ? 'favorite' : ''}`} onClick={(e) => props.onFavoriteClick(props.id, !props.isFavorite, e)} >
-                <span className={'feed-item-favorite'}>
-                    {props.isFavorite ? '★' : '☆' }
-                </span>
-            </span> */}
-            {(props.favicon) ? <img className="feed-item-favicon" src={props.favicon}></img> : '' }
+        <li
+            className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`}
+            onClick={() => props.onClick(props.id, props.url)}
+        >
+            {
+                (props.favicon)
+                    ? <img className="feed-item-favicon" src={props.favicon}></img>
+                    : ''
+            }
             <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary}>{props.title}</span>
 
             <span className={`feed-item-options-container ${optionsContainerVisible ? 'visible' : ''}`}>
@@ -90,11 +92,20 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     }
                     </span>
                     : ''}
-                <span ref={moreOptionsRef} className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
+                <span
+                    ref={moreOptionsRef}
+                    className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`}
+                    onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
+                >
                     <span>⋮</span>
                     {
                         (props.moreOptionsActiveId === props.id)
-                            ? <ContextPopup anchorRef={moreOptionsRef} onClose={props.onCloseFeedOptionsPopup} options={feedItemContextOptions}></ContextPopup>
+                            ?   <ContextPopup
+                                    anchorRef={moreOptionsRef}
+                                    alignment="top"
+                                    onClose={props.onCloseFeedOptionsPopup}
+                                    options={feedItemContextOptions}
+                                ></ContextPopup>
                             : ''
                     }
                 </span>
