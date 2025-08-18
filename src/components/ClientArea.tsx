@@ -26,6 +26,8 @@ export default function ClientArea() {
     const [selectedItemId, setSelectedItemId]                   = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
     const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
+    const [selectedSubscriptionOptionsId, setSelectedSubscriptionOptionsId] = useState(-1);
+    const [currentURL, setCurrentURL] = useState('');
     const [commentsActiveId, setCommentsActiveId]               = useState(-1);
     const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
     const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
@@ -139,15 +141,20 @@ export default function ClientArea() {
         window.electronApi.openAddSubscriptionModal();
     }
 
+    async function onCloseSubscriptionOptionsPopup() {
+        setSelectedSubscriptionOptionsId(-1);
+    }
+
     async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
 
     useEffect(() => {
-        const unsubscribe = window.electronApi.onClosePopups(() => {
+        return window.electronApi.onClosePopups(() => {
             onCloseFeedOptionsPopup();
+            onCloseSubscriptionOptionsPopup();
         });
-        return () => unsubscribe;
+    }, []);
     }, []);
 
     useEffect(() => {
@@ -299,6 +306,10 @@ export default function ClientArea() {
         // }
     }
 
+    async function onSubscriptionOptionsClick( subId : number ) {
+        setSelectedSubscriptionOptionsId(subId);
+    }
+
     async function onSubscriptionItemClick( subId : number ) {
         if( subId != selectedSubscriptionId ) {
             const foundItem = subscriptions.find( (item) => item.id == subId );
@@ -397,7 +408,14 @@ export default function ClientArea() {
                                 </ExpandableGroup> */}
 
                                 <div className='subscriptions-header'>Subscriptions</div>
-                                <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>
+                                <SubscriptionsList
+                                    faviconCache={faviconCache}
+                                    onClickSubTitle={onSubscriptionItemClick}
+                                    onClickSubOptions={onSubscriptionOptionsClick}
+                                    selectedSubscriptionOptionsId={selectedSubscriptionOptionsId}
+                                    subscriptions={subscriptions}
+                                    selectedSubscriptionId={selectedSubscriptionId}
+                                ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>
                                     <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>

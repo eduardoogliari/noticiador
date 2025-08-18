@@ -91,7 +91,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     </span>
                     : ''}
                 <span ref={moreOptionsRef} className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`} onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}>
-                    <span>...</span>
+                    <span>⋮</span>
                     {
                         (props.moreOptionsActiveId === props.id)
                             ? <ContextPopup anchorRef={moreOptionsRef} onClose={props.onCloseFeedOptionsPopup} options={feedItemContextOptions}></ContextPopup>

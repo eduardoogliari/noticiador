@@ -263,6 +263,25 @@
 
 .subscription-list-item:hover {
     background-color: rgba(0, 0, 0, 0.138);
+
+    .subscription-list-item-options-button {
+        visibility: visible;
+    }
+}
+
+.subscription-list-item-options-button {
+    margin-left: auto;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+.subscription-list-item-options-button:hover {
+    background-color: rgba(0, 0, 0, 0.138);
+}
+
+.subscription-list-item-options-button.selected {
+    background-color: rgba(0, 0, 0, 0.138);
+    visibility: visible;
 }
 
 .expandable-group {
