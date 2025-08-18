@@ -4,7 +4,8 @@ import ContextPopup, {ContextPopupOption} from "./ContextPopup";
 export type FeedListItemProp = {
     id                      : number;
     url                     : string;
-    commentsUrl            ?: string;
+    commentsUrl             ?: string;
+    summary                 ?: string;
     title                   : string;
     onClick                 : (itemId : number, url : string) => void;
     // onFavoriteClick         : (itemId : number, value : boolean, event: React.MouseEvent) => void;
@@ -77,7 +78,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                 </span>
             </span> */}
             {(props.favicon) ? <img className="feed-item-favicon" src={props.favicon}></img> : '' }
-            <span className="feed-item-title">{props.title}</span>
+            <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary}>{props.title}</span>
 
             <span className={`feed-item-options-container ${optionsContainerVisible ? 'visible' : ''}`}>
                 {props.commentsUrl ?

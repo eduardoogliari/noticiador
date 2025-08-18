@@ -457,8 +457,7 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
         }
         const absoluteURL = (isRelativeLink) ? new URL(i.link, s.url).toString() : i.link;
 
-        console.log( i.comments );
-        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'comments_url': i.comments,  'pub_date': i.pubDate };
+        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'comments_url': i.comments, 'summary': i.summary,  'pub_date': i.pubDate };
         items.push(f);
       });
       results[s.id] = { success: true, errorMessage: '' };
@@ -469,10 +468,10 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
     }
   }
 
-  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, comments_url, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
   for( const i of items ) {
     try {
-      const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.pub_date, 0, 0, 0 );
+      const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
       console.log(res);
     } catch( err ) {
       results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };

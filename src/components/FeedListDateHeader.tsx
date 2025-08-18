@@ -29,6 +29,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 title={item.title}
                 url={item.url}
                 commentsUrl={item.comments_url}
+                summary={item.summary}
                 favicon={props.faviconCache[item.sub_id]}
                 isSelected={item.id === props.selectedItemId}
                 onClick={ props.onClick }
