@@ -28,12 +28,20 @@ export default function ContextPopup( props : ContextPopupProp ) {
             const anchorRect = props.anchorRef.current.getBoundingClientRect();
             const popupRect = popupRef.current.getBoundingClientRect();
 
-            pos.top = anchorRect.top;
-            pos.left = anchorRect.right;
+            const horizontalOffset = 5; // 5 pixels
 
-            if( anchorRect.top + popupRect.height > window.innerHeight ) {
-                pos.top = window.innerHeight - popupRect.height;
+            // pos.top = anchorRect.top;
+            // pos.left = anchorRect.right;
+            pos.top = anchorRect.top - popupRect.height;
+            pos.left = anchorRect.right - popupRect.width - horizontalOffset;
+
+            if( anchorRect.top - popupRect.height < window.screenTop ) {
+                pos.top = anchorRect.bottom;
             }
+
+            // if( anchorRect.top + popupRect.height > window.innerHeight ) {
+            //     pos.top = window.innerHeight - popupRect.height;
+            // }
         }
         return pos;
     }
