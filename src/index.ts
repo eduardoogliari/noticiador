@@ -34,9 +34,12 @@ const defaultFilterList : string[] = [
 // plugin that tells the Electron app where to look for the Webpack-bundled app code (depending on
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const SUBSCRIPTION_MODAL_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let wcView : WebContentsView | null = null;
+let mainWindow : BrowserWindow | null = null;
+let subscriptionModalWindow : BrowserWindow | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -46,7 +49,7 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = () : void => {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         height        : 600,
         width         : 800,
         webPreferences: {
@@ -60,16 +63,17 @@ const createWindow = () : void => {
     // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+
+
     wcView = new WebContentsView({
         webPreferences: {
             partition: 'persist:custom-partition',
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: true,
+            // javascript: false,
         }
     });
-    wcView?.setBounds({ x: 0, y: 0, width: 800, height: 600 });
-    wcView?.webContents.loadURL('https://www.google.com');
 
     wcView.webContents.setWindowOpenHandler((details) => {
         console.log('Blocked window.open attempt:', details.url);
@@ -87,6 +91,12 @@ const createWindow = () : void => {
         //         autoHideMenuBar: true,
         //     }
         // };
+    });
+
+    wcView.webContents.addListener('before-mouse-event', (event, mouse) => {
+        if( mouse.type == 'mouseDown' ) {
+            mainWindow.webContents.send( 'close-popups' );
+        }
     });
 
     mainWindow.contentView.addChildView( wcView );
@@ -152,6 +162,62 @@ app.on('activate', () => {
   }
 });
 
+
+
+ipcMain.on( 'open-add-subscription-modal', () => {
+    if( subscriptionModalWindow ) { return; }
+
+     subscriptionModalWindow = new BrowserWindow({
+        title: 'Add new feed',
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        height        : 80,
+        width         : 640,
+        resizable: false,
+        webPreferences: {
+            preload         : MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+            contextIsolation: true,
+            nodeIntegration : false,
+        },
+        autoHideMenuBar: true,
+    });
+    // console.log( 'MODAL_WINDOW_WEBPACK_ENTRY: ', MODAL_WEBPACK_ENTRY );
+
+    subscriptionModalWindow.loadURL( SUBSCRIPTION_MODAL_WEBPACK_ENTRY );
+    subscriptionModalWindow.setMenu(null);
+
+    subscriptionModalWindow.on('closed', () => {
+        subscriptionModalWindow = null;
+    });
+
+    subscriptionModalWindow.webContents.on( 'before-input-event', (event, input) => {
+        if (input.type === "keyUp" && input.key === "Escape") {
+            closeAddSubscriptionModal();
+        }
+    });
+
+    subscriptionModalWindow.webContents.on( 'did-finish-load', () => {
+        const parentRect = mainWindow.getBounds();
+        const modalRect = subscriptionModalWindow.getBounds();
+
+        const x = parentRect.x + (parentRect.width / 2) - (modalRect.width / 2);
+        const y = parentRect.y + (parentRect.height / 2) - (modalRect.height / 2);
+
+        subscriptionModalWindow.setPosition( x, y );
+        subscriptionModalWindow.show();
+    });
+});
+
+ipcMain.on( 'close-add-subscription-modal', () => {
+    closeAddSubscriptionModal();
+});
+
+function closeAddSubscriptionModal() {
+    if( subscriptionModalWindow ) {
+        subscriptionModalWindow.close();
+    }
+}
 
 
 async function rebuildAdblock( filterLists : string[] ) {
@@ -500,7 +566,6 @@ ipcMain.on( 'set-webview-bounds', ( event: IpcMainInvokeEvent, x : number, y : n
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.on( 'set-webview-url', ( event: IpcMainInvokeEvent, url: string ) => {
-    console.log( 'set-webview-url: ', url );
     if( wcView?.webContents.getURL() !== url ) {
         wcView?.webContents.loadURL( url );
     }

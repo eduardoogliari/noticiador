@@ -7,7 +7,6 @@ import  { isValidURL } from '../utils';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
-import AddSubscriptionModal from './AddSubscriptionModal';
 
 type MainOptionInfo = {
     title : string;
@@ -18,23 +17,20 @@ type MainOptionInfo = {
 };
 
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel]                           = useState(true);
-    const [allFeedItems, setAllFeedItems]                             = useState<FeedItem[]>([]);
-    const [feedItems, setFeedItems]                                   = useState<FeedItem[]>([]);
-    const [favoriteItems, setFavoriteItems]                           = useState<FeedItem[]>([]);
-    const [feedBinItems, setFeedBinItems]                             = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache]                             = useState<Record<number, string>>({});
-    const [selectedItemId, setSelectedItemId]                         = useState(-1);
-    const [selectedSubscriptionId, setSelectedSubscriptionId]         = useState(-1);
+    const [showLeftPanel, setShowLeftPanel]                     = useState(true);
+    const [allFeedItems, setAllFeedItems]                       = useState<FeedItem[]>([]);
+    const [feedItems, setFeedItems]                             = useState<FeedItem[]>([]);
+    const [favoriteItems, setFavoriteItems]                     = useState<FeedItem[]>([]);
+    const [feedBinItems, setFeedBinItems]                       = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
+    const [selectedItemId, setSelectedItemId]                   = useState(-1);
+    const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
     const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
     const [commentsActiveId, setCommentsActiveId]               = useState(-1);
     const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
-    const [subscriptions, setSubscriptions]                           = useState<Subscription[]>([]);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [scrollToTopKey, setScrollToTopKey]                         = useState(0);
-    const [isAddSubscriptionModalOpen, SetIsAddSubscriptionModalOpen] = useState(false);
-
-
+    const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
+    const containerRef                                          = useRef<HTMLDivElement>(null);
+    const [scrollToTopKey, setScrollToTopKey]                   = useState(0);
 
     const mainOptions : MainOptionInfo[] = [
         { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () =>  allFeedItems.filter( (i) => !i.is_read ).length },
@@ -75,11 +71,6 @@ export default function ClientArea() {
         }
     }
 
-    // async function syncFeedBinItems() {
-    //     const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-    //     setFeedBinItems( binItems );
-    // }
-
     async function syncAllFeedItems() {
         const items = await window.rssAPI.getFeeds(subscriptions);
         setAllFeedItems(items);
@@ -87,14 +78,10 @@ export default function ClientArea() {
 
     async function updateFeedItemsFromDb() {
         syncSelectedSubscriptionFeedItems();
-        // syncFeedBinItems();
         syncAllFeedItems();
     }
 
     async function showAllFeeds() {
-        // const items = await window.rssAPI.getFeeds(subscriptions);
-        // setAllFeedItems( items );
-
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -107,15 +94,10 @@ export default function ClientArea() {
     }
 
     async function showFavorites() {
-        // const items = await window.rssAPI.getFavorites();
-        // setFavoriteItems(items);
-        // setFavoriteItems( favoriteItems );
         setScrollToTopKey( (prev) => prev+1 );
     }
 
     async function showFeedBin() {
-        // const items : FeedItem[] = [];
-        // setFeedBinItems(items);
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -154,16 +136,19 @@ export default function ClientArea() {
     }
 
     async function onClickAddSubscription() {
-        SetIsAddSubscriptionModalOpen(true);
+        window.electronApi.openAddSubscriptionModal();
     }
 
     async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
 
-    function closeModal() {
-        SetIsAddSubscriptionModalOpen(false);
-    }
+    useEffect(() => {
+        const unsubscribe = window.electronApi.onClosePopups(() => {
+            onCloseFeedOptionsPopup();
+        });
+        return () => unsubscribe;
+    }, []);
 
     useEffect(() => {
         if( !containerRef.current ) { return; }
@@ -452,8 +437,6 @@ export default function ClientArea() {
                 }
             </PanelGroup>
             <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
-
-            <AddSubscriptionModal isOpen={isAddSubscriptionModalOpen} onClose={closeModal}></AddSubscriptionModal>
         </div>
     );
 }

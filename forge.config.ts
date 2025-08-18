@@ -32,6 +32,14 @@ const config: ForgeConfig = {
               js: './src/preload.ts',
             },
           },
+          {
+            html: './src/subscription_modal_index.html',
+            js: './src/subscription_modal_renderer.ts',
+            name: 'subscription_modal',
+            preload: {
+              js: './src/preload.ts',
+            },
+          },
         ],
       },
     }),

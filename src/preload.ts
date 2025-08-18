@@ -13,18 +13,21 @@ contextBridge.exposeInMainWorld('rssAPI', {
   getSubscriptions: () => ipcRenderer.invoke( 'get-subscriptions' ),
   addSubscriptions: (newSubs: NewSubscription[]) => ipcRenderer.invoke( 'add-subscriptions', newSubs ),
   getFaviconData  : (subId : number) => ipcRenderer.invoke( 'get-favicon-data', subId ),
-  setFavorite : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
-  getFavorites : () => ipcRenderer.invoke('get-favorites'),
-  setRead : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
+  setFavorite     : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
+  getFavorites    : () => ipcRenderer.invoke('get-favorites'),
+  setRead         : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
   getFeedBinItems : () => ipcRenderer.invoke('get-feed-bin-items'),
-  setInFeedBin : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemId, value ),
+  setInFeedBin    : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemId, value ),
 
 });
 
 contextBridge.exposeInMainWorld('electronApi', {
-  openInExternalBrowser : (url : string) => ipcRenderer.invoke( 'open-external-browser', url ),
-  copyToClipboard : (text : string) => ipcRenderer.invoke( 'copy-to-clipboard', text ),
-  setWebviewBounds : (x : number, y : number, width : number, height : number) => ipcRenderer.send( 'set-webview-bounds', x, y, width, height ),
-  setWebviewURL : (url : string) => ipcRenderer.send( 'set-webview-url', url ),
-  getWebviewURL : () => ipcRenderer.invoke( 'get-webview-url' ),
+  openInExternalBrowser    : (url : string) => ipcRenderer.invoke( 'open-external-browser', url ),
+  copyToClipboard          : (text : string) => ipcRenderer.invoke( 'copy-to-clipboard', text ),
+  setWebviewBounds         : (x : number, y : number, width : number, height : number) => ipcRenderer.send( 'set-webview-bounds', x, y, width, height ),
+  setWebviewURL            : (url : string) => ipcRenderer.send( 'set-webview-url', url ),
+  getWebviewURL            : () => ipcRenderer.invoke( 'get-webview-url' ),
+  openAddSubscriptionModal : () => ipcRenderer.send( 'open-add-subscription-modal' ),
+  closeAddSubscriptionModal: () => ipcRenderer.send( 'close-add-subscription-modal' ),
+  onClosePopups: ( callback: () => void ) => { ipcRenderer.on( 'close-popups', callback ); return () => ipcRenderer.removeListener( 'close-popups', callback ); },
 });

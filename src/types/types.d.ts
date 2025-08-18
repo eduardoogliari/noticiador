@@ -13,20 +13,22 @@ declare global {
         getSubscriptions: () => Subscription[];
         addSubscriptions: (newSubs: NewSubscription[]) => void;
         getFaviconData  : (subId : number) => Buffer | null;
-        setFavorite : (itemId : number, value : boolean) => void;
-        getFavorites : () => FeedItem[];
-        setRead : (itemId : number, value : boolean) => void;
+        setFavorite     : (itemId : number, value : boolean) => void;
+        getFavorites    : () => FeedItem[];
+        setRead         : (itemId : number, value : boolean) => void;
         getFeedBinItems : () => FeedItem[];
-        setInFeedBin : (itemId : number, value : boolean) => void;
-
+        setInFeedBin    : (itemId : number, value : boolean) => void;
       };
 
     electronApi: {
-        openInExternalBrowser : (url : string) => void;
-        copyToClipboard : (text : string) => void;
-        setWebviewBounds : (x : number, y : number, width : number, height : number) => void;
-        setWebviewURL : (url : string) => void;
-        getWebviewURL : () => string;
+        openInExternalBrowser    : (url : string) => void;
+        copyToClipboard          : (text : string) => void;
+        setWebviewBounds         : (x : number, y : number, width : number, height : number) => void;
+        setWebviewURL            : (url : string) => void;
+        getWebviewURL            : () => string;
+        openAddSubscriptionModal : () => void;
+        closeAddSubscriptionModal: () => void;
+        onClosePopups: ( callback: () => void ) => void;
     }
   }
 }
