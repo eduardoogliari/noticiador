@@ -44,4 +44,18 @@ db.prepare(`
   )
 `).run();
 
+db.exec(`
+  CREATE TRIGGER IF NOT EXISTS cleanup_subscription
+  AFTER DELETE ON feed_item
+  FOR EACH ROW
+  BEGIN
+    DELETE FROM subscription
+    WHERE id = OLD.sub_id
+      AND deleted_at IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM feed_item WHERE sub_id = OLD.sub_id
+      );
+  END;
+`);
+
 export default db;
