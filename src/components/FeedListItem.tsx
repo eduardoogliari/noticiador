@@ -10,6 +10,7 @@ export type FeedListItemProp = {
     onClick                 : (itemId : number, url : string) => void;
     // onFavoriteClick         : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
+    deleteFeedItem : (itemId : number) => void;
     onMoreOptionsClick      : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick         : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
@@ -35,7 +36,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
     // Feed Bin context options
     const inFeedBinContextOptions : ContextPopupOption[] = [
         { optionTitle: 'Restore item', action: () => {props.setInFeedBin(props.id, false); props.onCloseFeedOptionsPopup();} },
-        { optionTitle: 'Delete permanently', action: () => {} },
+        { optionTitle: 'Delete permanently', action: () => { props.deleteFeedItem(props.id); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFeedBinContextOptions : ContextPopupOption[] = [
         { optionTitle: 'Move to Feed Bin', action: () => {props.setInFeedBin(props.id, true); props.onCloseFeedOptionsPopup();} },
@@ -72,6 +73,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
     return (
         <li
+            tabIndex={0}
             className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`}
             onClick={() => props.onClick(props.id, props.url)}
         >
@@ -80,14 +82,14 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     ? <img className="feed-item-favicon" src={props.favicon}></img>
                     : ''
             }
-            <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary}>{props.title}</span>
+            <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary ?? props.title}>{props.title}</span>
 
             <span className={`feed-item-options-container ${optionsContainerVisible ? 'visible' : ''}`}>
                 {props.commentsUrl ?
                     <span className={`feed-item-comments-container ${props.commentsActiveId === props.id ? 'selected' : ''}`} onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}>
                     {
                         props.commentsUrl
-                            ? <span className={`feed-item-comments`} >💬</span>
+                            ? <span className={`feed-item-comments`} title={'Comments'}>💬</span>
                             : ''
                     }
                     </span>
@@ -97,7 +99,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`}
                     onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
                 >
-                    <span>⋮</span>
+                    <span title={'More options'}>⋮</span>
                     {
                         (props.moreOptionsActiveId === props.id)
                             ?   <ContextPopup

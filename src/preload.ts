@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('rssAPI', {
   setRead         : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
   getFeedBinItems : () => ipcRenderer.invoke('get-feed-bin-items'),
   setInFeedBin    : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemId, value ),
+  deleteFeedItem : (itemId : number) => ipcRenderer.invoke( 'delete-feed-item', itemId ),
 
   signalSubscriptionsChanged: () => ipcRenderer.send('subscriptions-changed'),
   onSubscriptionsChanged: (callback: () => void) => { ipcRenderer.on("subscriptions-changed", callback); },

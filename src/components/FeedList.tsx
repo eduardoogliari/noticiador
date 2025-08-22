@@ -15,6 +15,7 @@ export type FeedListProp = {
     onClick       : (itemId : number, url : string) => void;
     // onFavoriteClick : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
+    deleteFeedItem : (itemId : number) => void;
     onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
@@ -74,6 +75,7 @@ export default function FeedList( props : FeedListProp ) {
                                 onClick={props.onClick}
                                 // onFavoriteClick={props.onFavoriteClick}
                                 setIsFeedFavorite={props.setIsFeedFavorite}
+                                deleteFeedItem={props.deleteFeedItem}
                                 name={key}
                                 selectedItemId={props.selectedItemId}
                                 onMoreOptionsClick={props.onMoreOptionsClick}

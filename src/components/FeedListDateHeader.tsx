@@ -8,6 +8,7 @@ export type FeedListDateHeaderProps = {
     onClick                : (itemId : number, url : string) => void;
     // onFavoriteClick        : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
+    deleteFeedItem : (itemId : number) => void;
     onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
@@ -37,6 +38,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 isRead={item.is_read}
                 // onFavoriteClick={props.onFavoriteClick}
                 setIsFeedFavorite={props.setIsFeedFavorite}
+                deleteFeedItem={props.deleteFeedItem}
                 onMoreOptionsClick={props.onMoreOptionsClick}
                 onCommentsClick={props.onCommentsClick}
                 onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
