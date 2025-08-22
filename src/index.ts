@@ -11,6 +11,7 @@ import { RunResult, Statement } from 'better-sqlite3';
 import * as cheerio from "cheerio";
 import sharp from 'sharp/lib';
 import { WebContentsView } from 'electron';
+import { SubscriptionFilter } from './types/subscription-filter';
 
 const store = new Store();
 const parser : Parser = new Parser({
@@ -211,6 +212,8 @@ ipcMain.on( 'open-add-subscription-modal', () => {
         subscriptionModalWindow.setPosition( x, y );
         subscriptionModalWindow.show();
     });
+
+    subscriptionModalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 });
 
 ipcMain.on( 'close-add-subscription-modal', () => {
@@ -294,11 +297,23 @@ async function urlContainsFeed( url : string ) : Promise<boolean> {
 }
 
 // ------------------------------------------------------------------------------------------------------
-ipcMain.handle( 'get-subscriptions', () => {
-   const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
-   return stmt.all() as Subscription[];
+ipcMain.on( "subscriptions-changed", () => {
+    mainWindow.webContents.send( 'subscriptions-changed' );
 });
 
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'get-subscriptions', (event: IpcMainInvokeEvent, filter : SubscriptionFilter) => {
+    const onlyActiveSubsStmt  = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
+    const onlyDeletedSubsStmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NOT NULL');
+    const allSubsStmt         = db.prepare('SELECT * FROM subscription');
+
+    switch( filter ) {
+        case SubscriptionFilter.ActiveOnly   : return onlyActiveSubsStmt.all() as Subscription[];
+        case SubscriptionFilter.DeletedOnly  : return onlyDeletedSubsStmt.all() as Subscription[];
+        case SubscriptionFilter.All          : return allSubsStmt.all() as Subscription[];
+        default                                 : return allSubsStmt.all() as Subscription[];
+    }
+});
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string ) => {
@@ -311,22 +326,21 @@ ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string
 
         const res = await fetch(url);
         const html = await res.text();
+        const redirectedUrl = await res.url;
         const $ = cheerio.load(html);
 
-        let feedURL = null;
-
-        const alternateLinks = $('link[rel="alternate"]');
-        if( alternateLinks.length > 0 ) {
-            const feedLink = alternateLinks.filter((_, el) => {
+        let feedURL = $('link[rel="alternate"]')
+            .filter((_, el) => {
                 const type = ($(el).attr("type") || "").toLowerCase();
+                console.log('type ', type);
                 return type.includes("rss") || type.includes("atom");
-            }).first();
+            })
+            .attr("href"); // returns from the first match automatically
 
-            if (feedLink && feedLink.attr("href") ) {
-                feedURL = feedLink.attr("href");
-            } else {
-                console.error('Could not resolve feed href');
-            }
+        if (feedURL) {
+            console.log("Feed found:", feedURL);
+        } else {
+            console.error("Could not resolve feed href");
         }
 
         if( !feedURL ) {
@@ -335,7 +349,8 @@ ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string
             // Fallback
             const aTags = $('a[href]').filter((_, el) => {
                 const href = $(el).attr('href') || '';
-                return /feed|rss|atom/i.test(href);  // matches /feed.xml, /rss, etc
+                // return /feed|rss|atom/i.test(href);  // matches /feed.xml, /rss, etc
+                return /(?:^|\/)(?:feed(?:\.(?:xml|rss|atom))?|rss(?:\d+)?(?:\.xml)?|atom(?:\.xml)?)(?:\/)?(?=$|[?#])/i.test(href);  // matches /feed.xml, /rss, etc
             });
 
             if (aTags.length > 0) {
@@ -344,9 +359,13 @@ ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string
         }
 
         if( feedURL ) {
-            const rssURL = new URL(feedURL, url).toString();
-            console.log( `Found ${rssURL}` );
-            return rssURL;
+            // const rssURL = new URL(feedURL, url).toString();
+            const rssURL = new URL(feedURL, redirectedUrl).toString();
+
+            if( await urlContainsFeed(rssURL) ) {
+                console.log( `Found ${rssURL}` );
+                return rssURL;
+            }
         }
 
     } catch (err) {
@@ -357,7 +376,7 @@ ipcMain.handle( 'find-feed-url', async ( event: IpcMainInvokeEvent, url : string
 });
 
 // ------------------------------------------------------------------------------------------------------
-ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : string ) : Promise<Buffer | null> => {
+ipcMain.handle( 'get-favicon', async ( event: IpcMainInvokeEvent, url : string ) : Promise<Buffer | null> => {
     let baseURL = '';
     try {
         baseURL = new URL(url).origin;
@@ -366,10 +385,14 @@ ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : str
         return null;
     }
 
+    console.log( 'favicon baseURL: ', baseURL );
+
     try {
         const res = await fetch(baseURL);
         const text = await res.text();
         const $ = cheerio.load(text);
+
+        console.log( 'favicon redirectedUrl: ', baseURL );
 
         // Find favicon
         let faviconURL = '';
@@ -387,13 +410,17 @@ ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : str
 
         // Fallback
         if( !faviconURL ) {
+            console.log( 'favicon URL not found, brute forcing /favicon.ico' );
             faviconURL = new URL( '/favicon.ico', baseURL).toString();
+            console.log( 'brute force url: ', faviconURL );
         }
 
         // Favicon binary data
         const iconRes = await fetch(faviconURL);
 
         if (iconRes.ok) {
+            console.log( 'Building favicon found at ', faviconURL );
+
             const buffer = Buffer.from( await iconRes.arrayBuffer() );
             const pngBuffer = await sharp(buffer)
                                         .resize(32, 32, { fit: 'contain' }) // optional resize
@@ -402,15 +429,18 @@ ipcMain.handle( 'get-feed-favicon', async ( event: IpcMainInvokeEvent, url : str
             return Buffer.from(pngBuffer);
 
         } else {
-            console.error(iconRes.text);
+            console.error( 'favicon error: ', iconRes.text);
         }
     } catch( err ) {
         console.warn("Failed to fetch favicon:", err);
     }
 
     try {
+        console.log("Will attempt to fetch favicon from google");
+
         const googleRes = await fetch(`https://www.google.com/s2/favicons?domain=${baseURL}&size=32`);
         if( googleRes.ok ) {
+            console.log("Got favicon from google: ", googleRes.url);
             return Buffer.from( await googleRes.arrayBuffer() );
         }
     } catch( err ) {
@@ -510,11 +540,48 @@ ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] 
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'add-subscriptions', ( event: IpcMainInvokeEvent, newSubs : NewSubscription[] ) => {
+    const existingSubStmt = db.prepare( 'SELECT 1 FROM subscription WHERE url = ? LIMIT 1' );
+    const restoreFromSoftDeleteStmt = db.prepare( 'UPDATE subscription SET deleted_at = NULL WHERE url = ?' );
+
     const stmt = db.prepare( 'INSERT OR IGNORE INTO subscription(name, url, category_id, last_updated, favicon, deleted_at ) VALUES ( ?, ?, ?, ?, ?, ?)' );
     for( const s of newSubs ) {
-        stmt.run( s.name, s.url, s.category_id, s.last_updated, s.favicon, null );
+        const row = existingSubStmt.get( s.url );
+        if( row ) {
+            // Already exists from a previous soft delete
+            console.log( 'Restoring from a soft delete' );
+            restoreFromSoftDeleteStmt.run( s.url );
+        } else {
+            stmt.run( s.name, s.url, s.category_id, s.last_updated, s.favicon, null );
+        }
     }
     refreshFaviconBlobRecord();
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'delete-subscriptions', ( event: IpcMainInvokeEvent, subsToDelete : number[] ) => {
+    // If subscription has items favorited, then we soft delete it. Otherwise, we hard delete.
+
+    const softDeleteStmt = db.prepare( 'UPDATE subscription SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?' );
+    const hardDeleteStmt = db.prepare( 'DELETE FROM subscription WHERE id = ?' );
+
+    const deleteNonFavoriteItemsStmt = db.prepare( 'DELETE FROM feed_item WHERE sub_id = ? AND is_favorite = 0' );
+
+    const favoriteItemsStmt = db.prepare( 'SELECT 1 FROM feed_item WHERE sub_id = ? AND is_favorite = 1 LIMIT 1' );
+    for( const id of subsToDelete ) {
+        const row = favoriteItemsStmt.get( id );
+
+        if( row ) {
+            // Soft delete
+            console.log( 'Soft delete' );
+            softDeleteStmt.run( id );
+            deleteNonFavoriteItemsStmt.run( id );
+
+        } else {
+            // Hard delete
+            console.log( 'Hard delete' );
+            hardDeleteStmt.run( id );
+        }
+    }
 });
 
 // ------------------------------------------------------------------------------------------------------
@@ -524,6 +591,7 @@ ipcMain.handle( 'get-favicon-data', ( event: IpcMainInvokeEvent, subId : number 
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'set-favorite', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
+
     const stmt = db.prepare( 'UPDATE feed_item SET is_favorite = ? WHERE id = ?' );
     stmt.run( value ? 1 : 0, itemId );
 });
@@ -538,6 +606,12 @@ ipcMain.handle( 'get-favorites', ( event: IpcMainInvokeEvent ) => {
 ipcMain.handle( 'get-feed-bin-items', ( event: IpcMainInvokeEvent ) => {
     const stmt = db.prepare( 'SELECT * FROM feed_item WHERE in_feed_bin = 1 AND is_favorite = 0' );
     return stmt.all();
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'delete-feed-item', ( event: IpcMainInvokeEvent, itemId : number ) => {
+    const stmt = db.prepare( 'DELETE FROM feed_item WHERE id = ?' );
+    stmt.run( itemId );
 });
 
 // ------------------------------------------------------------------------------------------------------

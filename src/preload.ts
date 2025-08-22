@@ -3,15 +3,17 @@
 
 import { contextBridge, IpcMainInvokeEvent, ipcRenderer } from "electron";
 import { Subscription, NewSubscription } from "./types/subscription";
+import { SubscriptionFilter } from "./types/subscription-filter";
 
 contextBridge.exposeInMainWorld('rssAPI', {
   findFeedURL     : (url : string) => ipcRenderer.invoke('find-feed-url', url),
-  getFeedFavicon  : (url : string) => ipcRenderer.invoke('get-feed-favicon', url),
+  getFavicon  : (url : string) => ipcRenderer.invoke('get-favicon', url),
   getFeedTitle    : (url : string) => ipcRenderer.invoke('get-feed-title', url),
   refreshFeeds    : (subs : Subscription[]) => ipcRenderer.invoke('refresh-feeds', subs),
   getFeeds        : (subs : Subscription[]) => ipcRenderer.invoke( 'get-feeds', subs ),
-  getSubscriptions: () => ipcRenderer.invoke( 'get-subscriptions' ),
+  getSubscriptions: ( filter : SubscriptionFilter ) => ipcRenderer.invoke( 'get-subscriptions', filter ),
   addSubscriptions: (newSubs: NewSubscription[]) => ipcRenderer.invoke( 'add-subscriptions', newSubs ),
+  deleteSubscriptions: ( subsToDelete: number[] ) => ipcRenderer.invoke( 'delete-subscriptions', subsToDelete ),
   getFaviconData  : (subId : number) => ipcRenderer.invoke( 'get-favicon-data', subId ),
   setFavorite     : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
   getFavorites    : () => ipcRenderer.invoke('get-favorites'),
@@ -19,6 +21,8 @@ contextBridge.exposeInMainWorld('rssAPI', {
   getFeedBinItems : () => ipcRenderer.invoke('get-feed-bin-items'),
   setInFeedBin    : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemId, value ),
 
+  signalSubscriptionsChanged: () => ipcRenderer.send('subscriptions-changed'),
+  onSubscriptionsChanged: (callback: () => void) => { ipcRenderer.on("subscriptions-changed", callback); },
 });
 
 contextBridge.exposeInMainWorld('electronApi', {

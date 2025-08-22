@@ -1,23 +1,27 @@
 // import { FeedItem } from './FeedItem';
 import { FeedItem } from "./feed-item";
 import { RefreshFeedResultsMap } from "./refresh-feed-result";
+import { SubscriptionFilter } from "./subscription-filter";
 
 declare global {
     interface Window {
         rssAPI: {
             findFeedURL     : (url : string) => Promise<string>,
-            getFeedFavicon  : (url : string) => Promise<Buffer | null>,
+            getFavicon  : (url : string) => Promise<Buffer | null>,
             getFeedTitle    : (url : string) => Promise<string>,
             refreshFeeds    : (subs : Subscription[]) => Promise<RefreshFeedResultsMap>;
             getFeeds        : (subs : Subscription[]) => FeedItem[];
-            getSubscriptions: () => Subscription[];
+            getSubscriptions: ( filter : SubscriptionFilter ) => Subscription[];
             addSubscriptions: (newSubs: NewSubscription[]) => void;
+            deleteSubscriptions: ( subsToDelete: number[] ) => void;
             getFaviconData  : (subId : number) => Buffer | null;
             setFavorite     : (itemId : number, value : boolean) => void;
             getFavorites    : () => FeedItem[];
             setRead         : (itemId : number, value : boolean) => void;
             getFeedBinItems : () => FeedItem[];
             setInFeedBin    : (itemId : number, value : boolean) => void;
+            signalSubscriptionsChanged: () => void;
+            onSubscriptionsChanged: (callback: () => void) => void;
         };
 
         electronApi: {

@@ -3,10 +3,11 @@ import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
 import { NewSubscription, Subscription } from '../types/subscription';
-import  { isValidURL } from '../utils';
+const isUrlHttp = require('is-url-http');
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
+import { SubscriptionFilter } from '../types/subscription-filter';
 
 type MainOptionInfo = {
     title : string;
@@ -33,6 +34,7 @@ export default function ClientArea() {
     const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
     const containerRef                                          = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                   = useState(0);
+    const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
     const mainOptions : MainOptionInfo[] = [
         { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () =>  allFeedItems.filter( (i) => !i.is_read ).length },
@@ -63,6 +65,13 @@ export default function ClientArea() {
         setFeedBinItems( binItems );
     }
 
+    async function deleteFeedItem(itemId : number) {
+        await window.rssAPI.deleteFeedItem(itemId);
+
+        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+        setFeedBinItems( binItems );
+    }
+
     async function syncSelectedSubscriptionFeedItems() {
         if( selectedSubscriptionId != -1 ) {
             const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
@@ -74,7 +83,9 @@ export default function ClientArea() {
     }
 
     async function syncAllFeedItems() {
-        const items = await window.rssAPI.getFeeds(subscriptions);
+        const allSubs = await window.rssAPI.getSubscriptions(SubscriptionFilter.All);
+
+        const items = await window.rssAPI.getFeeds(allSubs);
         setAllFeedItems(items);
     }
 
@@ -105,7 +116,9 @@ export default function ClientArea() {
 
     async function regenerateFavicons() {
         let favicons : Record<number, string> = {};
-        const subs = await window.rssAPI.getSubscriptions();
+        const subs = await window.rssAPI.getSubscriptions(SubscriptionFilter.All);
+
+        console.log( 'regenerateFavicons()  subs: ', subs );
         for( const s of subs ) {
             try {
                 const buffer = await window.rssAPI.getFaviconData(s.id);
@@ -116,10 +129,10 @@ export default function ClientArea() {
 
                     favicons[s.id] = faviconData;
 
-                    console.log( `Created favicon for sub id ${s.id}` );
+                    console.log( `Created favicon for sub id ${s.id} (${s.name})` );
                 }
             } catch(err) {
-                console.error( `Failed at regenerateFavicons() for sub id ${s.id}`, err );
+                console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
             }
         }
         return favicons;
@@ -127,11 +140,11 @@ export default function ClientArea() {
 
     async function updateAllFeeds() {
         try {
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
-            const results = await window.rssAPI.refreshFeeds(subs);
-            // const results = window.rssAPI.refreshFeeds(subs);
-            // const items = await window.rssAPI.getFeeds(subs);
-            // setFeedItems(items);
+            const results = await window.rssAPI.refreshFeeds(subscriptions);
+            setFeedRefreshKey( prev => prev + 1 );
+
+
+
         } catch (err) {
             console.error('Failed to load RSS feed after retries:', err);
         }
@@ -153,6 +166,40 @@ export default function ClientArea() {
         return window.electronApi.onClosePopups(() => {
             onCloseFeedOptionsPopup();
             onCloseSubscriptionOptionsPopup();
+        });
+    }, []);
+
+    useEffect(() => {
+        ( async () => {
+            const favicons = await regenerateFavicons();
+            setFaviconCache(favicons);
+
+            const items = await window.rssAPI.getFavorites();
+            setFavoriteItems(items);
+
+            const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+            setFeedBinItems( binItems );
+
+            await updateAllFeeds();
+            // await updateFeedItemsFromDb();
+        })();
+    }, [subscriptions]);
+
+    useEffect(() => {
+        ( async () => {
+            await updateFeedItemsFromDb();
+        })();
+    }, [feedRefreshKey]);
+
+    useEffect(() => {
+        window.rssAPI.onSubscriptionsChanged( async () => {
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
+            setSubscriptions(subs);
+
+            setSelectedSubscriptionId(-1);
+            setSelectedSubscriptionOptionsId(-1);
+
+            setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
         });
     }, []);
 
@@ -218,13 +265,14 @@ export default function ClientArea() {
             ];
 
             for( const url of linkArr ) {
-                if( isValidURL( url ) ) {
+
+                if( isUrlHttp( url ) ) {
                     const feedUrl = await window.rssAPI.findFeedURL( url );
 
                     if( feedUrl ) {
                         console.log(feedUrl);
                         const title = await window.rssAPI.getFeedTitle( feedUrl );
-                        const faviconBlob = await window.rssAPI.getFeedFavicon( feedUrl );
+                        const faviconBlob = await window.rssAPI.getFavicon( url );
 
                         const s : NewSubscription = { name: title, url: feedUrl,  last_updated: new Date().toISOString(), favicon: faviconBlob  };
                         console.log( s );
@@ -241,53 +289,31 @@ export default function ClientArea() {
                 }
             }
 
-            const favicons = await regenerateFavicons();
-            setFaviconCache(favicons);
 
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions();
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
             setSubscriptions(subs);
 
             const favorites : FeedItem[] = await window.rssAPI.getFavorites();
             setFavoriteItems( favorites );
-
-            // const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-            // setFeedBinItems( binItems );
-
-            await updateAllFeeds();
-
-            const items = await window.rssAPI.getFeeds(subs);
-            setAllFeedItems(items);
         })();
     }, [] );
 
     useEffect( () => {
         (async () => {
             await updateFeedItemsFromDb();
-            console.log('useEffect ----------------------------------------');
         })();
     }, [favoriteItems, feedBinItems] );
+
 
     async function onFeedItemClick( itemId : number, url : string ) {
         if( itemId != selectedItemId ) {
             console.log( "onFeedItemClick: ", url );
 
             setSelectedItemId(itemId);
-
-            // const items : FeedItem[] = getCurrentlyVisibleFeedItems();
-            // const foundItem = items.find( (i) => i.id === itemId );
-
-            // if( foundItem && !foundItem.is_read ) {
-            //     window.rssAPI.setRead( itemId, true );
-            //     updateFeedItemsFromDb();
-            // }
-
             markItemAsRead( itemId );
 
         }
         window.electronApi.setWebviewURL( url );
-
-        // setCommentsActiveId(-1);
-        // setMoreOptionsActiveId(-1);
     }
 
     async function setIsFeedFavorite( itemId : number, value : boolean ) {
@@ -297,33 +323,14 @@ export default function ClientArea() {
         setFavoriteItems(items);
     }
 
-    // async function onFeedItemFavoriteClick( itemId : number, value : boolean,  event: React.MouseEvent ) {
-    //     event.stopPropagation();
-
-    //     console.log( "onFeedItemFavoriteClick: ", itemId );
-    //     await window.rssAPI.setFavorite( itemId, value);
-
-    //     const items = await window.rssAPI.getFavorites();
-    //     setFavoriteItems(items);
-    // }
-
     async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
         event.stopPropagation();
 
         if( moreOptionsActiveId === itemId ) {
             setMoreOptionsActiveId(-1);
         } else {
-            // setCommentsActiveId(-1);
             setMoreOptionsActiveId(itemId);
-            // setSelectedItemId(itemId);
         }
-
-        // if( webviewRef.current ) {
-        //     if(webviewRef.current?.src !== url && commentsActiveId === -1 ) {
-        //         webviewRef.current.src = url;
-        //         markItemAsRead( itemId );
-        //     }
-        // }
     }
 
     async function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
@@ -356,7 +363,8 @@ export default function ClientArea() {
                 return <><img src={faviconCache[subId]}></img><span>{foundItem.name}</span></>
             }
         }
-        return mainOptions[selectedMainOptionIndex].title;
+        const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
+        return mainOptions[index].title;
     }
 
     function onToggleSidePanelClick() {
@@ -459,6 +467,7 @@ export default function ClientArea() {
                         onClick={onFeedItemClick}
                         // onFavoriteClick={onFeedItemFavoriteClick}
                         setIsFeedFavorite={setIsFeedFavorite}
+                        deleteFeedItem={deleteFeedItem}
                         onMoreOptionsClick={onMoreOptionsClick}
                         onCommentsClick={onCommentsClick}
                         faviconCache={faviconCache}

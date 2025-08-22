@@ -18,7 +18,11 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
      const subOptionsRef = useRef<HTMLElement>(null);
 
     const subItemContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Delete subscription', action: () => {  props.onCloseSubOptions(); } },
+        { optionTitle: 'Delete subscription', action: async () => {
+            await window.rssAPI.deleteSubscriptions( [props.id] );
+            window.rssAPI.signalSubscriptionsChanged();
+            props.onCloseSubOptions();
+        } },
     ];
 
     return (
