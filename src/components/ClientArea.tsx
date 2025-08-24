@@ -8,6 +8,7 @@ import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
 import { SubscriptionFilter } from '../types/subscription-filter';
+import { ModalType } from '../types/modal-type';
 
 type MainOptionInfo = {
     title : string;
@@ -50,17 +51,18 @@ export default function ClientArea() {
     }
 
     async function markItemAsRead( itemId : number ) {
-        const items : FeedItem[] = getCurrentlyVisibleFeedItems();
-        const foundItem = items.find( (i) => i.id === itemId );
 
-        if( foundItem && !foundItem.is_read ) {
-            await window.rssAPI.setRead( itemId, true );
-            updateFeedItemsFromDb();
-        }
+        await window.rssAPI.setRead( itemId, true );
+        updateFeedItemsFromDb();
     }
 
-    async function setInFeedBin( itemId : number, value : boolean ) {
-        await window.rssAPI.setInFeedBin( itemId, value );
+    async function markMultipleItemsAsRead( itemIds : number[] ) {
+        await window.rssAPI.setReadMultiple( itemIds, true );
+        updateFeedItemsFromDb();
+    }
+
+    async function setInFeedBin( itemIds : number[], value : boolean ) {
+        await window.rssAPI.setInFeedBin( itemIds, value );
 
         const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
         setFeedBinItems( binItems );
@@ -139,10 +141,6 @@ export default function ClientArea() {
         return favicons;
     }
 
-    async function updateAllFeeds() {
-        updateFeeds( subscriptions );
-    }
-
     async function updateFeeds( subs : Subscription[] ) {
         console.log('updateFeeds');
 
@@ -165,17 +163,8 @@ export default function ClientArea() {
         }
     }
 
-    // async function updateAllFeeds() {
-    //     try {
-    //         const results = await window.rssAPI.refreshFeeds(subscriptions);
-    //         setFeedRefreshKey( prev => prev + 1 );
-    //     } catch (err) {
-    //         console.error('Failed to load RSS feed after retries:', err);
-    //     }
-    // }
-
     async function onClickAddSubscription() {
-        window.electronApi.openAddSubscriptionModal();
+        window.electronApi.openModal( { type: ModalType.AddSubscription } );
     }
 
     async function onCloseSubscriptionOptionsPopup() {
@@ -205,8 +194,6 @@ export default function ClientArea() {
             setFeedBinItems( binItems );
 
             updateFeeds( subscriptions );
-            // await updateAllFeeds();
-            // await updateFeedItemsFromDb();
         })();
     }, [subscriptions]);
 
@@ -436,7 +423,7 @@ export default function ClientArea() {
 
     return (
         <div className={'client-area'}>
-            <Toolbar onClickAddSubscription={onClickAddSubscription} refreshAllFeeds={updateAllFeeds}></Toolbar>
+            <Toolbar onClickAddSubscription={onClickAddSubscription} refreshAllFeeds={() => updateFeeds(subscriptions)}></Toolbar>
             <PanelGroup autoSaveId="conditional" direction="horizontal">
                 {
                     showLeftPanel && (
@@ -474,6 +461,7 @@ export default function ClientArea() {
                                     subscriptions={subscriptions}
                                     selectedSubscriptionId={selectedSubscriptionId}
                                     onCloseSubOptions={onCloseSubscriptionOptionsPopup}
+                                    subscriptionsBeingRefreshed={subscriptionsBeingRefreshed}
                                 ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>
@@ -488,12 +476,37 @@ export default function ClientArea() {
                     <div className='feed-header'>
                         <div className='feed-header-title'>{ getFeedName(selectedSubscriptionId) }</div>
                         <span className='feed-header-buttons'>
-                            <button title={'Refresh'} onClick={() => {
-                                const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
-                                if( foundItem ) { updateFeeds([foundItem]) }
-                            }}>⟳</button>
-                            <button title={'Mark all as read'}>✅</button>
-                            <button title={'Move read items to feed bin'}>🗑️</button>
+
+                            <button
+                                title={'Refresh'}
+                                onClick={() => {
+                                    if( selectedSubscriptionId === -1 && selectedMainOptionIndex === 0 ) {
+                                        updateFeeds(subscriptions);
+                                    } else {
+                                        const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
+                                        if( foundItem ) { updateFeeds([foundItem]) }
+                                    }
+                                }}
+                                disabled={selectedMainOptionIndex !== 0}
+                            >⟳</button>
+
+                            <button title={'Mark all as read'} onClick={() =>{
+                                markMultipleItemsAsRead( getCurrentlyVisibleFeedItems().map( (item) => item.id ) );
+                            }}>✅</button>
+
+                            <button
+                                title={'Move read items to feed bin'}
+                                onClick={() => {
+                                    setInFeedBin(
+                                        getCurrentlyVisibleFeedItems()
+                                            .filter( (item) => item.is_read)
+                                            .map( (item) => item.id)
+                                        , true
+                                    );
+                                }}
+                                disabled={selectedMainOptionIndex !== 0}
+                            >🗑️</button>
+
                         </span>
                     </div>
 
@@ -501,7 +514,6 @@ export default function ClientArea() {
                         feedItems={ getCurrentlyVisibleFeedItems() }
                         scrollToTopKey={scrollToTopKey}
                         onClick={onFeedItemClick}
-                        // onFavoriteClick={onFeedItemFavoriteClick}
                         setIsFeedFavorite={setIsFeedFavorite}
                         deleteFeedItem={deleteFeedItem}
                         onMoreOptionsClick={onMoreOptionsClick}

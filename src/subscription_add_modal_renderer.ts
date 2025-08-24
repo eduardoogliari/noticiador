@@ -28,4 +28,4 @@
 
 import './index.css';
 import './app.css';
-import './subscription_modal';
+import './subscription_add_modal';

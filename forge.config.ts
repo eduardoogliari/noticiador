@@ -33,9 +33,17 @@ const config: ForgeConfig = {
             },
           },
           {
-            html: './src/subscription_modal_index.html',
-            js: './src/subscription_modal_renderer.ts',
-            name: 'subscription_modal',
+            html: './src/subscription_add_modal_index.html',
+            js: './src/subscription_add_modal_renderer.ts',
+            name: 'subscription_add_modal',
+            preload: {
+              js: './src/preload.ts',
+            },
+          },
+          {
+            html: './src/subscription_delete_modal_index.html',
+            js: './src/subscription_delete_modal_renderer.ts',
+            name: 'subscription_delete_modal',
             preload: {
               js: './src/preload.ts',
             },

@@ -6,14 +6,13 @@ export type FeedListDateHeaderProps = {
     name                   : string;
     feedItems              : FeedItem[];
     onClick                : (itemId : number, url : string) => void;
-    // onFavoriteClick        : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
     deleteFeedItem : (itemId : number) => void;
     onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
     copyToClipboard   : (url : string) => void;
-    setInFeedBin : (itemId: number, value : boolean) => void;
+    setInFeedBin : (itemIds: number[], value : boolean) => void;
     onCloseFeedOptionsPopup: () => void;
     commentsActiveId       : number;
     moreOptionsActiveId    : number;
@@ -36,7 +35,6 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 onClick={ props.onClick }
                 isFavorite={item.is_favorite}
                 isRead={item.is_read}
-                // onFavoriteClick={props.onFavoriteClick}
                 setIsFeedFavorite={props.setIsFeedFavorite}
                 deleteFeedItem={props.deleteFeedItem}
                 onMoreOptionsClick={props.onMoreOptionsClick}
@@ -51,10 +49,6 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
             ></FeedListItem>
         );
     });
-
-    // useEffect(() => {
-    //     console.log( 'props', props );
-    // }, [props.feedItems]);
 
     return (
         <>

@@ -32,6 +32,13 @@
     margin: 0px 5px;
 }
 
+.h-separator {
+    border-bottom: 1px solid gray;
+    width: 100%;
+    height: 1px;
+    margin: 5px 0px;
+}
+
 .add-subscription-modal {
     background-color: white;
     /* position: relative; */
@@ -125,6 +132,30 @@
     color: gray;
     margin-top: 10px;
     margin-left: 5px;
+}
+
+.remove-sub-modal-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.remove-sub-modal-text {
+
+}
+
+.remove-sub-modal-buttons {
+    display: flex;
+    flex-direction: row;
+    align-self: end;
+    margin: 5px 0px;
+    gap: 5px;
+
+    > button {
+        padding: 5px;
+    }
 }
 
 .status-bar {

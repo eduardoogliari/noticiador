@@ -1,7 +1,7 @@
-// import { FeedItem } from './FeedItem';
 import { FeedItem } from "./feed-item";
 import { RefreshFeedResultsMap } from "./refresh-feed-result";
 import { SubscriptionFilter } from "./subscription-filter";
+import { ModalData } from "./modal-data";
 
 declare global {
     interface Window {
@@ -18,8 +18,9 @@ declare global {
             setFavorite     : (itemId : number, value : boolean) => void;
             getFavorites    : () => FeedItem[];
             setRead         : (itemId : number, value : boolean) => void;
+            setReadMultiple : (itemIds : number[], value : boolean) => void;
             getFeedBinItems : () => FeedItem[];
-            setInFeedBin    : (itemId : number, value : boolean) => void;
+            setInFeedBin    : (itemIds : number[], value : boolean) => void;
             deleteFeedItem : (itemId : number) => void;
 
             signalSubscriptionsChanged: () => void;
@@ -32,9 +33,11 @@ declare global {
             setWebviewBounds         : (x : number, y : number, width : number, height : number) => void;
             setWebviewURL            : (url : string) => void;
             getWebviewURL            : () => string;
-            openAddSubscriptionModal : () => void;
-            closeAddSubscriptionModal: () => void;
+            openModal: (data : ModalData) => void;
+            closeModal: () => void;
             onClosePopups: ( callback: () => void ) => void;
+
+            onModalData: ( callback: (data : ModalData) => void ) => void;
         };
 
         webAPI: {

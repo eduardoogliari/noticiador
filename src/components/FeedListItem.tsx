@@ -8,14 +8,13 @@ export type FeedListItemProp = {
     summary                 ?: string;
     title                   : string;
     onClick                 : (itemId : number, url : string) => void;
-    // onFavoriteClick         : (itemId : number, value : boolean, event: React.MouseEvent) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
     deleteFeedItem : (itemId : number) => void;
     onMoreOptionsClick      : (itemId : number, url : string, event: React.MouseEvent) => void;
     onCommentsClick         : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
     copyToClipboard   : (url : string) => void;
-    setInFeedBin : (itemId: number, value : boolean) => void;
+    setInFeedBin : (itemIds: number[], value : boolean) => void;
     onCloseFeedOptionsPopup : () => void;
     isSelected              : boolean;
     commentsActiveId        : number;
@@ -35,11 +34,11 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
     // Feed Bin context options
     const inFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Restore item', action: () => {props.setInFeedBin(props.id, false); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: 'Restore item', action: () => {props.setInFeedBin([props.id], false); props.onCloseFeedOptionsPopup();} },
         { optionTitle: 'Delete permanently', action: () => { props.deleteFeedItem(props.id); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Move to Feed Bin', action: () => {props.setInFeedBin(props.id, true); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: 'Move to Feed Bin', action: () => {props.setInFeedBin([props.id], true); props.onCloseFeedOptionsPopup();} },
     ];
 
     // Favorite context options

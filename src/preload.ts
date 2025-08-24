@@ -4,6 +4,7 @@
 import { contextBridge, IpcMainInvokeEvent, ipcRenderer } from "electron";
 import { Subscription, NewSubscription } from "./types/subscription";
 import { SubscriptionFilter } from "./types/subscription-filter";
+import { ModalData } from "./types/modal-data";
 
 contextBridge.exposeInMainWorld('rssAPI', {
   findFeedURL     : (url : string) => ipcRenderer.invoke('find-feed-url', url),
@@ -18,8 +19,9 @@ contextBridge.exposeInMainWorld('rssAPI', {
   setFavorite     : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-favorite', itemId, value ),
   getFavorites    : () => ipcRenderer.invoke('get-favorites'),
   setRead         : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-read', itemId, value ),
+  setReadMultiple : (itemIds : number[], value : boolean) => ipcRenderer.invoke( 'set-read-multiple', itemIds, value ),
   getFeedBinItems : () => ipcRenderer.invoke('get-feed-bin-items'),
-  setInFeedBin    : (itemId : number, value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemId, value ),
+  setInFeedBin    : (itemIds : number[], value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemIds, value ),
   deleteFeedItem : (itemId : number) => ipcRenderer.invoke( 'delete-feed-item', itemId ),
 
   signalSubscriptionsChanged: () => ipcRenderer.send('subscriptions-changed'),
@@ -32,9 +34,11 @@ contextBridge.exposeInMainWorld('electronApi', {
   setWebviewBounds         : (x : number, y : number, width : number, height : number) => ipcRenderer.send( 'set-webview-bounds', x, y, width, height ),
   setWebviewURL            : (url : string) => ipcRenderer.send( 'set-webview-url', url ),
   getWebviewURL            : () => ipcRenderer.invoke( 'get-webview-url' ),
-  openAddSubscriptionModal : () => ipcRenderer.send( 'open-add-subscription-modal' ),
-  closeAddSubscriptionModal: () => ipcRenderer.send( 'close-add-subscription-modal' ),
+  openModal : ( data : ModalData ) => ipcRenderer.send( 'open-modal', data ),
+  closeModal : () => ipcRenderer.send( 'close-modal'),
   onClosePopups: ( callback: () => void ) => { ipcRenderer.on( 'close-popups', callback ); return () => ipcRenderer.removeListener( 'close-popups', callback ); },
+
+  onModalData: ( callback: (data : ModalData) => void ) => ipcRenderer.on( 'modal-data', (_, data) => callback(data) ),
 });
 
 contextBridge.exposeInMainWorld('webAPI', {

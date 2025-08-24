@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import ConstrainedLabel from "./ConstrainedLabel";
 import ContextPopup, {ContextPopupOption} from "./ContextPopup";
+import { ModalType } from "../types/modal-type";
 
 export type SubscriptionListItemProp = {
     id : number;
@@ -11,6 +12,7 @@ export type SubscriptionListItemProp = {
     onClickSubTitle : (subId : number) => void;
     onClickSubOptions : (subId : number, event: React.MouseEvent) => void;
     onCloseSubOptions : () => void;
+    subscriptionsBeingRefreshed: Set<number>;
 };
 
 
@@ -19,8 +21,7 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
 
     const subItemContextOptions : ContextPopupOption[] = [
         { optionTitle: 'Delete subscription', action: async () => {
-            await window.rssAPI.deleteSubscriptions( [props.id] );
-            window.rssAPI.signalSubscriptionsChanged();
+            window.electronApi.openModal( { type: ModalType.ConfirmDeleteSubscription, data: { subId: props.id, subName: props.name } } );
             props.onCloseSubOptions();
         } },
     ];
@@ -33,6 +34,7 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
         >
             <img src={props.faviconCache[props.id]}></img>
             <ConstrainedLabel title={props.name}></ConstrainedLabel>
+            <span hidden={!props.subscriptionsBeingRefreshed.has(props.id)}>⟳</span>
 
             <span
                 ref={subOptionsRef}

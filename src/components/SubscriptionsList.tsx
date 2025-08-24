@@ -9,6 +9,7 @@ export type SubscriptionsListProp = {
     onClickSubTitle : (subId : number) => void;
     onClickSubOptions : (subId : number, event: React.MouseEvent) => void;
     onCloseSubOptions : () => void;
+    subscriptionsBeingRefreshed: Set<number>;
 };
 
 export default function SubscriptionsList( props : SubscriptionsListProp ) {
@@ -27,6 +28,7 @@ export default function SubscriptionsList( props : SubscriptionsListProp ) {
                             selectedSubscriptionId={props.selectedSubscriptionId}
                             selectedSubscriptionOptionsId={props.selectedSubscriptionOptionsId}
                             key={item.id}
+                            subscriptionsBeingRefreshed={props.subscriptionsBeingRefreshed}
                         ></SubscriptionListItem>
                     );
                 })

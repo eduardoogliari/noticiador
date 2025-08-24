@@ -58,7 +58,7 @@ export default function AddSubscriptionModal() {
                 console.log( 'added', s );
 
                 window.rssAPI.signalSubscriptionsChanged();
-                window.electronApi.closeAddSubscriptionModal();
+                window.electronApi.closeModal();
 
             } else {
                 console.warn(`No feed found for ${url}`);

@@ -12,6 +12,8 @@ import * as cheerio from "cheerio";
 import sharp from 'sharp/lib';
 import { WebContentsView } from 'electron';
 import { SubscriptionFilter } from './types/subscription-filter';
+import { ModalType } from './types/modal-type';
+import { ModalData } from './types/modal-data';
 
 const store = new Store();
 const parser : Parser = new Parser({
@@ -35,12 +37,13 @@ const defaultFilterList : string[] = [
 // plugin that tells the Electron app where to look for the Webpack-bundled app code (depending on
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const SUBSCRIPTION_MODAL_WEBPACK_ENTRY: string;
+declare const SUBSCRIPTION_ADD_MODAL_WEBPACK_ENTRY: string;
+declare const SUBSCRIPTION_DELETE_MODAL_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let wcView : WebContentsView | null = null;
 let mainWindow : BrowserWindow | null = null;
-let subscriptionModalWindow : BrowserWindow | null = null;
+let modalWindow : BrowserWindow | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -169,16 +172,41 @@ app.on('activate', () => {
 
 
 
-ipcMain.on( 'open-add-subscription-modal', () => {
-    if( subscriptionModalWindow ) { return; }
+ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
+    if( modalWindow ) { return; }
 
-     subscriptionModalWindow = new BrowserWindow({
-        title: 'Add new feed',
+    let modalEntryPoint = '';
+    let modalWidth      = 0;
+    let modalHeight     = 0;
+    let modalTitle = '';
+
+    switch( data.type ) {
+        case ModalType.AddSubscription:
+        {
+            modalEntryPoint = SUBSCRIPTION_ADD_MODAL_WEBPACK_ENTRY;
+            modalWidth      = 640;
+            modalHeight     = 80;
+            modalTitle      = 'Add new subscription';
+            break;
+        }
+
+        case ModalType.ConfirmDeleteSubscription:
+        {
+            modalEntryPoint = SUBSCRIPTION_DELETE_MODAL_WEBPACK_ENTRY;
+            modalWidth      = 500;
+            modalHeight     = 80;
+            modalTitle      = 'Confirm subscription deletion';
+            break;
+        }
+    }
+
+    modalWindow = new BrowserWindow({
+        title: modalTitle,
         parent: mainWindow,
         modal: true,
         show: false,
-        height        : 80,
-        width         : 640,
+        width         : modalWidth,
+        height        : modalHeight,
         resizable: false,
         webPreferences: {
             preload         : MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
@@ -187,42 +215,44 @@ ipcMain.on( 'open-add-subscription-modal', () => {
         },
         autoHideMenuBar: true,
     });
-    // console.log( 'MODAL_WINDOW_WEBPACK_ENTRY: ', MODAL_WEBPACK_ENTRY );
 
-    subscriptionModalWindow.loadURL( SUBSCRIPTION_MODAL_WEBPACK_ENTRY );
-    subscriptionModalWindow.setMenu(null);
+    modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 
-    subscriptionModalWindow.on('closed', () => {
-        subscriptionModalWindow = null;
+    modalWindow.loadURL( modalEntryPoint );
+    modalWindow.setMenu(null);
+
+    modalWindow.on('closed', () => {
+        modalWindow = null;
     });
 
-    subscriptionModalWindow.webContents.on( 'before-input-event', (event, input) => {
+    modalWindow.webContents.on( 'before-input-event', (event, input) => {
         if (input.type === "keyUp" && input.key === "Escape") {
-            closeAddSubscriptionModal();
+            closeModalWindow();
+
         }
     });
 
-    subscriptionModalWindow.webContents.on( 'did-finish-load', () => {
+    modalWindow.webContents.on( 'did-finish-load', () => {
+        modalWindow.webContents.send( 'modal-data', data );
+
         const parentRect = mainWindow.getBounds();
-        const modalRect = subscriptionModalWindow.getBounds();
+        const modalRect = modalWindow.getBounds();
 
         const x = parentRect.x + (parentRect.width / 2) - (modalRect.width / 2);
         const y = parentRect.y + (parentRect.height / 2) - (modalRect.height / 2);
 
-        subscriptionModalWindow.setPosition( x, y );
-        subscriptionModalWindow.show();
+        modalWindow.setPosition( x, y );
+        modalWindow.show();
     });
-
-    subscriptionModalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 });
 
-ipcMain.on( 'close-add-subscription-modal', () => {
-    closeAddSubscriptionModal();
+ipcMain.on( 'close-modal', () => {
+    closeModalWindow();
 });
 
-function closeAddSubscriptionModal() {
-    if( subscriptionModalWindow ) {
-        subscriptionModalWindow.close();
+function closeModalWindow() {
+    if( modalWindow ) {
+        modalWindow.close();
     }
 }
 
@@ -621,9 +651,16 @@ ipcMain.handle( 'set-read', ( event: IpcMainInvokeEvent, itemId : number, value 
 });
 
 // ------------------------------------------------------------------------------------------------------
-ipcMain.handle( 'set-in-feed-bin', ( event: IpcMainInvokeEvent, itemId : number, value : boolean ) => {
-    const stmt = db.prepare( 'UPDATE feed_item SET in_feed_bin = ? WHERE id = ?' );
-    stmt.run( value ? 1 : 0, itemId );
+ipcMain.handle( 'set-read-multiple', ( event: IpcMainInvokeEvent, itemIds : number[], value : boolean ) => {
+    const stmt = db.prepare( `UPDATE feed_item SET is_read = ? WHERE id IN (${itemIds.map(() => '?').join(',')})` );
+    stmt.run( value ? 1 : 0, itemIds );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'set-in-feed-bin', ( event: IpcMainInvokeEvent, itemIds : number[], value : boolean ) => {
+    // const stmt = db.prepare( 'UPDATE feed_item SET in_feed_bin = ? WHERE id = ?' );
+    const stmt = db.prepare( `UPDATE feed_item SET in_feed_bin = ? WHERE id IN (${itemIds.map(() => '?').join(',')})` );
+    stmt.run( value ? 1 : 0, itemIds );
 });
 
 // ------------------------------------------------------------------------------------------------------
