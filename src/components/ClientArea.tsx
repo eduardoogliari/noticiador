@@ -32,6 +32,7 @@ export default function ClientArea() {
     const [commentsActiveId, setCommentsActiveId]               = useState(-1);
     const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
     const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
+    const [subscriptionsBeingRefreshed, setSubscriptionsBeingRefreshed] = useState<Set<number>>(new Set([]));
     const containerRef                                          = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                   = useState(0);
     const [feedRefreshKey, setFeedRefreshKey] = useState(0);
@@ -139,16 +140,39 @@ export default function ClientArea() {
     }
 
     async function updateAllFeeds() {
-        try {
-            const results = await window.rssAPI.refreshFeeds(subscriptions);
-            setFeedRefreshKey( prev => prev + 1 );
+        updateFeeds( subscriptions );
+    }
 
+    async function updateFeeds( subs : Subscription[] ) {
+        console.log('updateFeeds');
 
+        const arr : number[] = subs.filter( (item) => !subscriptionsBeingRefreshed.has( item.id ) ).map( (item) => item.id );
 
-        } catch (err) {
-            console.error('Failed to load RSS feed after retries:', err);
+        if( arr.length > 0 ) {
+            console.log( 'updateFeeds(): adding to update', arr );
+
+            setSubscriptionsBeingRefreshed( (prev) => new Set([...prev, ...arr]) );
+
+            window.rssAPI.refreshFeeds(subs).then(
+                (res) => {
+                    console.log( 'refreshFeeds finished: ', res );
+                    setSubscriptionsBeingRefreshed( (prev) => new Set([...prev].filter( (id) => !subs.find( (i) => i.id == id ) )) );
+                    setFeedRefreshKey( prev => prev + 1 );
+                }
+            );
+        } else {
+            console.log( 'updateFeeds(): nothing to update' );
         }
     }
+
+    // async function updateAllFeeds() {
+    //     try {
+    //         const results = await window.rssAPI.refreshFeeds(subscriptions);
+    //         setFeedRefreshKey( prev => prev + 1 );
+    //     } catch (err) {
+    //         console.error('Failed to load RSS feed after retries:', err);
+    //     }
+    // }
 
     async function onClickAddSubscription() {
         window.electronApi.openAddSubscriptionModal();
@@ -180,7 +204,8 @@ export default function ClientArea() {
             const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
             setFeedBinItems( binItems );
 
-            await updateAllFeeds();
+            updateFeeds( subscriptions );
+            // await updateAllFeeds();
             // await updateFeedItemsFromDb();
         })();
     }, [subscriptions]);
@@ -411,7 +436,7 @@ export default function ClientArea() {
 
     return (
         <div className={'client-area'}>
-            <Toolbar onClickAddSubscription={onClickAddSubscription}></Toolbar>
+            <Toolbar onClickAddSubscription={onClickAddSubscription} refreshAllFeeds={updateAllFeeds}></Toolbar>
             <PanelGroup autoSaveId="conditional" direction="horizontal">
                 {
                     showLeftPanel && (
@@ -460,7 +485,18 @@ export default function ClientArea() {
                     )
                 }
                 <Panel id="center" className={'panel-middle'} order={2} minSize={26}>
-                    <div className='feed-header'>{ getFeedName(selectedSubscriptionId) }</div>
+                    <div className='feed-header'>
+                        <div className='feed-header-title'>{ getFeedName(selectedSubscriptionId) }</div>
+                        <span className='feed-header-buttons'>
+                            <button title={'Refresh'} onClick={() => {
+                                const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
+                                if( foundItem ) { updateFeeds([foundItem]) }
+                            }}>⟳</button>
+                            <button title={'Mark all as read'}>✅</button>
+                            <button title={'Move read items to feed bin'}>🗑️</button>
+                        </span>
+                    </div>
+
                     <FeedList
                         feedItems={ getCurrentlyVisibleFeedItems() }
                         scrollToTopKey={scrollToTopKey}
