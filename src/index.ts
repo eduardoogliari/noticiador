@@ -502,7 +502,7 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
     }
   }
 
-  const stmt: Statement = db.prepare('INSERT INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+  const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
   for( const i of items ) {
     try {
       const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
