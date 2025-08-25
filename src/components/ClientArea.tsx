@@ -423,7 +423,11 @@ export default function ClientArea() {
 
     return (
         <div className={'client-area'}>
-            <Toolbar onClickAddSubscription={onClickAddSubscription} refreshAllFeeds={() => updateFeeds(subscriptions)}></Toolbar>
+            <Toolbar
+                onClickAddSubscription={onClickAddSubscription}
+                refreshAllFeeds={() => updateFeeds(subscriptions)}
+            ></Toolbar>
+
             <PanelGroup autoSaveId="conditional" direction="horizontal">
                 {
                     showLeftPanel && (
@@ -487,7 +491,10 @@ export default function ClientArea() {
                                         if( foundItem ) { updateFeeds([foundItem]) }
                                     }
                                 }}
-                                disabled={selectedMainOptionIndex !== 0}
+                                disabled={
+                                    (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) ||
+                                    subscriptionsBeingRefreshed.has( selectedSubscriptionId )
+                                }
                             >⟳</button>
 
                             <button title={'Mark all as read'} onClick={() =>{
