@@ -147,14 +147,15 @@ export default function ClientArea() {
         const arr : number[] = subs.filter( (item) => !subscriptionsBeingRefreshed.has( item.id ) ).map( (item) => item.id );
 
         if( arr.length > 0 ) {
-            console.log( 'updateFeeds(): adding to update', arr );
+            const filteredSubs = subscriptions.filter( (item) => arr.find( (id) => id === item.id ) );
+            console.log( 'updateFeeds(): adding to update', filteredSubs );
 
             setSubscriptionsBeingRefreshed( (prev) => new Set([...prev, ...arr]) );
 
-            window.rssAPI.refreshFeeds(subs).then(
+            window.rssAPI.refreshFeeds(filteredSubs).then(
                 (res) => {
                     console.log( 'refreshFeeds finished: ', res );
-                    setSubscriptionsBeingRefreshed( (prev) => new Set([...prev].filter( (id) => !subs.find( (i) => i.id == id ) )) );
+                    setSubscriptionsBeingRefreshed( (prev) => new Set([...prev].filter( (id) => !filteredSubs.find( (i) => i.id == id ) )) );
                     setFeedRefreshKey( prev => prev + 1 );
                 }
             );
