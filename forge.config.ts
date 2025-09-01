@@ -5,6 +5,7 @@ import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
+import ForgeExternalsPlugin from '@timfish/forge-externals-plugin';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
@@ -13,7 +14,9 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    "asar" : {
+      "unpack": "**/node_modules/{sharp,@img}/**/*"
+    }
   },
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
@@ -58,6 +61,10 @@ const config: ForgeConfig = {
           },
         ],
       },
+    }),
+    new ForgeExternalsPlugin({
+      "externals": ["sharp"],
+      "includeDeps": true
     }),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
