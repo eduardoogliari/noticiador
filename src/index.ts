@@ -14,8 +14,15 @@ import { WebContentsView } from 'electron';
 import { SubscriptionFilter } from './types/subscription-filter';
 import { ModalType } from './types/modal-type';
 import { ModalData } from './types/modal-data';
+import Store from 'electron-store';
 
-const store = new Store();
+type SubscriptionFeedRecord = Record<string, NewFeedItem[]>;
+
+type StoreType = {
+    rssCache : SubscriptionFeedRecord;
+};
+const store = new Store<StoreType>();
+
 const parser : Parser = new Parser({
   customFields: {
     item: ['comments']
@@ -506,13 +513,22 @@ ipcMain.handle( 'get-feed-title', async ( event: IpcMainInvokeEvent, url : strin
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
   const results : RefreshFeedResultsMap = {};
-  let items : NewFeedItem[] = [];
+    let newFeedItems : NewFeedItem[] = [];
+
+    let rssCache : SubscriptionFeedRecord = store.get('rssCache');
+    if( !rssCache ) {
+        rssCache = {};
+        store.set('rssCache', rssCache);
+    }
 
   for( const s of subs ) {
     try {
       const feed = await parser.parseURL( s.url );
 
-      feed.items.forEach(i => {
+            if( !rssCache[s.url] ) { rssCache[s.url] = []; }
+
+            let feedItems : NewFeedItem[] =
+                feed.items.map( (i) => {
         let isRelativeLink = false;
         try {
             new URL(i.link).origin === new URL(s.url).origin;
@@ -521,9 +537,13 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
         }
         const absoluteURL = (isRelativeLink) ? new URL(i.link, s.url).toString() : i.link;
 
-        const f : NewFeedItem = { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'comments_url': i.comments, 'summary': i.summary,  'pub_date': i.pubDate };
-        items.push(f);
+                    return { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'comments_url': i.comments, 'summary': i.summary,  'pub_date': i.pubDate };
       });
+
+            console.log( `Feed items for ${s.name} in rssCache:  ${rssCache[s.url].length}` );
+            newFeedItems.push( ...feedItems.filter( (i) => !rssCache[s.url].find( (f) => f.url === i.url ) ) );
+
+            rssCache[s.url] = feedItems;
       results[s.id] = { success: true, errorMessage: '' };
 
     } catch( err ) {
@@ -532,8 +552,14 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
     }
   }
 
+    if( newFeedItems.length > 0 ) {
+        console.log( 'newFeedItems: ', newFeedItems );
+    } else {
+        console.log( 'No new feed items to insert! ---------------------------' );
+    }
+
   const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-  for( const i of items ) {
+    for( const i of newFeedItems ) {
     try {
       const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
       console.log(res);
@@ -541,6 +567,9 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
       results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
     }
   }
+
+    // console.log( 'rssCache: ', rssCache );
+    store.set('rssCache', rssCache);
   return results;
 });
 
