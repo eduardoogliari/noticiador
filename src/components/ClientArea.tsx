@@ -41,6 +41,7 @@ export default function ClientArea() {
     const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
     const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
+    const feedBinButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex === 1) || feedBinItems.length === 0;
 
     const mainOptions : MainOptionInfo[] = [
         { title: ' All Feeds', itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
@@ -579,16 +580,14 @@ export default function ClientArea() {
                                         );
                                     }
                                 }}
-                                disabled={
-                                    (selectedSubscriptionId === -1 && selectedMainOptionIndex === 1)
-                                }
+                                disabled={ feedBinButtonDisabled }
                             >
                                 <img
                                     className={'feed-header-button-icon'}
                                     src={
                                         (selectedMainOptionIndex === 2)
                                             ? '../icons/bin_empty.svg'
-                                            : ((selectedSubscriptionId === -1 && selectedMainOptionIndex === 1))
+                                            : (feedBinButtonDisabled)
                                                 ? '../icons/bin_disabled.svg'
                                                 : '../icons/bin.svg'
                                     }
