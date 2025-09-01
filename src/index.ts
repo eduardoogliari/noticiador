@@ -4,7 +4,6 @@ import { FeedItem, NewFeedItem } from './types/feed-item';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
 import fetch from 'cross-fetch';
 import { NewSubscription, Subscription } from './types/subscription';
-import Store from 'electron-store';
 import db from './database';
 import { RefreshFeedResultsMap } from './types/refresh-feed-result';
 import { RunResult, Statement } from 'better-sqlite3';
@@ -46,6 +45,7 @@ const defaultFilterList : string[] = [
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const SUBSCRIPTION_ADD_MODAL_WEBPACK_ENTRY: string;
 declare const SUBSCRIPTION_DELETE_MODAL_WEBPACK_ENTRY: string;
+declare const CONFIRM_EMPTY_BIN_MODAL_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 let wcView : WebContentsView | null = null;
@@ -205,6 +205,15 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
             modalTitle      = 'Confirm subscription deletion';
             break;
         }
+
+        case ModalType.ConfirmEmptyBin:
+        {
+            modalEntryPoint = CONFIRM_EMPTY_BIN_MODAL_WEBPACK_ENTRY;
+            modalWidth      = 500;
+            modalHeight     = 100;
+            modalTitle      = 'Confirm deletion';
+            break;
+        }
     }
 
     modalWindow = new BrowserWindow({
@@ -223,7 +232,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         autoHideMenuBar: true,
     });
 
-    modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
+    // modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 
     modalWindow.loadURL( modalEntryPoint );
     modalWindow.setMenu(null);
@@ -336,6 +345,11 @@ async function urlContainsFeed( url : string ) : Promise<boolean> {
 // ------------------------------------------------------------------------------------------------------
 ipcMain.on( "subscriptions-changed", () => {
     mainWindow.webContents.send( 'subscriptions-changed' );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.on( "feed-bin-changed", () => {
+    mainWindow.webContents.send( 'feed-bin-changed' );
 });
 
 // ------------------------------------------------------------------------------------------------------
@@ -512,7 +526,7 @@ ipcMain.handle( 'get-feed-title', async ( event: IpcMainInvokeEvent, url : strin
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  const results : RefreshFeedResultsMap = {};
+    const results : RefreshFeedResultsMap = {};
     let newFeedItems : NewFeedItem[] = [];
 
     let rssCache : SubscriptionFeedRecord = store.get('rssCache');
@@ -521,36 +535,36 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
         store.set('rssCache', rssCache);
     }
 
-  for( const s of subs ) {
-    try {
-      const feed = await parser.parseURL( s.url );
+    for( const s of subs ) {
+        try {
+            const feed = await parser.parseURL( s.url );
 
             if( !rssCache[s.url] ) { rssCache[s.url] = []; }
 
             let feedItems : NewFeedItem[] =
                 feed.items.map( (i) => {
-        let isRelativeLink = false;
-        try {
-            new URL(i.link).origin === new URL(s.url).origin;
-        } catch( err ) {
-            isRelativeLink = true;
-        }
-        const absoluteURL = (isRelativeLink) ? new URL(i.link, s.url).toString() : i.link;
+                    let isRelativeLink = false;
+                    try {
+                        new URL(i.link).origin === new URL(s.url).origin;
+                    } catch( err ) {
+                        isRelativeLink = true;
+                    }
+                    const absoluteURL = (isRelativeLink) ? new URL(i.link, s.url).toString() : i.link;
 
                     return { 'id':  s.id, 'title': i.title, 'url': absoluteURL, 'comments_url': i.comments, 'summary': i.summary,  'pub_date': i.pubDate };
-      });
+                });
 
             console.log( `Feed items for ${s.name} in rssCache:  ${rssCache[s.url].length}` );
             newFeedItems.push( ...feedItems.filter( (i) => !rssCache[s.url].find( (f) => f.url === i.url ) ) );
 
             rssCache[s.url] = feedItems;
-      results[s.id] = { success: true, errorMessage: '' };
+            results[s.id] = { success: true, errorMessage: '' };
 
-    } catch( err ) {
-      console.error(err);
-      results[s.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
+        } catch( err ) {
+            console.error(err);
+            results[s.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
+        }
     }
-  }
 
     if( newFeedItems.length > 0 ) {
         console.log( 'newFeedItems: ', newFeedItems );
@@ -558,19 +572,19 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
         console.log( 'No new feed items to insert! ---------------------------' );
     }
 
-  const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
     for( const i of newFeedItems ) {
-    try {
-      const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
-      console.log(res);
-    } catch( err ) {
-      results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
+        try {
+            const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
+            console.log(res);
+        } catch( err ) {
+            results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
+        }
     }
-  }
 
     // console.log( 'rssCache: ', rssCache );
     store.set('rssCache', rssCache);
-  return results;
+    return results;
 });
 
 // ------------------------------------------------------------------------------------------------------
@@ -668,9 +682,9 @@ ipcMain.handle( 'get-feed-bin-items', ( event: IpcMainInvokeEvent ) => {
 });
 
 // ------------------------------------------------------------------------------------------------------
-ipcMain.handle( 'delete-feed-item', ( event: IpcMainInvokeEvent, itemId : number ) => {
-    const stmt = db.prepare( 'DELETE FROM feed_item WHERE id = ?' );
-    stmt.run( itemId );
+ipcMain.handle( 'delete-feed-items', ( event: IpcMainInvokeEvent, itemIds : number[] ) => {
+    const stmt = db.prepare( `DELETE FROM feed_item WHERE id IN (${itemIds.map(() => '?').join(',')})` );
+    stmt.run( itemIds );
 });
 
 // ------------------------------------------------------------------------------------------------------
@@ -694,6 +708,7 @@ ipcMain.handle( 'set-in-feed-bin', ( event: IpcMainInvokeEvent, itemIds : number
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'open-external-browser', ( event: IpcMainInvokeEvent, url : string ) => {
+    console.log('external: ', url);
     shell.openExternal(url);
 });
 

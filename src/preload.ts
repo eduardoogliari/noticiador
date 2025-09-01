@@ -22,9 +22,11 @@ contextBridge.exposeInMainWorld('rssAPI', {
   setReadMultiple : (itemIds : number[], value : boolean) => ipcRenderer.invoke( 'set-read-multiple', itemIds, value ),
   getFeedBinItems : () => ipcRenderer.invoke('get-feed-bin-items'),
   setInFeedBin    : (itemIds : number[], value : boolean) => ipcRenderer.invoke( 'set-in-feed-bin', itemIds, value ),
-  deleteFeedItem : (itemId : number) => ipcRenderer.invoke( 'delete-feed-item', itemId ),
+  deleteFeedItems : (itemIds : number[]) => ipcRenderer.invoke( 'delete-feed-items', itemIds ),
 
+  signalFeedBinChanged: () => ipcRenderer.send('feed-bin-changed'),
   signalSubscriptionsChanged: () => ipcRenderer.send('subscriptions-changed'),
+  onFeedBinChanged: (callback: () => void) => { ipcRenderer.on("feed-bin-changed", callback); },
   onSubscriptionsChanged: (callback: () => void) => { ipcRenderer.on("subscriptions-changed", callback); },
 });
 

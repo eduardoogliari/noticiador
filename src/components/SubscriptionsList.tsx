@@ -10,6 +10,8 @@ export type SubscriptionsListProp = {
     onClickSubOptions : (subId : number, event: React.MouseEvent) => void;
     onCloseSubOptions : () => void;
     subscriptionsBeingRefreshed: Set<number>;
+    subscriptionUnreadCount :  Record<number, number>;
+    subscriptionFeedCount : Record<number, number>;
 };
 
 export default function SubscriptionsList( props : SubscriptionsListProp ) {
@@ -29,6 +31,8 @@ export default function SubscriptionsList( props : SubscriptionsListProp ) {
                             selectedSubscriptionOptionsId={props.selectedSubscriptionOptionsId}
                             key={item.id}
                             subscriptionsBeingRefreshed={props.subscriptionsBeingRefreshed}
+                            unreadFeedsCount={props.subscriptionUnreadCount[item.id] ?? 0}
+                            feedCount={props.subscriptionFeedCount[item.id] ?? 0}
                         ></SubscriptionListItem>
                     );
                 })

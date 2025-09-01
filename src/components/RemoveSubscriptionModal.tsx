@@ -3,15 +3,12 @@ import { ModalData } from "../types/modal-data";
 import { ModalType } from "../types/modal-type";
 
 export default function RemoveSubscriptionModal() {
-    // const [modalData, setModalData] = useState<ModalData | null>(null);
     const [subId, setSubId] = useState(-1);
     const [subName, setSubName] = useState('');
     const defaultButton = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         window.electronApi.onModalData( (data: ModalData) => {
-            console.log('onModalData', data);
-            // setModalData(data);
             if( data.type === ModalType.ConfirmDeleteSubscription && data.data ) {
                 setSubId( data.data.subId );
                 setSubName( data.data.subName );

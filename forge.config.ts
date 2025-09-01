@@ -48,6 +48,14 @@ const config: ForgeConfig = {
               js: './src/preload.ts',
             },
           },
+          {
+            html: './src/confirm_empty_bin_modal_index.html',
+            js: './src/confirm_empty_bin_modal_renderer.ts',
+            name: 'confirm_empty_bin_modal',
+            preload: {
+              js: './src/preload.ts',
+            },
+          },
         ],
       },
     }),

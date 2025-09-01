@@ -8,4 +8,8 @@ export type ModalData =
 | {
     type: ModalType.ConfirmDeleteSubscription;
     data?: { subId : number, subName : string };
+}
+| {
+    type: ModalType.ConfirmEmptyBin;
+    data?: {};
 };

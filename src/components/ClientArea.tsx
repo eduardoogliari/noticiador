@@ -25,6 +25,8 @@ export default function ClientArea() {
     const [favoriteItems, setFavoriteItems]                     = useState<FeedItem[]>([]);
     const [feedBinItems, setFeedBinItems]                       = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
+    const [subscriptionUnreadCount, setSubscriptionUnreadCount] = useState<Record<number, number>>({});
+    const [subscriptionFeedCount, setSubscriptionFeedCount] = useState<Record<number, number>>({});
     const [selectedItemId, setSelectedItemId]                   = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
     const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
@@ -90,11 +92,31 @@ export default function ClientArea() {
 
         const items = await window.rssAPI.getFeeds(allSubs);
         setAllFeedItems(items);
+
+        const subFeedCount : Record<number,number> = {};
+        for( const i of items ) {
+            if( !subFeedCount[i.sub_id] ) { subFeedCount[i.sub_id] = 0;  }
+            subFeedCount[i.sub_id]++;
+        }
+        setSubscriptionFeedCount(subFeedCount);
+
+        const subUnreadCount : Record<number,number> = {};
+        for( const i of items ) {
+            if( !subUnreadCount[i.sub_id] ) {  subUnreadCount[i.sub_id] = 0;  }
+
+            if( !i.is_read ) {
+                subUnreadCount[i.sub_id]++;
+            }
+        }
+        setSubscriptionUnreadCount( subUnreadCount );
     }
 
     async function updateFeedItemsFromDb() {
         syncSelectedSubscriptionFeedItems();
         syncAllFeedItems();
+
+        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+        setFeedBinItems( binItems );
     }
 
     async function showAllFeeds() {
@@ -213,6 +235,11 @@ export default function ClientArea() {
             setSelectedSubscriptionOptionsId(-1);
 
             setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
+        });
+
+        window.rssAPI.onFeedBinChanged( async () => {
+            const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+            setFeedBinItems( binItems );
         });
     }, []);
 
@@ -346,6 +373,11 @@ export default function ClientArea() {
         }
     }
 
+    async function onMarkReadClick( itemId : number, event: React.MouseEvent ) {
+        event.stopPropagation();
+        markItemAsRead( itemId );
+    }
+
     async function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
         event.stopPropagation();
         setSelectedSubscriptionOptionsId(subId);
@@ -467,6 +499,8 @@ export default function ClientArea() {
                                     selectedSubscriptionId={selectedSubscriptionId}
                                     onCloseSubOptions={onCloseSubscriptionOptionsPopup}
                                     subscriptionsBeingRefreshed={subscriptionsBeingRefreshed}
+                                    subscriptionUnreadCount={subscriptionUnreadCount}
+                                    subscriptionFeedCount={subscriptionFeedCount}
                                 ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>
@@ -523,8 +557,9 @@ export default function ClientArea() {
                         scrollToTopKey={scrollToTopKey}
                         onClick={onFeedItemClick}
                         setIsFeedFavorite={setIsFeedFavorite}
-                        deleteFeedItem={deleteFeedItem}
+                        deleteFeedItems={deleteFeedItems}
                         onMoreOptionsClick={onMoreOptionsClick}
+                        onMarkReadClick={onMarkReadClick}
                         onCommentsClick={onCommentsClick}
                         faviconCache={faviconCache}
                         selectedItemId={selectedItemId}

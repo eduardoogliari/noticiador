@@ -13,6 +13,8 @@ export type SubscriptionListItemProp = {
     onClickSubOptions : (subId : number, event: React.MouseEvent) => void;
     onCloseSubOptions : () => void;
     subscriptionsBeingRefreshed: Set<number>;
+    unreadFeedsCount : number;
+    feedCount : number;
 };
 
 

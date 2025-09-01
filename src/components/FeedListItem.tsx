@@ -9,8 +9,9 @@ export type FeedListItemProp = {
     title                   : string;
     onClick                 : (itemId : number, url : string) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
-    deleteFeedItem : (itemId : number) => void;
+    deleteFeedItems : (itemIds : number[]) => void;
     onMoreOptionsClick      : (itemId : number, url : string, event: React.MouseEvent) => void;
+    onMarkReadClick         : (itemId : number, event: React.MouseEvent) => void;
     onCommentsClick         : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
     copyToClipboard   : (url : string) => void;

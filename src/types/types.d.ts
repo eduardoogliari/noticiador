@@ -21,9 +21,11 @@ declare global {
             setReadMultiple : (itemIds : number[], value : boolean) => void;
             getFeedBinItems : () => FeedItem[];
             setInFeedBin    : (itemIds : number[], value : boolean) => void;
-            deleteFeedItem : (itemId : number) => void;
+            deleteFeedItems : (itemIds : number[]) => void;
 
             signalSubscriptionsChanged: () => void;
+            signalFeedBinChanged: () => void;
+            onFeedBinChanged: (callback: () => void) => void;
             onSubscriptionsChanged: (callback: () => void) => void;
         };
 
