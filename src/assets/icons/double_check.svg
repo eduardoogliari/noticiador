@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24.417704mm"
+   height="24.118965mm"
+   viewBox="0 0 24.417704 24.118965"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient1">
+      <stop
+         style="stop-color:#327d00;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#ccff41;stop-opacity:1;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient1"
+       id="linearGradient2"
+       x1="45.727417"
+       y1="113.00289"
+       x2="66.833885"
+       y2="113.00289"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(-40.637024,-98.986338)">
+    <g
+       id="path1"
+       style="opacity:1;fill:#4ab700;fill-opacity:1;stroke:#140000;stroke-opacity:1"
+       transform="translate(-1.7791534,-1.9570687)">
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#346315;fill-opacity:1;stroke:#021400;stroke-width:1.29671;stroke-linejoin:round;stroke-opacity:1;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="m 56.81417,102.44794 -7.841556,12.63404 -3.858771,-5.11954 -2.04932,3.46765 5.339908,7.19995 c 0.424391,0.58189 1.046798,0.64921 1.518864,0.16424 l 9.315975,-14.6826 z"
+         id="path3" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:url(#linearGradient2);fill-opacity:1;stroke:#021400;stroke-width:1.56651;stroke-linejoin:round;stroke-opacity:1;enable-background:accumulate;stop-color:#000000"
+         d="m 63.120991,101.72659 -9.473032,15.26262 -4.66161,-6.18471 -2.475692,4.18912 6.450904,8.69795 c 0.512691,0.70294 1.26459,0.78427 1.834872,0.19842 l 11.254211,-17.73741 z"
+         id="path3-3" />
+    </g>
+  </g>
+</svg>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type ContextPopupOption = {
     optionTitle : string;
+    icon : string;
     action : (...args : unknown[]) => void;
 };
 
@@ -70,7 +71,6 @@ export default function ContextPopup( props : ContextPopupProp ) {
                     <div style={{width: '100%', height: '100%', position: 'fixed', top: '0', left: '0', zIndex: '9998'}} onClick={
                         (e) => {
                             e.stopPropagation();
-                            console.log('aaaaaaa');
                             props.onClose();
                              }}></div>
                     <div
@@ -93,7 +93,22 @@ export default function ContextPopup( props : ContextPopupProp ) {
                     >
                         <ul className="context-popup">
                             {
-                                props.options.map( (item, index) => { return <li key={index} onClick={item.action}>{item.optionTitle}</li> })
+                                props.options.map( (item, index) => {
+                                    return (
+                                        <li
+                                            style={{display: 'flex', alignItems: 'center', gap: '10px', height: '30px'}}
+                                            key={index}
+                                            onClick={item.action}
+                                        >
+                                            {
+                                                (item.icon)
+                                                    ? <img  width={'20px'} height={'20px'} src={item.icon}></img>
+                                                    : <span style={{width: '20px', height: '20px'}}></span>
+                                            }
+                                            <span>{item.optionTitle}</span>
+                                        </li>
+                                    );
+                                })
                             }
                         </ul>
                     </div>

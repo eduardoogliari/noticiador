@@ -35,25 +35,25 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
     // Feed Bin context options
     const inFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Restore item', action: () => {props.setInFeedBin([props.id], false); props.onCloseFeedOptionsPopup();} },
-        { optionTitle: 'Delete permanently', action: () => { props.deleteFeedItem(props.id); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: 'Restore item', icon: '../icons/remove_bin.svg', action: () => {props.setInFeedBin([props.id], false); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: 'Delete permanently', icon: '../icons/bin_empty.svg', action: () => { props.deleteFeedItems([props.id]); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Move to Feed Bin', action: () => {props.setInFeedBin([props.id], true); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: 'Move to Feed Bin', icon: '../icons/add_bin.svg', action: () => {props.setInFeedBin([props.id], true); props.onCloseFeedOptionsPopup();} },
     ];
 
     // Favorite context options
     const inFavoritesContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Remove from Favorites', action: () => { props.setIsFeedFavorite( props.id, false ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: 'Remove from Favorites', icon: '../icons/remove_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, false ); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFavoritesContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Move to Favorites', action: () => { props.setIsFeedFavorite( props.id, true ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: 'Move to Favorites', icon: '../icons/add_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, true ); props.onCloseFeedOptionsPopup(); } },
     ];
 
     // Build context menu options
     const feedItemContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Open in external browser', action: () => {  props.openInExternalBrowser( props.url ); props.onCloseFeedOptionsPopup(); } },
-        { optionTitle: 'Copy link', action: () => { props.copyToClipboard( props.url ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: 'Open in external browser', icon: '../icons/open_external.svg', action: () => {  props.openInExternalBrowser( props.url ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: 'Copy link',  icon: '../icons/copy.svg',action: () => { props.copyToClipboard( props.url ); props.onCloseFeedOptionsPopup(); } },
 
     ]
     .concat(
@@ -85,20 +85,46 @@ export default function FeedListItem( props : FeedListItemProp ) {
             <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary ?? props.title}>{props.title}</span>
 
             <span className={`feed-item-options-container ${optionsContainerVisible ? 'visible' : ''}`}>
-                {props.commentsUrl ?
-                    <span className={`feed-item-comments-container ${props.commentsActiveId === props.id ? 'selected' : ''}`} onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}>
-                    {
-                        props.commentsUrl
-                            ? <span className={`feed-item-comments`} title={'Comments'}>💬</span>
-                            : ''
-                    }
+                {
+                    props.commentsUrl
+                        ?
+                            <span
+                                className={`feed-item-comments-container ${props.commentsActiveId === props.id ? 'selected' : ''}`}
+                                onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}
+                            >
+                                {
+                                    props.commentsUrl
+                                        ? <span className={`feed-item-comments`} title={'Comments'}><img src={'../icons/comments.svg'}></img></span>
+                                        : ''
+                                }
+                            </span>
+                        : ''
+                }
+
+                <span
+                    className={`feed-item-comments-container`}
+                    onClick={(e) => props.onMarkReadClick( props.id, e )}
+                >
+                    <span
+                        className={`feed-item-comments`}
+                        title={'Mark read'}
+                    >
+                        <img
+                            src={
+                                (props.isRead)
+                                    ? '../icons/check_disabled.svg'
+                                    : '../icons/check.svg'
+                            }
+                        ></img>
                     </span>
-                    : ''}
+                </span>
+
                 <span
                     ref={moreOptionsRef}
                     className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`}
                     onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
                 >
+
                     <span title={'More options'}>⋮</span>
                     {
                         (props.moreOptionsActiveId === props.id)

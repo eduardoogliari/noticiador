@@ -22,10 +22,14 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
      const subOptionsRef = useRef<HTMLElement>(null);
 
     const subItemContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Delete subscription', action: async () => {
-            window.electronApi.openModal( { type: ModalType.ConfirmDeleteSubscription, data: { subId: props.id, subName: props.name } } );
-            props.onCloseSubOptions();
-        } },
+        {
+            optionTitle: 'Delete Subscription',
+            icon: '../icons/x.svg',
+            action: async () => {
+                window.electronApi.openModal( { type: ModalType.ConfirmDeleteSubscription, data: { subId: props.id, subName: props.name } } );
+                props.onCloseSubOptions();
+            }
+        },
     ];
 
     return (
@@ -34,9 +38,21 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
             className={`subscription-list-item ${props.selectedSubscriptionId == props.id ? 'selected' : ''}`}
             key={props.id}
         >
+
+            <span className="subscription-status">
+            {
+                (props.subscriptionsBeingRefreshed.has(props.id))
+                    ? <span><img width={'16px'} height={'16px'} src={'../icons/reload.svg'}></img></span>
+                    // : <span>({props.unreadFeedsCount})</span>
+                    : <span>({props.feedCount})</span>
+            }
+            </span>
+
+
             <img src={props.faviconCache[props.id]}></img>
             <ConstrainedLabel title={props.name}></ConstrainedLabel>
-            <span hidden={!props.subscriptionsBeingRefreshed.has(props.id)}>⟳</span>
+
+
 
             <span
                 ref={subOptionsRef}

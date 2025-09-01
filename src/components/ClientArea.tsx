@@ -40,10 +40,12 @@ export default function ClientArea() {
     const [scrollToTopKey, setScrollToTopKey]                   = useState(0);
     const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
+    const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
+
     const mainOptions : MainOptionInfo[] = [
-        { title: '🌐 All Feeds', itemSource: allFeedItems, icon: '', onClick: showAllFeeds, getCount: () =>  allFeedItems.filter( (i) => !i.is_read ).length },
-        { title: '⭐ Favorites', itemSource: favoriteItems, icon: '', onClick: showFavorites, getCount: () => favoriteItems.length },
-        { title: '🗑️ Feed Bin', itemSource: feedBinItems, icon: '', onClick: showFeedBin, getCount: () => feedBinItems.length },
+        { title: ' All Feeds', itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
+        { title: 'Favorites', itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
+        { title: 'Feed Bin', itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
 
     function getCurrentlyVisibleFeedItems() : FeedItem[] {
@@ -53,7 +55,6 @@ export default function ClientArea() {
     }
 
     async function markItemAsRead( itemId : number ) {
-
         await window.rssAPI.setRead( itemId, true );
         updateFeedItemsFromDb();
     }
@@ -70,8 +71,8 @@ export default function ClientArea() {
         setFeedBinItems( binItems );
     }
 
-    async function deleteFeedItem(itemId : number) {
-        await window.rssAPI.deleteFeedItem(itemId);
+    async function deleteFeedItems(itemIds : number[]) {
+        await window.rssAPI.deleteFeedItems(itemIds);
 
         const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
         setFeedBinItems( binItems );
@@ -405,11 +406,21 @@ export default function ClientArea() {
         if( selectedSubscriptionId != -1 ) {
             const foundItem = subscriptions.find( (item) => item.id == subId );
             if( foundItem ){
-                return <><img src={faviconCache[subId]}></img><span>{foundItem.name}</span></>
+                return (
+                    <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
+                        <img width={'24px'} height={'24px'} src={faviconCache[subId]}></img>
+                        <span>{foundItem.name}</span>
+                    </span>
+                );
             }
         }
         const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
-        return mainOptions[index].title;
+        return (
+            <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
+                <img width={'24px'} height={'24px'} src={mainOptions[index].icon}></img>
+                <span>{mainOptions[index].title}</span>
+            </span>
+        );
     }
 
     function onToggleSidePanelClick() {
@@ -475,7 +486,7 @@ export default function ClientArea() {
                                                     title={item.title}
                                                     onClick={() => onClickMainOption(index)}
                                                 >
-                                                    {/* <img src={item.icon}></img> */}
+                                                    <img width={'16px'} height={'16px'} src={item.icon}></img>
                                                     <span>{`${item.title} (${item.getCount()})`}</span>
                                                 </li>
                                             );
@@ -526,28 +537,64 @@ export default function ClientArea() {
                                         if( foundItem ) { updateFeeds([foundItem]) }
                                     }
                                 }}
-                                disabled={
-                                    (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) ||
-                                    subscriptionsBeingRefreshed.has( selectedSubscriptionId )
-                                }
-                            >⟳</button>
-
-                            <button title={'Mark all as read'} onClick={() =>{
-                                markMultipleItemsAsRead( getCurrentlyVisibleFeedItems().map( (item) => item.id ) );
-                            }}>✅</button>
+                                disabled={refreshButtonDisabled}
+                            >
+                                <img
+                                    className={'feed-header-button-icon'}
+                                    src={
+                                        (refreshButtonDisabled)
+                                            ? '../icons/reload_disabled.svg'
+                                            : '../icons/reload.svg'
+                                    }
+                                ></img>
+                            </button>
 
                             <button
-                                title={'Move read items to feed bin'}
+                                title={'Mark all as read'}
+                                onClick={() => markMultipleItemsAsRead( getCurrentlyVisibleFeedItems().map( (item) => item.id ) )}
+                            >
+                                <img
+                                    className={'feed-header-button-icon'}
+                                    src={'../icons/double_check.svg'}
+                                ></img>
+                            </button>
+
+                            <button
+                                title={
+                                    (selectedMainOptionIndex === 2 )
+                                        ? 'Delete all items permanently'
+                                        : 'Move read items to feed bin'
+                                }
+
                                 onClick={() => {
-                                    setInFeedBin(
-                                        getCurrentlyVisibleFeedItems()
-                                            .filter( (item) => item.is_read)
-                                            .map( (item) => item.id)
-                                        , true
-                                    );
+                                    if( selectedMainOptionIndex === 2 ) {
+                                        window.electronApi.openModal( { type: ModalType.ConfirmEmptyBin } )
+
+                                    } else {
+                                        setInFeedBin(
+                                            getCurrentlyVisibleFeedItems()
+                                                .filter( (item) => item.is_read)
+                                                .map( (item) => item.id)
+                                            , true
+                                        );
+                                    }
                                 }}
-                                disabled={selectedMainOptionIndex !== 0}
-                            >🗑️</button>
+                                disabled={
+                                    (selectedSubscriptionId === -1 && selectedMainOptionIndex === 1)
+                                }
+                            >
+                                <img
+                                    className={'feed-header-button-icon'}
+                                    src={
+                                        (selectedMainOptionIndex === 2)
+                                            ? '../icons/bin_empty.svg'
+                                            : ((selectedSubscriptionId === -1 && selectedMainOptionIndex === 1))
+                                                ? '../icons/bin_disabled.svg'
+                                                : '../icons/bin.svg'
+                                    }
+                                >
+                                </img>
+                            </button>
 
                         </span>
                     </div>
