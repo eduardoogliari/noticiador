@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, ipcMain, IpcMainInvokeEvent, session, shell, webContents } from 'electron';
+import { app, BrowserWindow, clipboard, ipcMain, IpcMainInvokeEvent, Menu, MenuItemConstructorOptions, session, shell, webContents } from 'electron';
 import Parser from 'rss-parser';
 import { FeedItem, NewFeedItem } from './types/feed-item';
 import { ElectronBlocker } from '@ghostery/adblocker-electron';
@@ -75,6 +75,19 @@ const createWindow = () : void => {
 
     // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+
+    const menuTemplate : MenuItemConstructorOptions[] = [
+        {
+            label: 'File',
+            submenu: [
+                { role: 'quit' }
+            ]
+        },
+    ];
+
+    const menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
 
 
 
