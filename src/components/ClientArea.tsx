@@ -41,7 +41,7 @@ export default function ClientArea() {
     const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
     const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
-    const feedBinButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex === 1) || feedBinItems.length === 0;
+    const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
 
     const mainOptions : MainOptionInfo[] = [
         { title: ' All Feeds', itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
