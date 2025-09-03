@@ -50,6 +50,7 @@
     "@braintree/sanitize-url": "^7.1.1",
     "@ghostery/adblocker-electron": "^2.11.1",
     "@timfish/forge-externals-plugin": "^0.2.1",
+    "@types/css-modules": "^1.0.5",
     "better-sqlite3": "^12.2.0",
     "cheerio": "^1.1.0",
     "cross-fetch": "^4.1.0",

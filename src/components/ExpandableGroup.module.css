@@ -1,0 +1,36 @@
+.expandable-group {
+    padding: 0 0 0 5px;
+}
+
+.expandable-group-header {
+    width: 100%;
+    background-color: rgba(195, 195, 195, 0.623);
+    padding: 5px;
+    display        : flex;
+    flex-direction : row;
+    justify-content: space-between;
+    align-items    : center;
+    margin: 0px 0px 5px 0px;
+    user-select: none;
+
+    span {
+        justify-self: start;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    button {
+        margin-left: 5px;
+        justify-self: end;
+        min-width: 1.5rem;
+        position: sticky;
+        right: 0;
+        z-index: 1;
+        flex-shrink: 0;
+    }
+}
+
+.expandable-group-header:hover {
+    background-color: rgba(218, 218, 218, 0.52);
+}

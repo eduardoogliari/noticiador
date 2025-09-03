@@ -1,0 +1,15 @@
+.context-popup {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+
+    > li {
+        padding: 5px;
+    }
+
+    > li:hover {
+        background-color: rgba(200, 200, 200, 0.585);
+        cursor: pointer;
+    }
+}

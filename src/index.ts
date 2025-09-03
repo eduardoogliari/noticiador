@@ -134,7 +134,7 @@ const createWindow = () : void => {
     mainWindow.contentView.addChildView( wcView );
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools( {mode:'detach', activate: false, title: 'main'} );
 };
 
 // This method will be called when Electron has finished

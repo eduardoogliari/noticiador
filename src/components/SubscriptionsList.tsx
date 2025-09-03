@@ -1,5 +1,6 @@
 import { Subscription } from "../types/subscription";
 import SubscriptionListItem from "./SubscriptionListItem";
+import styles from './SubscriptionList.module.css';
 
 export type SubscriptionsListProp = {
     subscriptions : Subscription[];
@@ -16,7 +17,7 @@ export type SubscriptionsListProp = {
 
 export default function SubscriptionsList( props : SubscriptionsListProp ) {
     return (
-        <ul className="subscription-list">
+        <ul className={styles["subscription-list"]}>
             {
                 props.subscriptions.map( (item) => {
                     return (

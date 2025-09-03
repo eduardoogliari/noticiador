@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ModalData } from "../types/modal-data";
 import { ModalType } from "../types/modal-type";
+import styles from './RemoveSubscriptionModal.module.css';
 
 export default function RemoveSubscriptionModal() {
     const [subId, setSubId] = useState(-1);
@@ -20,14 +21,14 @@ export default function RemoveSubscriptionModal() {
 
     return (
         <>
-            <div className="remove-sub-modal-container">
-                <div className="remove-sub-modal-text" >
+            <div className={styles["remove-sub-modal-container"]}>
+                <div>
                     Delete subscription <strong>{`${subName}`}</strong>?
                 </div>
 
                 <div className="h-separator"></div>
 
-                <div className="remove-sub-modal-buttons">
+                <div className={styles["remove-sub-modal-buttons"]}>
                     <button
                         onClick={ async () => {
                             await window.rssAPI.deleteSubscriptions( [subId] );

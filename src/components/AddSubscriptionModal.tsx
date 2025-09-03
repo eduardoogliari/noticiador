@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NewSubscription } from "../types/subscription";
 const isUrlHttp = require('is-url-http');
 const sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
+import styles from './AddSubscriptionModal.module.css';
 
 const defaultMessageInfo = 'Waiting for input...';
 const validatingMessageInfo = 'Validating URL...';
@@ -72,11 +73,11 @@ export default function AddSubscriptionModal() {
 
     return (
         <>
-            <div className="add-subscription-modal-container">
+            <div className={styles["add-subscription-modal-container"]}>
 
-                <div className="add-subscription-modal">
+                <div className={styles["add-subscription-modal"]}>
 
-                    <div className="add-subscription-input" >
+                    <div className={styles["add-subscription-input"]}>
                         <input
                             ref={inputRef}
                             placeholder="Enter the website's URL (for instance: example.com/rss)"
@@ -89,7 +90,7 @@ export default function AddSubscriptionModal() {
                         <button onClick={onClick} disabled={inputDisabled}>Add</button>
                     </div>
 
-                    <div className="add-subscription-info">
+                    <div className={styles["add-subscription-info"]}>
                         <span>{messageInfo}</span>
                     </div>
                 </div>

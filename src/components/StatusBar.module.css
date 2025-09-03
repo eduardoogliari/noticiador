@@ -1,0 +1,25 @@
+.status-bar {
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(208, 208, 208);
+    border-top: 1px solid black;
+    padding: 5px 5px;
+    font-size: small;
+
+    > button {
+        font-size: x-small;
+    }
+}
+
+.status-bar-button {
+    display:flex;
+    justify-content: center;
+    align-self: center;
+    padding: 1px;
+    margin: 0px;
+}
+
+.status-bar-icon {
+    width: 16px;
+    height: 16px;
+}

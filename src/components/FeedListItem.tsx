@@ -1,21 +1,22 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import ContextPopup, {ContextPopupOption} from "./ContextPopup";
+import styles from './FeedListItem.module.css';
 
 export type FeedListItemProp = {
     id                      : number;
     url                     : string;
-    commentsUrl             ?: string;
-    summary                 ?: string;
+    commentsUrl            ?: string;
+    summary                ?: string;
     title                   : string;
     onClick                 : (itemId : number, url : string) => void;
-    setIsFeedFavorite : (itemId : number, value : boolean) => void;
-    deleteFeedItems : (itemIds : number[]) => void;
+    setIsFeedFavorite       : (itemId : number, value : boolean) => void;
+    deleteFeedItems         : (itemIds : number[]) => void;
     onMoreOptionsClick      : (itemId : number, url : string, event: React.MouseEvent) => void;
     onMarkReadClick         : (itemId : number, event: React.MouseEvent) => void;
     onCommentsClick         : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
-    copyToClipboard   : (url : string) => void;
-    setInFeedBin : (itemIds: number[], value : boolean) => void;
+    copyToClipboard         : (url : string) => void;
+    setInFeedBin            : (itemIds: number[], value : boolean) => void;
     onCloseFeedOptionsPopup : () => void;
     isSelected              : boolean;
     commentsActiveId        : number;
@@ -74,27 +75,27 @@ export default function FeedListItem( props : FeedListItemProp ) {
     return (
         <li
             tabIndex={0}
-            className={`feed-item  ${props.isSelected ? 'selected' : ''} ${props.isRead ? 'read' : ''}`}
+            className={`${styles['feed-item']} ${props.isSelected ? styles.selected : ''} ${props.isRead ? styles.read : ''}`}
             onClick={() => props.onClick(props.id, props.url)}
         >
             {
                 (props.favicon)
-                    ? <img className="feed-item-favicon" src={props.favicon}></img>
+                    ? <img className={styles["feed-item-favicon"]} src={props.favicon}></img>
                     : ''
             }
-            <span className="feed-item-title" title={props.summary ?? props.title } aria-label={props.summary ?? props.title}>{props.title}</span>
+            <span className={styles["feed-item-title"]} title={props.summary ?? props.title } aria-label={props.summary ?? props.title}>{props.title}</span>
 
-            <span className={`feed-item-options-container ${optionsContainerVisible ? 'visible' : ''}`}>
+            <span className={`${styles['feed-item-options-container']} ${optionsContainerVisible ? styles.visible : ''}`}>
                 {
                     props.commentsUrl
                         ?
                             <span
-                                className={`feed-item-comments-container ${props.commentsActiveId === props.id ? 'selected' : ''}`}
+                                className={`${styles['feed-item-comments-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}
                                 onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}
                             >
                                 {
                                     props.commentsUrl
-                                        ? <span className={`feed-item-comments`} title={'Comments'}><img src={'../icons/comments.svg'}></img></span>
+                                        ? <span className={styles['feed-item-comments']} title={'Comments'}><img src={'../icons/comments.svg'}></img></span>
                                         : ''
                                 }
                             </span>
@@ -102,11 +103,11 @@ export default function FeedListItem( props : FeedListItemProp ) {
                 }
 
                 <span
-                    className={`feed-item-comments-container`}
+                    className={styles[`feed-item-comments-container`]}
                     onClick={(e) => props.onMarkReadClick( props.id, e )}
                 >
                     <span
-                        className={`feed-item-comments`}
+                        className={styles[`feed-item-comments`]}
                         title={'Mark read'}
                     >
                         <img
@@ -121,7 +122,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
                 <span
                     ref={moreOptionsRef}
-                    className={`feed-items-more-options-container ${props.moreOptionsActiveId === props.id ? 'selected' : ''}`}
+                    className={`${styles['feed-items-more-options-container']} ${props.moreOptionsActiveId === props.id ? styles.selected : ''}`}
                     onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
                 >
 

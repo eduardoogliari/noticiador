@@ -2,6 +2,7 @@ import { useRef } from "react";
 import ConstrainedLabel from "./ConstrainedLabel";
 import ContextPopup, {ContextPopupOption} from "./ContextPopup";
 import { ModalType } from "../types/modal-type";
+import styles from './SubscriptionListItem.module.css'
 
 export type SubscriptionListItemProp = {
     id : number;
@@ -35,11 +36,11 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
     return (
         <li
             onClick={() => props.onClickSubTitle(props.id)}
-            className={`subscription-list-item ${props.selectedSubscriptionId == props.id ? 'selected' : ''}`}
+            className={`${styles['subscription-list-item']} ${props.selectedSubscriptionId == props.id ? styles.selected : ''}`}
             key={props.id}
         >
 
-            <span className="subscription-status">
+            <span className={styles["subscription-status"]}>
             {
                 (props.subscriptionsBeingRefreshed.has(props.id))
                     ? <span><img width={'16px'} height={'16px'} src={'../icons/reload.svg'}></img></span>
@@ -56,10 +57,10 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
 
             <span
                 ref={subOptionsRef}
-                className={`subscription-list-item-options-container ${props.selectedSubscriptionOptionsId === props.id ? 'selected' : ''}`}
+                className={`${styles['subscription-list-item-options-container']} ${props.selectedSubscriptionOptionsId === props.id ? styles.selected : ''}`}
                 onClick={(e) => { props.onClickSubOptions(props.id, e); }}
             >
-                <span className={`subscription-list-item-options-button`}>⋮</span>
+                <span>⋮</span>
                 {
                     (props.selectedSubscriptionOptionsId === props.id)
                         ?

@@ -1,0 +1,7 @@
+.feed-date-list {
+    list-style: none;
+    margin: 0;
+    padding: 0px 0px;
+    height: 100%;
+    overflow-y: scroll;
+}

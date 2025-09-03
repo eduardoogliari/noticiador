@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
+import styles from './ContextPopup.module.css';
 
 export type ContextPopupOption = {
     optionTitle : string;
@@ -91,7 +92,7 @@ export default function ContextPopup( props : ContextPopupProp ) {
                             }
                         }
                     >
-                        <ul className="context-popup">
+                        <ul className={styles["context-popup"]}>
                             {
                                 props.options.map( (item, index) => {
                                     return (

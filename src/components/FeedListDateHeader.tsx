@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { FeedItem } from "../types/feed-item";
 import FeedListItem from "./FeedListItem";
+import styles from './FeedListDateHeader.module.css';
 
 export type FeedListDateHeaderProps = {
     name                   : string;
@@ -54,8 +54,8 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
 
     return (
         <>
-            <h3 className="feed-date-header">{props.name}</h3>
-            <ul className="feed-list">
+            <h3 className={styles["feed-date-header"]}>{props.name}</h3>
+            <ul className={styles["feed-list"]}>
                 {items}
             </ul>
         </>

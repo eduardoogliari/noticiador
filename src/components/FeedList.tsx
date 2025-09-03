@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import { FeedItem } from "../types/feed-item";
 import FeedListDateHeader from "./FeedListDateHeader";
-import { startOfWeek, endOfWeek, subDays, isSameDay } from 'date-fns'
+import { startOfWeek, endOfWeek, subDays, isSameDay } from 'date-fns';
+import styles from './FeedList.module.css';
 
 const today            = new Date();
 const yesterday        = subDays( today, 1 );
@@ -11,22 +12,22 @@ const lastWeekBegin    = subDays(currentWeekBegin, 7);
 const lastWeekEnd      = subDays(currentWeekEnd, 7);
 
 export type FeedListProp = {
-    feedItems     : FeedItem[];
-    onClick       : (itemId : number, url : string) => void;
-    setIsFeedFavorite : (itemId : number, value : boolean) => void;
-    deleteFeedItems : (itemIds : number[]) => void;
-    onMoreOptionsClick : (itemId : number, url : string, event: React.MouseEvent) => void;
-    onMarkReadClick         : (itemId : number, event: React.MouseEvent) => void;
-    onCommentsClick : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
-    openInExternalBrowser   : (url : string) => void;
-    copyToClipboard   : (url : string) => void;
-    setInFeedBin : (itemIds: number[], value : boolean) => void;
-    onCloseFeedOptionsPopup : () => void;
-    commentsActiveId : number;
-    moreOptionsActiveId : number;
-    faviconCache  : Record<number, string>;
-    selectedItemId: number;
-    scrollToTopKey : number;
+    feedItems              : FeedItem[];
+    onClick                : (itemId : number, url : string) => void;
+    setIsFeedFavorite      : (itemId : number, value : boolean) => void;
+    deleteFeedItems        : (itemIds : number[]) => void;
+    onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
+    onMarkReadClick        : (itemId : number, event: React.MouseEvent) => void;
+    onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    openInExternalBrowser  : (url : string) => void;
+    copyToClipboard        : (url : string) => void;
+    setInFeedBin           : (itemIds: number[], value : boolean) => void;
+    onCloseFeedOptionsPopup: () => void;
+    commentsActiveId       : number;
+    moreOptionsActiveId    : number;
+    faviconCache           : Record<number, string>;
+    selectedItemId         : number;
+    scrollToTopKey         : number;
 };
 
 export default function FeedList( props : FeedListProp ) {
@@ -64,7 +65,7 @@ export default function FeedList( props : FeedListProp ) {
     }, [props.scrollToTopKey]);
 
     return (
-        <ul ref={listRef} className="feed-date-list">
+        <ul ref={listRef} className={styles["feed-date-list"]}>
             {
                 Object.entries(itemsMap).filter( ([key, value]) => value.length > 0 ).map( ([key, value]) => {
                     return (

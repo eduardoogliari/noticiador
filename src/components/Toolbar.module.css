@@ -1,0 +1,26 @@
+.toolbar {
+    background-color: rgb(212, 212, 212);
+    border-bottom: 1px solid black;
+    padding: 5px 5px;
+    display: flex;
+    flex-direction: row;
+
+    > button {
+        margin: 0px 5px;
+        cursor: pointer;
+        padding: 5px;
+    }
+
+}
+
+.toolbar-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+
+.toolbar-button-icon {
+    width: 16px;
+    height: 16px;
+}

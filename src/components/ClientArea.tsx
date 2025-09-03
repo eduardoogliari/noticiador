@@ -9,6 +9,7 @@ import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
 import { SubscriptionFilter } from '../types/subscription-filter';
 import { ModalType } from '../types/modal-type';
+import styles from './ClientArea.module.css';
 
 type MainOptionInfo = {
     title : string;
@@ -19,26 +20,26 @@ type MainOptionInfo = {
 };
 
 export default function ClientArea() {
-    const [showLeftPanel, setShowLeftPanel]                     = useState(true);
-    const [allFeedItems, setAllFeedItems]                       = useState<FeedItem[]>([]);
-    const [feedItems, setFeedItems]                             = useState<FeedItem[]>([]);
-    const [favoriteItems, setFavoriteItems]                     = useState<FeedItem[]>([]);
-    const [feedBinItems, setFeedBinItems]                       = useState<FeedItem[]>([]);
-    const [faviconCache, setFaviconCache]                       = useState<Record<number, string>>({});
-    const [subscriptionUnreadCount, setSubscriptionUnreadCount] = useState<Record<number, number>>({});
-    const [subscriptionFeedCount, setSubscriptionFeedCount] = useState<Record<number, number>>({});
-    const [selectedItemId, setSelectedItemId]                   = useState(-1);
-    const [selectedSubscriptionId, setSelectedSubscriptionId]   = useState(-1);
-    const [selectedMainOptionIndex, setSelectedMainOptionIndex] = useState(0);
+    const [showLeftPanel, setShowLeftPanel]                                 = useState(true);
+    const [allFeedItems, setAllFeedItems]                                   = useState<FeedItem[]>([]);
+    const [feedItems, setFeedItems]                                         = useState<FeedItem[]>([]);
+    const [favoriteItems, setFavoriteItems]                                 = useState<FeedItem[]>([]);
+    const [feedBinItems, setFeedBinItems]                                   = useState<FeedItem[]>([]);
+    const [faviconCache, setFaviconCache]                                   = useState<Record<number, string>>({});
+    const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
+    const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
+    const [selectedItemId, setSelectedItemId]                               = useState(-1);
+    const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
+    const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
     const [selectedSubscriptionOptionsId, setSelectedSubscriptionOptionsId] = useState(-1);
-    const [currentURL, setCurrentURL] = useState('');
-    const [commentsActiveId, setCommentsActiveId]               = useState(-1);
-    const [moreOptionsActiveId, setMoreOptionsActiveId]         = useState(-1);
-    const [subscriptions, setSubscriptions]                     = useState<Subscription[]>([]);
-    const [subscriptionsBeingRefreshed, setSubscriptionsBeingRefreshed] = useState<Set<number>>(new Set([]));
-    const containerRef                                          = useRef<HTMLDivElement>(null);
-    const [scrollToTopKey, setScrollToTopKey]                   = useState(0);
-    const [feedRefreshKey, setFeedRefreshKey] = useState(0);
+    const [currentURL, setCurrentURL]                                       = useState('');
+    const [commentsActiveId, setCommentsActiveId]                           = useState(-1);
+    const [moreOptionsActiveId, setMoreOptionsActiveId]                     = useState(-1);
+    const [subscriptions, setSubscriptions]                                 = useState<Subscription[]>([]);
+    const [subscriptionsBeingRefreshed, setSubscriptionsBeingRefreshed]     = useState<Set<number>>(new Set([]));
+    const containerRef                                                      = useRef<HTMLDivElement>(null);
+    const [scrollToTopKey, setScrollToTopKey]                               = useState(0);
+    const [feedRefreshKey, setFeedRefreshKey]                               = useState(0);
 
     const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
     const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
@@ -462,12 +463,10 @@ export default function ClientArea() {
         }
 
         setSelectedItemId(itemId);
-
-        // setMoreOptionsActiveId(-1);
     }
 
     return (
-        <div className={'client-area'}>
+        <div className={styles['client-area']}>
             <Toolbar
                 onClickAddSubscription={onClickAddSubscription}
                 refreshAllFeeds={() => updateFeeds(subscriptions)}
@@ -477,13 +476,13 @@ export default function ClientArea() {
                 {
                     showLeftPanel && (
                         <>
-                            <Panel id="left" className={'panel-left'} order={1} minSize={16}>
-                                <ul className="main-options-list">
+                            <Panel id="left" className={styles['panel-left']} order={1} minSize={16}>
+                                <ul className={styles["main-options-list"]}>
                                     {
                                         mainOptions.map( (item, index) => {
                                             return (
                                                 <li key={index}
-                                                    className={`main-options-list-item ${selectedMainOptionIndex === index ? 'selected' : ''}`}
+                                                    className={`${styles['main-options-list-item']} ${selectedMainOptionIndex === index ? styles.selected : ''}`}
                                                     title={item.title}
                                                     onClick={() => onClickMainOption(index)}
                                                 >
@@ -501,7 +500,7 @@ export default function ClientArea() {
                                     <p>Music</p>
                                 </ExpandableGroup> */}
 
-                                <div className='subscriptions-header'>Subscriptions</div>
+                                <div className={styles['subscriptions-header']}>Subscriptions</div>
                                 <SubscriptionsList
                                     faviconCache={faviconCache}
                                     onClickSubTitle={onSubscriptionItemClick}
@@ -519,14 +518,14 @@ export default function ClientArea() {
                                     <SubscriptionsList faviconCache={faviconCache} onClick={onSubscriptionItemClick} subscriptions={subscriptions} selectedSubscriptionId={selectedSubscriptionId}></SubscriptionsList>
                                 </ExpandableGroup> */}
                             </Panel>
-                            <PanelResizeHandle className='panel-resizer-handle'/>
+                            <PanelResizeHandle className={styles['panel-resizer-handle']}/>
                         </>
                     )
                 }
-                <Panel id="center" className={'panel-middle'} order={2} minSize={26}>
-                    <div className='feed-header'>
-                        <div className='feed-header-title'>{ getFeedName(selectedSubscriptionId) }</div>
-                        <span className='feed-header-buttons'>
+                <Panel id="center" className={styles['panel-middle']} order={2} minSize={26}>
+                    <div className={styles['feed-header']}>
+                        <div className={styles['feed-header-title']}>{ getFeedName(selectedSubscriptionId) }</div>
+                        <span className={styles['feed-header-buttons']}>
 
                             <button
                                 title={'Refresh'}
@@ -541,7 +540,7 @@ export default function ClientArea() {
                                 disabled={refreshButtonDisabled}
                             >
                                 <img
-                                    className={'feed-header-button-icon'}
+                                    className={styles['feed-header-button-icon']}
                                     src={
                                         (refreshButtonDisabled)
                                             ? '../icons/reload_disabled.svg'
@@ -555,7 +554,7 @@ export default function ClientArea() {
                                 onClick={() => markMultipleItemsAsRead( getCurrentlyVisibleFeedItems().map( (item) => item.id ) )}
                             >
                                 <img
-                                    className={'feed-header-button-icon'}
+                                    className={styles['feed-header-button-icon']}
                                     src={'../icons/double_check.svg'}
                                 ></img>
                             </button>
@@ -583,7 +582,7 @@ export default function ClientArea() {
                                 disabled={ feedBinButtonDisabled }
                             >
                                 <img
-                                    className={'feed-header-button-icon'}
+                                    className={styles['feed-header-button-icon']}
                                     src={
                                         (selectedMainOptionIndex === 2)
                                             ? '../icons/bin_empty.svg'
@@ -619,8 +618,8 @@ export default function ClientArea() {
                 </Panel>
                 {
                     <>
-                        <PanelResizeHandle className='panel-resizer-handle' />
-                        <Panel id="right" className={'panel-right'} order={3} minSize={30}>
+                        <PanelResizeHandle className={styles['panel-resizer-handle']}/>
+                        <Panel id="right" className={styles['panel-right']} order={3} minSize={30}>
                             <div ref={containerRef} style={{width: '100%', height: '100%'}}></div>
                         </Panel>
                     </>
