@@ -14,6 +14,7 @@ import { SubscriptionFilter } from './types/subscription-filter';
 import { ModalType } from './types/modal-type';
 import { ModalData } from './types/modal-data';
 import Store from 'electron-store';
+const path = require('path');
 
 type SubscriptionFeedRecord = Record<string, NewFeedItem[]>;
 
@@ -59,8 +60,15 @@ if (require('electron-squirrel-startup')) {
 
 
 const createWindow = () : void => {
+    console.log( '----------------- path: ', path.join(__dirname, "../renderer/icons/icon.png") );
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        // icon: '../../src/assets/icons/icon.png',
+        // icon: './src/assets/icons/icon.png',
+        // icon: './icon.png',
+        icon: path.join(__dirname, "../renderer/icons/icon.png"),
+        // icon: '../icons/icon.png',
         minWidth    : 300,
         minHeight   : 300,
         height      : 600,

@@ -1,9 +1,10 @@
 {
   "name": "noticiador",
-  "productName": "noticiador",
+  "productName": "Noticiador",
   "version": "0.1.0",
   "description": "My Electron application description",
   "main": ".webpack/main",
+  "icon": "./src/assets/icons/icon.png",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",

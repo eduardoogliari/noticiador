@@ -11,15 +11,33 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+const path = require('path');
 
 const config: ForgeConfig = {
   packagerConfig: {
-    "asar" : {
+    asar : {
       "unpack": "**/node_modules/{sharp,@img}/**/*"
-    }
+    },
+    // icon: './src/assets/icons/icon',
+    // icon: './icons/icon',
+    icon: path.resolve(__dirname, "src/assets/icons/icon"),
+    executableName: 'noticiador'
+
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [
+    new MakerSquirrel({}),
+    new MakerZIP({}, ['darwin']),
+    // new MakerRpm({}),
+    new MakerDeb({
+      options: {
+        name: 'Noticiador',
+        // icon: './src/assets/icons/icon.png',
+        // icon: './icons/icon.png',
+        icon: path.resolve(__dirname, "src/assets/icons/icon.png"),
+      }
+    })
+  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
