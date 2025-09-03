@@ -60,15 +60,9 @@ if (require('electron-squirrel-startup')) {
 
 
 const createWindow = () : void => {
-    console.log( '----------------- path: ', path.join(__dirname, "../renderer/icons/icon.png") );
-
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        // icon: '../../src/assets/icons/icon.png',
-        // icon: './src/assets/icons/icon.png',
-        // icon: './icon.png',
         icon: path.join(__dirname, "../renderer/icons/icon.png"),
-        // icon: '../icons/icon.png',
         minWidth    : 300,
         minHeight   : 300,
         height      : 600,
@@ -147,13 +141,6 @@ const createWindow = () : void => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then( async () => {
-    // const blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch);
-    // blocker.enableBlockingInSession(session.fromPartition('persist:custom-partition'));
-
-    // blocker.on('request-blocked', (req) => {
-    //     console.log('[BLOCKED]', req.url);
-    // });
-
     await rebuildAdblock( defaultFilterList );
 
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -328,8 +315,6 @@ async function rebuildAdblock( filterLists : string[] ) {
 // ------------------------------------------------------------------------------------------------------
 function refreshFaviconBlobRecord() {
     console.log('Refreshing favicon blobs');
-
-    // const subs = getSubscriptions();
 
     const stmt = db.prepare('SELECT * FROM subscription'); // Intentionally including deleted subs because of favorites
     const subs = stmt.all() as Subscription[];

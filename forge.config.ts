@@ -18,8 +18,6 @@ const config: ForgeConfig = {
     asar : {
       "unpack": "**/node_modules/{sharp,@img}/**/*"
     },
-    // icon: './src/assets/icons/icon',
-    // icon: './icons/icon',
     icon: path.resolve(__dirname, "src/assets/icons/icon"),
     executableName: 'noticiador'
 
@@ -32,8 +30,6 @@ const config: ForgeConfig = {
     new MakerDeb({
       options: {
         name: 'Noticiador',
-        // icon: './src/assets/icons/icon.png',
-        // icon: './icons/icon.png',
         icon: path.resolve(__dirname, "src/assets/icons/icon.png"),
       }
     })
