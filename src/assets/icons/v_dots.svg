@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="160mm"
+   height="160mm"
+   viewBox="0 0 160 160"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer2"
+     style="fill:none;stroke:none"
+     transform="translate(-22.881356,-76.192133)">
+    <rect
+       style="fill:none;stroke:none;stroke-width:5.23979;stroke-linecap:round;stroke-opacity:1"
+       id="rect1"
+       width="160"
+       height="160"
+       x="22.881355"
+       y="76.192123"
+       rx="2.2506397"
+       ry="8.4066572" />
+  </g>
+  <g
+     id="layer1"
+     transform="translate(-22.881356,-76.192133)">
+    <g
+       id="g2"
+       transform="translate(2.2372818,-12.000729)"
+       style="fill:#272727;fill-opacity:1">
+      <ellipse
+         style="fill:#272727;fill-opacity:1;stroke:none;stroke-width:1.478;stroke-linecap:round;stroke-opacity:1"
+         id="path1"
+         ry="17.38983"
+         rx="18.991524"
+         cy="111.09829"
+         cx="100.64407" />
+      <ellipse
+         style="fill:#272727;fill-opacity:1;stroke:none;stroke-width:1.478;stroke-linecap:round;stroke-opacity:1"
+         id="ellipse1"
+         cx="100.64407"
+         cy="168.19286"
+         rx="18.991524"
+         ry="17.38983" />
+      <ellipse
+         style="fill:#272727;fill-opacity:1;stroke:none;stroke-width:1.478;stroke-linecap:round;stroke-opacity:1"
+         id="ellipse2"
+         cx="100.64407"
+         cy="225.28741"
+         rx="18.991524"
+         ry="17.38983" />
+    </g>
+  </g>
+</svg>
