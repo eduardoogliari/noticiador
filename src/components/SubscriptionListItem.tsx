@@ -54,7 +54,7 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
             <span className={styles["subscription-status"]}>
             {
                 (props.subscriptionsBeingRefreshed.has(props.id))
-                    ? <span><img width={'16px'} height={'16px'} src={'../icons/reload.svg'}></img></span>
+                    ? <span><img width={'12px'} height={'12px'} src={'../icons/reload.svg'}></img></span>
                     // : <span>({props.unreadFeedsCount})</span>
                     : <span>({props.feedCount})</span>
             }

@@ -107,6 +107,7 @@
 .main-options-list-item {
     display: flex;
     justify-content: start;
+    align-items: center;
     gap: 5px;
     height: 25px;
     padding: 3px;

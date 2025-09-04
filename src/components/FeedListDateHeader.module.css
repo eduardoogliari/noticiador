@@ -7,10 +7,10 @@
 
     padding: 5px 10px;
     /* background-color: rgb(232, 232, 232); */
-    background-color: rgb(87, 87, 87);
+    /* background-color: rgb(87, 87, 87); */
     /* color: rgb(220, 220, 220); */
     color: rgb(255, 255, 255);
-    text-shadow:  1px 0px 1px rgb(84, 84, 84);
+    text-shadow:  2px 2px 1px rgb(82, 82, 82);
     /* border-bottom: 1px solid rgb(152, 152, 152); */
     margin: 0;
 
@@ -19,7 +19,7 @@
     border-bottom: 1px solid rgb(43, 43, 43);
     border-right: 1px solid rgb(43, 43, 43);
 
-    background-color: rgb(126, 126, 126);
+    background-color: rgb(125, 125, 125);
 /* background: #595959; */
 /* background: linear-gradient(90deg, rgb(85, 85, 85) 0%, rgb(122, 122, 122) 100%); */
 }

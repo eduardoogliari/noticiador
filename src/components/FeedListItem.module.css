@@ -39,30 +39,56 @@
     border-left: none;
     background-color: var(--feed-item-background-color-read);
 
+    background-image: repeating-linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.076) 0 10px,
+        transparent 10px 20px
+    );
+
+
     span {
         font-weight: normal;
     }
 
     .feed-item-option:hover {
-        background-color: rgb(231, 231, 231);
+        background-color: rgb(227, 227, 227);
     }
 }
 
 
 .feed-item.selected {
     background-color: var(--feed-item-background-color-selected);
-    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.25);
-    border-top: none;
-    border-left: none;
-    border: 2px solid rgb(221, 194, 45);
+    box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.25);
+    /* border-top: none; */
+    /* border-left: none; */
+    /* border: 2px solid rgb(233, 207, 58); */
+    border: 2px solid rgb(50, 117, 142);
+
+     /* background-image: repeating-linear-gradient(
+        135deg,
+        rgba(71, 71, 71, 0.095) 0 10px,
+        transparent 10px 20px
+    ); */
+
+    span {
+        font-weight: 500;
+        /* text-shadow: 1px 1px 2px rgb(181, 181, 181); */
+    }
 
     .feed-item-options-container {
         visibility: visible;
     }
 
-    .feed-items-more-options-container:hover {
-        background-color: rgb(200, 200, 200);
+    .feed-item-option:hover {
+         background-color: rgba(147, 147, 147, 0.379);
+        /* border-right: 1px solid rgb(123, 123, 123); */
+        /* border-left: 1px solid rgb(123, 123, 123); */
     }
+
+    /* .feed-items-more-options-container:hover {
+        background-color: rgb(200, 200, 200);
+    } */
+
 }
 
 .feed-item.selected:hover {
@@ -83,8 +109,20 @@
     justify-content: center;
     align-items: center;
     margin-left: auto;
+
     border-right: 1px solid transparent;
     border-left: 1px solid transparent;
+}
+
+.feed-item-options-container.selected {
+    visibility: visible;
+    background-color: rgb(230, 230, 230);
+    border-right: 1px solid rgb(143, 143, 143);
+    border-left: 1px solid rgb(143, 143, 143);
+}
+
+.feed-item-options-container.visible {
+    visibility: visible;
 }
 
 .feed-item-option {
@@ -97,16 +135,6 @@
 }
 
 .feed-item-option.selected {
-    background-color: rgba(230, 230, 230, 0.592);
+    background-color: rgb(223, 223, 223);
 }
 
-.feed-item-options-container.selected {
-    visibility: visible;
-    background-color: rgba(230, 230, 230, 0.592);
-    border-right: 1px solid rgb(123, 123, 123);
-    border-left: 1px solid rgb(123, 123, 123);
-}
-
-.feed-item-options-container.visible {
-    visibility: visible;
-}

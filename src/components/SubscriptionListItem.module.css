@@ -5,7 +5,8 @@
     gap : 10px;
     border-bottom: 1px solid rgb(205, 205, 205);
     /* padding: 4px; */
-    height: 24px;
+    text-align: center;
+    height: 28px;
     margin: 0px;
     cursor: pointer;
     user-select: none;
@@ -37,8 +38,8 @@
 }
 
 .subscription-list-item-options-container img {
-    height: 16px;
-    vertical-align: middle;
+    height: 100%;
+    padding: 5px;
 }
 
 .subscription-list-item-options-container:hover {
@@ -47,10 +48,10 @@
 
 .subscription-list-item-options-container.selected {
     background-color: rgba(0, 0, 0, 0.138);
-    outline: 1px solid rgb(181, 181, 181);
+    outline: 1px solid rgb(160, 160, 160);
     visibility: visible;
 }
 
 .subscription-status {
-    min-width: 30px;
+    min-width: 32px;
 }

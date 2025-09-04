@@ -6,7 +6,6 @@
     flex-direction: row;
 
     > button {
-        margin: 0px 5px;
         cursor: pointer;
         padding: 5px;
     }
