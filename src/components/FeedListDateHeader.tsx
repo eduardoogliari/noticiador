@@ -5,6 +5,7 @@ import styles from './FeedListDateHeader.module.css';
 export type FeedListDateHeaderProps = {
     name                   : string;
     feedItems              : FeedItem[];
+    subscriptionNameRecord : Record<number, string>;
     onClick                : (itemId : number, url : string) => void;
     setIsFeedFavorite : (itemId : number, value : boolean) => void;
     deleteFeedItems : (itemIds : number[]) => void;
@@ -30,6 +31,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 id={item.id}
                 key={item.id}
                 title={item.title}
+                subName={props.subscriptionNameRecord[item.sub_id] ?? ''}
                 url={item.url}
                 commentsUrl={item.comments_url}
                 summary={item.summary}

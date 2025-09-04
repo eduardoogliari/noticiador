@@ -4,15 +4,69 @@
     justify-content: left;
     align-items: center;
     padding: 0px 0px 0px 10px;
-    border-bottom: 1px solid rgb(193, 193, 193);
-    background-color: rgb(249, 249, 249);
+    background-color: var(--feed-item-background-color-default);
     font-size: 0.9rem;
     user-select: none;
+
+    border-top: 2px solid var(--feed-item-highlight-color);
+    border-left: 2px solid var(--feed-item-highlight-color);
+
+    border-bottom: 1px solid var(--feed-item-shadow-color);
+    border-right: 1px solid var(--feed-item-shadow-color);
+
 
     img {
         width: 16px;
         height: 16px;
     }
+
+    .feed-item-option:hover {
+        background-color: rgb(200, 200, 200);
+    }
+}
+
+.feed-item:hover {
+    cursor: pointer;
+    text-decoration: underline;
+
+    .feed-item-options-container {
+        visibility: visible;
+    }
+}
+
+.feed-item.read {
+    border-top: none;
+    border-left: none;
+    background-color: var(--feed-item-background-color-read);
+
+    span {
+        font-weight: normal;
+    }
+
+    .feed-item-option:hover {
+        background-color: rgb(231, 231, 231);
+    }
+}
+
+
+.feed-item.selected {
+    background-color: var(--feed-item-background-color-selected);
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.25);
+    border-top: none;
+    border-left: none;
+    border: 2px solid rgb(221, 194, 45);
+
+    .feed-item-options-container {
+        visibility: visible;
+    }
+
+    .feed-items-more-options-container:hover {
+        background-color: rgb(200, 200, 200);
+    }
+}
+
+.feed-item.selected:hover {
+    background-color: var(--feed-item-background-color-selected);
 }
 
 .feed-item-title {
@@ -21,31 +75,19 @@
     padding: 10px 5px;
 }
 
-.feed-item-favorite-container {
-    display: flex;
-    flex-direction: column;
-    visibility: hidden;
-    align-self: stretch;
-    justify-content: center;
-    align-content: center;
-    padding: 0 10px 0 10px;
-}
-
-.feed-item-favorite-container.favorite {
-    visibility: visible;
-}
-
 .feed-item-options-container {
     display: flex;
     flex-direction: row;
     visibility: hidden;
     align-self: stretch;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     margin-left: auto;
+    border-right: 1px solid transparent;
+    border-left: 1px solid transparent;
 }
 
-.feed-item-comments-container {
+.feed-item-option {
     display: flex;
     flex-direction: column;
     align-self: stretch;
@@ -54,68 +96,17 @@
     padding: 0 10px 0 10px;
 }
 
-.feed-item-comments-container:hover {
+.feed-item-option.selected {
     background-color: rgba(230, 230, 230, 0.592);
 }
 
-.feed-item-comments-container.selected {
+.feed-item-options-container.selected {
+    visibility: visible;
     background-color: rgba(230, 230, 230, 0.592);
-    outline: 1px solid rgb(123, 123, 123);
-}
-
-.feed-items-more-options-container {
-    display: flex;
-    flex-direction: column;
-    align-self: stretch;
-    justify-content: center;
-    align-content: center;
-    padding: 0 10px 0 10px;
-}
-
-.feed-items-more-options-container:hover {
-    background-color: rgba(230, 230, 230, 0.592);
-}
-
-.feed-items-more-options-container.selected {
-    background-color: rgba(230, 230, 230, 0.592);
-    outline: 1px solid rgb(123, 123, 123);
+    border-right: 1px solid rgb(123, 123, 123);
+    border-left: 1px solid rgb(123, 123, 123);
 }
 
 .feed-item-options-container.visible {
     visibility: visible;
-}
-
-.feed-item:hover {
-    background-color: rgb(255, 255, 255);
-    cursor: pointer;
-
-    .feed-item-favorite-container {
-        visibility: visible;
-    }
-
-    .feed-item-options-container {
-        visibility: visible;
-    }
-}
-
-.feed-item.read {
-    background-color: rgba(195, 195, 195, 0.335);
-
-    span {
-        font-weight: normal;
-    }
-}
-
-.feed-item.read:hover {
-    background-color: rgba(222, 222, 222, 0.335);
-}
-
-.feed-item.selected {
-    background-color: rgba(0, 0, 0, 0.217);
-    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(255, 255, 255, 0.25);
-
-}
-
-.feed-item.selected:hover {
-    background-color: rgba(0, 0, 0, 0.217);
 }

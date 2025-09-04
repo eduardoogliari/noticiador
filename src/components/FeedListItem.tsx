@@ -9,6 +9,7 @@ export type FeedListItemProp = {
     commentsUrl            ?: string;
     summary                ?: string;
     title                   : string;
+    subName : string;
     onClick                 : (itemId : number, url : string) => void;
     setIsFeedFavorite       : (itemId : number, value : boolean) => void;
     deleteFeedItems         : (itemIds : number[]) => void;
@@ -85,7 +86,12 @@ export default function FeedListItem( props : FeedListItemProp ) {
         >
             {
                 (props.favicon)
-                    ? <img className={styles["feed-item-favicon"]} src={props.favicon}></img>
+                    ?   <img
+                            title={props.subName}
+                            aria-label={props.subName}
+                            className={styles["feed-item-favicon"]}
+                            src={props.favicon}
+                        ></img>
                     : ''
             }
             <span className={styles["feed-item-title"]} title={props.summary ?? props.title } aria-label={props.summary ?? props.title}>{props.title}</span>
@@ -95,7 +101,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     props.commentsUrl
                         ?
                             <span
-                                className={`${styles['feed-item-comments-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}
+                                className={`${styles['feed-item-options-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}
                                 onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}
                                 onMouseOver={ (e) => {
                                     e.stopPropagation();
@@ -106,7 +112,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                                     props.commentsUrl
                                         ?
                                             <span
-                                                className={styles['feed-item-comments']}
+                                                className={styles['feed-item-option']}
                                                 aria-label={t('comments')}
                                                 title={t('comments')}
                                             >
@@ -119,11 +125,11 @@ export default function FeedListItem( props : FeedListItemProp ) {
                 }
 
                 <span
-                    className={styles[`feed-item-comments-container`]}
+                    className={`${styles[`feed-item-options-container`]}`}
                     onClick={(e) => props.onMarkReadClick( props.id, e )}
                 >
                     <span
-                        className={styles[`feed-item-comments`]}
+                        className={styles[`feed-item-option`]}
                         title={t('feed_item_mark_read')}
                         aria-label={t('feed_item_mark_read')}
                     >
@@ -139,11 +145,16 @@ export default function FeedListItem( props : FeedListItemProp ) {
 
                 <span
                     ref={moreOptionsRef}
-                    className={`${styles['feed-items-more-options-container']} ${props.moreOptionsActiveId === props.id ? styles.selected : ''}`}
+                    className={`${styles['feed-item-options-container']} ${props.moreOptionsActiveId === props.id ? styles.selected : ''}`}
                     onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
                 >
 
-                    <span title={t('feed_item_more_options')}>⋮</span>
+                    <span
+                        title={t('feed_item_more_options')}
+                        className={styles['feed-item-option']}
+                    >
+                        <img src={'../icons/v_dots.svg'}></img>
+                    </span>
                     {
                         (props.moreOptionsActiveId === props.id)
                             ?   <ContextPopup

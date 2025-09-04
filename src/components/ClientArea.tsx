@@ -30,6 +30,7 @@ export default function ClientArea() {
     const [faviconCache, setFaviconCache]                                   = useState<Record<number, string>>({});
     const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
     const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
+    const [subscriptionNameRecord, setSubscriptionNameRecord]                 = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                               = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
     const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
@@ -226,6 +227,10 @@ export default function ClientArea() {
 
             const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
             setFeedBinItems( binItems );
+
+            const subNames : Record<number, string> = {};
+            subscriptions.map( (item) => subNames[item.id] = item.name );
+            setSubscriptionNameRecord( subNames );
 
             updateFeeds( subscriptions );
         })();
@@ -615,6 +620,7 @@ export default function ClientArea() {
 
                     <FeedList
                         feedItems={ getCurrentlyVisibleFeedItems() }
+                        subscriptionNameRecord={subscriptionNameRecord}
                         scrollToTopKey={scrollToTopKey}
                         onClick={onFeedItemClick}
                         setIsFeedFavorite={setIsFeedFavorite}

@@ -1,9 +1,11 @@
 .subscription-list-item {
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap : 10px;
     border-bottom: 1px solid rgb(205, 205, 205);
-    padding: 3px;
+    /* padding: 4px; */
+    height: 24px;
     margin: 0px;
     cursor: pointer;
     user-select: none;
@@ -15,11 +17,11 @@
 }
 
 .subscription-list-item.selected {
-    background-color: rgba(0, 0, 0, 0.138);
+    background-color: var(--option-selected-color);
 }
 
 .subscription-list-item:hover {
-    background-color: rgba(0, 0, 0, 0.138);
+    background-color: var(--option-hover-color);
 
     .subscription-list-item-options-container {
         visibility: visible;
@@ -27,9 +29,16 @@
 }
 
 .subscription-list-item-options-container {
+    align-content: center;
     margin-left: auto;
     cursor: pointer;
     visibility: hidden;
+    height: 100%;
+}
+
+.subscription-list-item-options-container img {
+    height: 16px;
+    vertical-align: middle;
 }
 
 .subscription-list-item-options-container:hover {
@@ -38,10 +47,10 @@
 
 .subscription-list-item-options-container.selected {
     background-color: rgba(0, 0, 0, 0.138);
+    outline: 1px solid rgb(181, 181, 181);
     visibility: visible;
 }
 
 .subscription-status {
     min-width: 30px;
-    height: 100%;
 }

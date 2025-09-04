@@ -14,6 +14,7 @@ const lastWeekEnd      = subDays(currentWeekEnd, 7);
 
 export type FeedListProp = {
     feedItems              : FeedItem[];
+    subscriptionNameRecord : Record<number, string>;
     onClick                : (itemId : number, url : string) => void;
     setIsFeedFavorite      : (itemId : number, value : boolean) => void;
     deleteFeedItems        : (itemIds : number[]) => void;
@@ -78,6 +79,7 @@ export default function FeedList( props : FeedListProp ) {
                             <FeedListDateHeader
                                 faviconCache={props.faviconCache}
                                 feedItems={value}
+                                subscriptionNameRecord={props.subscriptionNameRecord}
                                 onClick={props.onClick}
                                 setIsFeedFavorite={props.setIsFeedFavorite}
                                 deleteFeedItems={props.deleteFeedItems}

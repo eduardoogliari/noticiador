@@ -74,7 +74,9 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
                 <span
                     title={t('subscription_more_options')}
                     aria-label={t('subscription_more_options')}
-                >⋮</span>
+                >
+                    <img src={'../icons/v_dots.svg'} ></img>
+                </span>
                 {
                     (props.selectedSubscriptionOptionsId === props.id)
                         ?
