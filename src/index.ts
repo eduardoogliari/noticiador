@@ -580,17 +580,16 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
         console.log( 'No new feed items to insert! ---------------------------' );
     }
 
-    const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const stmt: Statement = db.prepare('INSERT OR IGNORE INTO feed_item (sub_id, title, url, comments_url, summary, pub_date, is_favorite, is_read, in_feed_bin, in_read_later) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     for( const i of newFeedItems ) {
         try {
-            const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0 );
+            const res: RunResult = stmt.run( i.id, i.title, i.url, i.comments_url, i.summary, i.pub_date, 0, 0, 0, 0 );
             console.log(res);
         } catch( err ) {
             results[i.id] = { success: false, errorMessage: err instanceof Error ? err.message : String(err) };
         }
     }
 
-    // console.log( 'rssCache: ', rssCache );
     store.set('rssCache', rssCache);
     return results;
 });

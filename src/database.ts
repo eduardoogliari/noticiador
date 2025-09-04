@@ -39,6 +39,7 @@ db.prepare(`
     is_favorite     INTEGER   DEFAULT 0   CHECK(is_favorite IN (0, 1)),
     is_read         INTEGER   DEFAULT 0   CHECK(is_read IN (0, 1)),
     in_feed_bin     INTEGER   DEFAULT 0   CHECK(in_feed_bin IN (0, 1)),
+    in_read_later   INTEGER   DEFAULT 0   CHECK(in_read_later IN (0, 1)),
 
     FOREIGN KEY (sub_id) REFERENCES subscription(id) ON DELETE CASCADE
   )
