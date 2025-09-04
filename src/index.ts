@@ -192,6 +192,9 @@ app.on('activate', () => {
 ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
     if( modalWindow ) { return; }
 
+    console.log('modal-data', JSON.stringify(data, null, 2));
+
+
     let modalEntryPoint = '';
     let modalWidth      = 0;
     let modalHeight     = 0;
@@ -211,7 +214,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         {
             modalEntryPoint = SUBSCRIPTION_DELETE_MODAL_WEBPACK_ENTRY;
             modalWidth      = 500;
-            modalHeight     = 80;
+            modalHeight     = 90;
             modalTitle      = data?.data.title ?? 'Confirm subscription deletion';
             break;
         }
@@ -220,11 +223,14 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         {
             modalEntryPoint = CONFIRM_EMPTY_BIN_MODAL_WEBPACK_ENTRY;
             modalWidth      = 500;
-            modalHeight     = 100;
+            modalHeight     = 110;
             modalTitle      = data?.data.title ??'Confirm deletion';
             break;
         }
     }
+
+    console.log('mainWindow is', mainWindow);
+    console.log('instanceof BrowserWindow:', mainWindow instanceof BrowserWindow);
 
     modalWindow = new BrowserWindow({
         title: modalTitle,
@@ -233,6 +239,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         show: false,
         width         : modalWidth,
         height        : modalHeight,
+        useContentSize: true,
         resizable: false,
         webPreferences: {
             preload         : MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
@@ -242,7 +249,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         autoHideMenuBar: true,
     });
 
-    modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
+    // modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 
     modalWindow.loadURL( modalEntryPoint );
     modalWindow.setMenu(null);
@@ -260,14 +267,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
 
     modalWindow.webContents.on( 'did-finish-load', () => {
         modalWindow.webContents.send( 'modal-data', data );
-
-        const parentRect = mainWindow.getBounds();
-        const modalRect = modalWindow.getBounds();
-
-        const x = parentRect.x + (parentRect.width / 2) - (modalRect.width / 2);
-        const y = parentRect.y + (parentRect.height / 2) - (modalRect.height / 2);
-
-        modalWindow.setPosition( x, y );
+        modalWindow.center();
         modalWindow.show();
     });
 });
