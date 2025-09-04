@@ -192,9 +192,6 @@ app.on('activate', () => {
 ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
     if( modalWindow ) { return; }
 
-    console.log('modal-data', JSON.stringify(data, null, 2));
-
-
     let modalEntryPoint = '';
     let modalWidth      = 0;
     let modalHeight     = 0;
@@ -228,9 +225,6 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
             break;
         }
     }
-
-    console.log('mainWindow is', mainWindow);
-    console.log('instanceof BrowserWindow:', mainWindow instanceof BrowserWindow);
 
     modalWindow = new BrowserWindow({
         title: modalTitle,
