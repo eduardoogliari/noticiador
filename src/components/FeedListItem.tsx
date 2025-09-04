@@ -15,6 +15,7 @@ export type FeedListItemProp = {
     onMoreOptionsClick      : (itemId : number, url : string, event: React.MouseEvent) => void;
     onMarkReadClick         : (itemId : number, event: React.MouseEvent) => void;
     onCommentsClick         : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    onMouseOverFeedItem     : (url : string) => void;
     openInExternalBrowser   : (url : string) => void;
     copyToClipboard         : (url : string) => void;
     setInFeedBin            : (itemIds: number[], value : boolean) => void;
@@ -33,7 +34,6 @@ export type FeedListItemProp = {
 export default function FeedListItem( props : FeedListItemProp ) {
     const { t } = useTranslation();
     const moreOptionsRef = useRef<HTMLElement>(null);
-
     const optionsContainerVisible = props.isSelected || props.commentsActiveId === props.id || props.moreOptionsActiveId === props.id;
 
     // Feed Bin context options
@@ -79,6 +79,9 @@ export default function FeedListItem( props : FeedListItemProp ) {
             tabIndex={0}
             className={`${styles['feed-item']} ${props.isSelected ? styles.selected : ''} ${props.isRead ? styles.read : ''}`}
             onClick={() => props.onClick(props.id, props.url)}
+            onMouseOver={ (e) => {
+                props.onMouseOverFeedItem( props.url );
+            }}
         >
             {
                 (props.favicon)
@@ -94,6 +97,10 @@ export default function FeedListItem( props : FeedListItemProp ) {
                             <span
                                 className={`${styles['feed-item-comments-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}
                                 onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}
+                                onMouseOver={ (e) => {
+                                    e.stopPropagation();
+                                    props.onMouseOverFeedItem( props.commentsUrl )}
+                                }
                             >
                                 {
                                     props.commentsUrl

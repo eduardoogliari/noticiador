@@ -12,9 +12,11 @@ export type FeedListDateHeaderProps = {
     onMarkReadClick         : (itemId : number, event: React.MouseEvent) => void;
     onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
     openInExternalBrowser   : (url : string) => void;
+    onMouseOverFeedItem     : (url : string) => void;
     copyToClipboard   : (url : string) => void;
     setInFeedBin : (itemIds: number[], value : boolean) => void;
     onCloseFeedOptionsPopup: () => void;
+    clearHoveredUrl: () => void;
     commentsActiveId       : number;
     moreOptionsActiveId    : number;
     faviconCache           : Record<number, string>;
@@ -42,6 +44,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
                 onCommentsClick={props.onCommentsClick}
                 onMarkReadClick={props.onMarkReadClick}
                 onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
+                onMouseOverFeedItem={props.onMouseOverFeedItem}
                 commentsActiveId={props.commentsActiveId}
                 moreOptionsActiveId={props.moreOptionsActiveId}
                 openInExternalBrowser={props.openInExternalBrowser}
@@ -55,7 +58,7 @@ export default function FeedListDateHeader( props : FeedListDateHeaderProps ) {
     return (
         <>
             <h3 className={styles["feed-date-header"]}>{props.name}</h3>
-            <ul className={styles["feed-list"]}>
+            <ul onMouseLeave={() => props.clearHoveredUrl()} className={styles["feed-list"]}>
                 {items}
             </ul>
         </>

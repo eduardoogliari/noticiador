@@ -42,6 +42,7 @@ export default function ClientArea() {
     const containerRef                                                      = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                               = useState(0);
     const [feedRefreshKey, setFeedRefreshKey]                               = useState(0);
+    const [hoveredUrl, setHoveredUrl] = useState('');
 
     const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
     const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
@@ -201,6 +202,11 @@ export default function ClientArea() {
 
     async function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
+    }
+
+    async function clearHoveredUrl() {
+        setHoveredUrl('');
+        console.log('clearHoveredUrl');
     }
 
     useEffect(() => {
@@ -431,6 +437,11 @@ export default function ClientArea() {
         setShowLeftPanel(!showLeftPanel);
     }
 
+    async function onMouseOverFeedItem(url : string) {
+        console.log( 'onMouseOverFeedItem: ', url );
+        setHoveredUrl( url );
+    }
+
     async function onClickMainOption( index : number ) {
         const wrappedIndex = index % mainOptions.length;
         setSelectedMainOptionIndex( wrappedIndex );
@@ -616,6 +627,8 @@ export default function ClientArea() {
                         commentsActiveId={commentsActiveId}
                         moreOptionsActiveId={moreOptionsActiveId}
                         onCloseFeedOptionsPopup={onCloseFeedOptionsPopup}
+                        onMouseOverFeedItem={onMouseOverFeedItem}
+                        clearHoveredUrl={clearHoveredUrl}
                         openInExternalBrowser={openInExternalBrowser}
                         copyToClipboard={copyToClipboard}
                         setInFeedBin={setInFeedBin}
@@ -630,7 +643,11 @@ export default function ClientArea() {
                     </>
                 }
             </PanelGroup>
-            <StatusBar onToggleSidePanelClick={onToggleSidePanelClick} isHidden={!showLeftPanel}></StatusBar>
+            <StatusBar
+                onToggleSidePanelClick={onToggleSidePanelClick}
+                isHidden={!showLeftPanel}
+                hoveredUrl={hoveredUrl}
+            ></StatusBar>
         </div>
     );
 }

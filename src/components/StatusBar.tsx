@@ -4,6 +4,7 @@ import styles from './StatusBar.module.css';
 export type StatusBarProp = {
     onToggleSidePanelClick: () => void;
     isHidden: boolean;
+    hoveredUrl : string;
 };
 
 export default function StatusBar( props: StatusBarProp ) {
@@ -22,6 +23,10 @@ export default function StatusBar( props: StatusBarProp ) {
                     src="../icons/side_panel.svg"
                 ></img>
             </button>
+
+            <span className='v-separator'></span>
+
+            <span className={styles['status-bar-url']}>{props.hoveredUrl}</span>
         </div>
     );
 }

@@ -20,10 +20,12 @@ export type FeedListProp = {
     onMoreOptionsClick     : (itemId : number, url : string, event: React.MouseEvent) => void;
     onMarkReadClick        : (itemId : number, event: React.MouseEvent) => void;
     onCommentsClick        : (itemId : number, url : string, commentsUrl : string, event: React.MouseEvent) => void;
+    onMouseOverFeedItem     : (url : string) => void;
     openInExternalBrowser  : (url : string) => void;
     copyToClipboard        : (url : string) => void;
     setInFeedBin           : (itemIds: number[], value : boolean) => void;
     onCloseFeedOptionsPopup: () => void;
+    clearHoveredUrl: () => void;
     commentsActiveId       : number;
     moreOptionsActiveId    : number;
     faviconCache           : Record<number, string>;
@@ -87,6 +89,8 @@ export default function FeedList( props : FeedListProp ) {
                                 commentsActiveId={props.commentsActiveId}
                                 moreOptionsActiveId={props.moreOptionsActiveId}
                                 onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
+                                onMouseOverFeedItem={props.onMouseOverFeedItem}
+                                clearHoveredUrl={props.clearHoveredUrl}
                                 openInExternalBrowser={props.openInExternalBrowser}
                                 copyToClipboard={props.copyToClipboard}
                                 setInFeedBin={props.setInFeedBin}
