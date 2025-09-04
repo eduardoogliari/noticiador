@@ -3,6 +3,7 @@ import { FeedItem } from "../types/feed-item";
 import FeedListDateHeader from "./FeedListDateHeader";
 import { startOfWeek, endOfWeek, subDays, isSameDay } from 'date-fns';
 import styles from './FeedList.module.css';
+import { useTranslation } from "react-i18next";
 
 const today            = new Date();
 const yesterday        = subDays( today, 1 );
@@ -31,23 +32,25 @@ export type FeedListProp = {
 };
 
 export default function FeedList( props : FeedListProp ) {
+    const { t, i18n } = useTranslation();
     const listRef = useRef(null);
 
-    const itemsMap : Record<string, FeedItem[]> = { 'Today': [], 'Yesterday' : [], 'This week' : [], 'Last week' : [] };
+    const itemsMap : Record<string, FeedItem[]> = { 'today': [], 'yesterday' : [], 'this_week' : [], 'last_week' : [] };
 
     for( const i of props.feedItems ) {
         if (i.pub_date) {
             const d = new Date(i.pub_date);
             if (isSameDay(d, today)) {
-                itemsMap['Today'].push(i);
+                itemsMap['today'].push(i);
             } else if (isSameDay(d, yesterday)) {
-                itemsMap['Yesterday'].push(i);
+                itemsMap['yesterday'].push(i);
             } else if (d >= currentWeekBegin && d <= currentWeekEnd) {
-                itemsMap['This week'].push(i);
+                itemsMap['this_week'].push(i);
             } else if (d >= lastWeekBegin && d <= lastWeekEnd) {
-                itemsMap['Last week'].push(i);
+                itemsMap['last_week'].push(i);
             } else {
-                const localizedMonthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(d);
+                // const localizedMonthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(d);
+                const localizedMonthName = new Intl.DateTimeFormat( i18n.language, { month: 'long' }).format(d);
                 const dateKey = `${localizedMonthName}, ${d.getFullYear()}`;
 
                 if (!itemsMap[dateKey]) {
@@ -76,7 +79,7 @@ export default function FeedList( props : FeedListProp ) {
                                 onClick={props.onClick}
                                 setIsFeedFavorite={props.setIsFeedFavorite}
                                 deleteFeedItems={props.deleteFeedItems}
-                                name={key}
+                                name={t(key)}
                                 selectedItemId={props.selectedItemId}
                                 onMoreOptionsClick={props.onMoreOptionsClick}
                                 onMarkReadClick={props.onMarkReadClick}

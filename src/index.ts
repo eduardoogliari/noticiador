@@ -203,7 +203,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
             modalEntryPoint = SUBSCRIPTION_ADD_MODAL_WEBPACK_ENTRY;
             modalWidth      = 640;
             modalHeight     = 80;
-            modalTitle      = 'Add new subscription';
+            modalTitle      = data?.data.title ?? 'Add new subscription';
             break;
         }
 
@@ -212,7 +212,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
             modalEntryPoint = SUBSCRIPTION_DELETE_MODAL_WEBPACK_ENTRY;
             modalWidth      = 500;
             modalHeight     = 80;
-            modalTitle      = 'Confirm subscription deletion';
+            modalTitle      = data?.data.title ?? 'Confirm subscription deletion';
             break;
         }
 
@@ -221,7 +221,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
             modalEntryPoint = CONFIRM_EMPTY_BIN_MODAL_WEBPACK_ENTRY;
             modalWidth      = 500;
             modalHeight     = 100;
-            modalTitle      = 'Confirm deletion';
+            modalTitle      = data?.data.title ??'Confirm deletion';
             break;
         }
     }
@@ -242,7 +242,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         autoHideMenuBar: true,
     });
 
-    // modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
+    modalWindow.webContents.openDevTools( {title: 'modal', mode: 'detach', activate: false} );
 
     modalWindow.loadURL( modalEntryPoint );
     modalWindow.setMenu(null);

@@ -10,6 +10,7 @@ import StatusBar from './StatusBar';
 import { SubscriptionFilter } from '../types/subscription-filter';
 import { ModalType } from '../types/modal-type';
 import styles from './ClientArea.module.css';
+import {useTranslation} from 'react-i18next';
 
 type MainOptionInfo = {
     title : string;
@@ -20,6 +21,7 @@ type MainOptionInfo = {
 };
 
 export default function ClientArea() {
+    const { t, i18n } = useTranslation();
     const [showLeftPanel, setShowLeftPanel]                                 = useState(true);
     const [allFeedItems, setAllFeedItems]                                   = useState<FeedItem[]>([]);
     const [feedItems, setFeedItems]                                         = useState<FeedItem[]>([]);
@@ -45,9 +47,9 @@ export default function ClientArea() {
     const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
 
     const mainOptions : MainOptionInfo[] = [
-        { title: ' All Feeds', itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
-        { title: 'Favorites', itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
-        { title: 'Feed Bin', itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
+        { title: t('all_feeds'), itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
+        { title: t('favorites'), itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
+        { title: t('feed_bin'), itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
 
     function getCurrentlyVisibleFeedItems() : FeedItem[] {
@@ -190,7 +192,7 @@ export default function ClientArea() {
     }
 
     async function onClickAddSubscription() {
-        window.electronApi.openModal( { type: ModalType.AddSubscription } );
+        window.electronApi.openModal( { type: ModalType.AddSubscription, data: { title: t('modal_add_subscriptions_title') } } );
     }
 
     async function onCloseSubscriptionOptionsPopup() {
@@ -500,7 +502,7 @@ export default function ClientArea() {
                                     <p>Music</p>
                                 </ExpandableGroup> */}
 
-                                <div className={styles['subscriptions-header']}>Subscriptions</div>
+                                <div className={styles['subscriptions-header']}>{t('subscriptions')}</div>
                                 <SubscriptionsList
                                     faviconCache={faviconCache}
                                     onClickSubTitle={onSubscriptionItemClick}
@@ -525,10 +527,11 @@ export default function ClientArea() {
                 <Panel id="center" className={styles['panel-middle']} order={2} minSize={26}>
                     <div className={styles['feed-header']}>
                         <div className={styles['feed-header-title']}>{ getFeedName(selectedSubscriptionId) }</div>
-                        <span className={styles['feed-header-buttons']}>
+                        <span className={styles['feed-header-buttons-container']}>
 
                             <button
-                                title={'Refresh'}
+                                className={styles['feed-header-button']}
+                                title={t('hint_refresh')}
                                 onClick={() => {
                                     if( selectedSubscriptionId === -1 && selectedMainOptionIndex === 0 ) {
                                         updateFeeds(subscriptions);
@@ -550,7 +553,8 @@ export default function ClientArea() {
                             </button>
 
                             <button
-                                title={'Mark all as read'}
+                                className={styles['feed-header-button']}
+                                title={t('hint_mark_all_read')}
                                 onClick={() => markMultipleItemsAsRead( getCurrentlyVisibleFeedItems().map( (item) => item.id ) )}
                             >
                                 <img
@@ -560,15 +564,16 @@ export default function ClientArea() {
                             </button>
 
                             <button
+                                className={styles['feed-header-button']}
                                 title={
                                     (selectedMainOptionIndex === 2 )
-                                        ? 'Delete all items permanently'
-                                        : 'Move read items to feed bin'
+                                        ? t('hint_delete_all_permanently')
+                                        : t('hint_move_read_to_bin')
                                 }
 
                                 onClick={() => {
                                     if( selectedMainOptionIndex === 2 ) {
-                                        window.electronApi.openModal( { type: ModalType.ConfirmEmptyBin } )
+                                        window.electronApi.openModal( { type: ModalType.ConfirmEmptyBin, data: { title: t('modal_confirm_empty_bin_title') } } )
 
                                     } else {
                                         setInFeedBin(

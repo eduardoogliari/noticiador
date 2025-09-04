@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { ModalData } from "../types/modal-data";
 import { ModalType } from "../types/modal-type";
 import styles from './RemoveSubscriptionModal.module.css';
+import { Trans, useTranslation } from "react-i18next";
 
 export default function RemoveSubscriptionModal() {
+    const { t } = useTranslation();
     const [subId, setSubId] = useState(-1);
     const [subName, setSubName] = useState('');
     const defaultButton = useRef<HTMLButtonElement>(null);
@@ -23,7 +25,11 @@ export default function RemoveSubscriptionModal() {
         <>
             <div className={styles["remove-sub-modal-container"]}>
                 <div>
-                    Delete subscription <strong>{`${subName}`}</strong>?
+                    <Trans
+                        i18nKey="modal_confirm_subscription_delete_message"
+                        values={{ name: subName }}
+                        components={{ strong: <strong /> }}
+                    />
                 </div>
 
                 <div className="h-separator"></div>
@@ -35,13 +41,13 @@ export default function RemoveSubscriptionModal() {
                             window.rssAPI.signalSubscriptionsChanged();
                             window.electronApi.closeModal();}
                         }
-                    >Delete</button>
+                    >{t('modal_button_delete')}</button>
 
                     <button
                         ref={defaultButton}
                         onClick={() => {
                             window.electronApi.closeModal();
-                        }}>Cancel</button>
+                        }}>{t('modal_button_cancel')}</button>
                 </div>
             </div>
         </>

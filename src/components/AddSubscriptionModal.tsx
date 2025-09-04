@@ -3,20 +3,22 @@ import { NewSubscription } from "../types/subscription";
 const isUrlHttp = require('is-url-http');
 const sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
 import styles from './AddSubscriptionModal.module.css';
+import { useTranslation } from "react-i18next";
 
-const defaultMessageInfo = 'Waiting for input...';
-const validatingMessageInfo = 'Validating URL...';
-const errorMessageInfo = "Invalid URL. Please provide a valid url in the format: 'https://example.com'";
+// const defaultMessageInfo = 'Waiting for input...';
+// const validatingMessageInfo = 'Validating URL...';
+// const errorMessageInfo = "Invalid URL. Please provide a valid url in the format: 'https://example.com'";
 
 export default function AddSubscriptionModal() {
-    const [messageInfo, setMessageInfo]     = useState(defaultMessageInfo);
+    const { t } = useTranslation();
+    const [messageInfo, setMessageInfo]     = useState(t('modal_add_subscriptions_message_waiting'));
     const [inputURL, setInputURL]                     = useState('');
     const inputRef                          = useRef<HTMLInputElement>(null);
     const [inputDisabled, setInputDisabled] = useState(false);
 
     // Input focus by default
     useEffect( () => {
-        setMessageInfo(defaultMessageInfo);
+        setMessageInfo(t('modal_add_subscriptions_message_waiting'));
         inputRef.current?.focus();
     }, [] );
 
@@ -38,7 +40,7 @@ export default function AddSubscriptionModal() {
 
     async function sendData() {
         setInputDisabled(true);
-        setMessageInfo( validatingMessageInfo );
+        setMessageInfo( t('modal_add_subscriptions_message_validating_url') );
 
         let url = sanitizeUrl( inputURL.replaceAll(' ', '') );
 
@@ -63,10 +65,10 @@ export default function AddSubscriptionModal() {
 
             } else {
                 console.warn(`No feed found for ${url}`);
-                setMessageInfo( 'No RSS feed found at provided URL' );
+                setMessageInfo( t('modal_add_subscriptions_message_no_feeds') );
             }
         } else {
-            setMessageInfo( errorMessageInfo );
+            setMessageInfo( t('modal_add_subscriptions_message_invalid_url') );
         }
         setInputDisabled(false);
     }
@@ -80,14 +82,14 @@ export default function AddSubscriptionModal() {
                     <div className={styles["add-subscription-input"]}>
                         <input
                             ref={inputRef}
-                            placeholder="Enter the website's URL (for instance: example.com/rss)"
+                            placeholder={t('modal_add_subscriptions_url_placeholder')}
                             onChange={onInputChanged}
                             value={inputURL}
                             onKeyUp={onKeyUp}
                             disabled={inputDisabled}
                         ></input>
 
-                        <button onClick={onClick} disabled={inputDisabled}>Add</button>
+                        <button onClick={onClick} disabled={inputDisabled}>{t('modal_add_subscriptions_button_add')}</button>
                     </div>
 
                     <div className={styles["add-subscription-info"]}>

@@ -1,0 +1,57 @@
+{
+    "subscriptions" : "Inscrições",
+    "all_feeds" : "Todos os feeds",
+    "refresh" : "Atualizar",
+    "feed_bin" : "Lixeira",
+    "favorites" : "Favoritos",
+    "comments" : "Comentários",
+
+    "hint_status_bar_show_left_panel" : "Exibir painel lateral",
+    "hint_status_bar_hide_left_panel" : "Ocultar painel lateral",
+
+    "subscription_more_options" : "Mais opções",
+    "delete_subscription" : "Remover inscrição",
+
+    "modal_add_subscriptions_title" : "Adicionar nova inscrição",
+    "modal_add_subscriptions_button_add" : "Adicionar",
+    "modal_add_subscriptions_url_placeholder" : "Digite a URL do site (por exemplo: example.com/rss)",
+    "modal_add_subscriptions_message_waiting" : "Esperando você digitar...",
+    "modal_add_subscriptions_message_no_feeds" : "Nenhum feed RSS encontrado na URL fornecida",
+    "modal_add_subscriptions_message_invalid_url" : "URL inválida. Forneça uma URL no formato: 'https://example.com'",
+    "modal_add_subscriptions_message_validating_url" : "Validando a URL...",
+
+    "modal_confirm_empty_bin_title" : "Confirme o esvaziamento da lixeira",
+    "modal_confirm_empty_bin_message" : "Remover permanentemente todos os items da lixeira? Esta ação não pode ser desfeita.",
+
+    "modal_confirm_subscription_delete_title" : "Confirme a remoção de inscrição",
+    "modal_confirm_subscription_delete_message" : "Remover inscrição <strong>{{name}}</strong>?",
+
+    "modal_button_delete" : "Remover",
+    "modal_button_cancel" : "Cancelar",
+
+    "today" : "Hoje",
+    "yesterday" : "Ontem",
+    "this_week" : "Esta semana",
+    "last_week" : "Semana passada",
+
+    "hint_mark_all_read" : "Marcar todos os items como lidos",
+    "hint_refresh" : "Atualizar feed",
+    "hint_delete_all_permanently" : "Deletar todos os items permanentemente",
+    "hint_move_read_to_bin" : "Mover todos os items lidos para a lixeira",
+
+    "toolbar_new_feed" : "Novo feed",
+    "toolbar_refresh_all" : "Atualizar feeds",
+    "hint_toolbar_new_feed": "Adicionar nova inscrição",
+    "hint_toolbar_refresh_all" : "Atualizar todos os feeds",
+
+    "feed_item_restore" : "Restaurar item",
+    "feed_item_delete_permanently" : "Deletar permanentemente",
+    "feed_item_move_feed_bin" : "Mover para lixeira",
+    "feed_item_add_favorite" : "Mover para favoritos",
+    "feed_item_remove_favorite" : "Remover dos favoritos",
+    "feed_item_mark_read" : "Marcar como lido",
+    "feed_item_more_options" : "Mais opções",
+
+    "open_external_browser" : "Abrir no navegador externo",
+    "copy_link" : "Copiar link"
+}

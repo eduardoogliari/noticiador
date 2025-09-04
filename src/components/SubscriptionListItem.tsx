@@ -3,6 +3,7 @@ import ConstrainedLabel from "./ConstrainedLabel";
 import ContextPopup, {ContextPopupOption} from "./ContextPopup";
 import { ModalType } from "../types/modal-type";
 import styles from './SubscriptionListItem.module.css'
+import { useTranslation } from "react-i18next";
 
 export type SubscriptionListItemProp = {
     id : number;
@@ -20,14 +21,24 @@ export type SubscriptionListItemProp = {
 
 
 export default function SubscriptionListItem( props : SubscriptionListItemProp ) {
+    const { t } = useTranslation();
      const subOptionsRef = useRef<HTMLElement>(null);
 
     const subItemContextOptions : ContextPopupOption[] = [
         {
-            optionTitle: 'Delete Subscription',
+            optionTitle: t('delete_subscription'),
             icon: '../icons/x.svg',
             action: async () => {
-                window.electronApi.openModal( { type: ModalType.ConfirmDeleteSubscription, data: { subId: props.id, subName: props.name } } );
+                window.electronApi.openModal(
+                    {
+                        type: ModalType.ConfirmDeleteSubscription,
+                        data: {
+                            subId: props.id,
+                            subName: props.name,
+                            title: t('modal_confirm_subscription_delete_title')
+                        }
+                    }
+                );
                 props.onCloseSubOptions();
             }
         },
@@ -60,7 +71,10 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
                 className={`${styles['subscription-list-item-options-container']} ${props.selectedSubscriptionOptionsId === props.id ? styles.selected : ''}`}
                 onClick={(e) => { props.onClickSubOptions(props.id, e); }}
             >
-                <span>⋮</span>
+                <span
+                    title={t('subscription_more_options')}
+                    aria-label={t('subscription_more_options')}
+                >⋮</span>
                 {
                     (props.selectedSubscriptionOptionsId === props.id)
                         ?

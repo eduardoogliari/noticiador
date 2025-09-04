@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import ContextPopup, {ContextPopupOption} from "./ContextPopup";
 import styles from './FeedListItem.module.css';
+import { useTranslation } from "react-i18next";
 
 export type FeedListItemProp = {
     id                      : number;
@@ -30,31 +31,32 @@ export type FeedListItemProp = {
 
 
 export default function FeedListItem( props : FeedListItemProp ) {
+    const { t } = useTranslation();
     const moreOptionsRef = useRef<HTMLElement>(null);
 
     const optionsContainerVisible = props.isSelected || props.commentsActiveId === props.id || props.moreOptionsActiveId === props.id;
 
     // Feed Bin context options
     const inFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Restore item', icon: '../icons/remove_bin.svg', action: () => {props.setInFeedBin([props.id], false); props.onCloseFeedOptionsPopup();} },
-        { optionTitle: 'Delete permanently', icon: '../icons/bin_empty.svg', action: () => { props.deleteFeedItems([props.id]); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: t('feed_item_restore'), icon: '../icons/remove_bin.svg', action: () => {props.setInFeedBin([props.id], false); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: t('feed_item_delete_permanently'), icon: '../icons/bin_empty.svg', action: () => { props.deleteFeedItems([props.id]); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFeedBinContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Move to Feed Bin', icon: '../icons/add_bin.svg', action: () => {props.setInFeedBin([props.id], true); props.onCloseFeedOptionsPopup();} },
+        { optionTitle: t('feed_item_move_feed_bin'), icon: '../icons/add_bin.svg', action: () => {props.setInFeedBin([props.id], true); props.onCloseFeedOptionsPopup();} },
     ];
 
     // Favorite context options
     const inFavoritesContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Remove from Favorites', icon: '../icons/remove_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, false ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: t('feed_item_remove_favorite'), icon: '../icons/remove_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, false ); props.onCloseFeedOptionsPopup(); } },
     ];
     const outFavoritesContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Move to Favorites', icon: '../icons/add_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, true ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: t('feed_item_add_favorite'), icon: '../icons/add_favorite.svg', action: () => { props.setIsFeedFavorite( props.id, true ); props.onCloseFeedOptionsPopup(); } },
     ];
 
     // Build context menu options
     const feedItemContextOptions : ContextPopupOption[] = [
-        { optionTitle: 'Open in external browser', icon: '../icons/open_external.svg', action: () => {  props.openInExternalBrowser( props.url ); props.onCloseFeedOptionsPopup(); } },
-        { optionTitle: 'Copy link',  icon: '../icons/copy.svg',action: () => { props.copyToClipboard( props.url ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: t('open_external_browser'), icon: '../icons/open_external.svg', action: () => {  props.openInExternalBrowser( props.url ); props.onCloseFeedOptionsPopup(); } },
+        { optionTitle: t('copy_link'),  icon: '../icons/copy.svg',action: () => { props.copyToClipboard( props.url ); props.onCloseFeedOptionsPopup(); } },
 
     ]
     .concat(
@@ -95,7 +97,14 @@ export default function FeedListItem( props : FeedListItemProp ) {
                             >
                                 {
                                     props.commentsUrl
-                                        ? <span className={styles['feed-item-comments']} title={'Comments'}><img src={'../icons/comments.svg'}></img></span>
+                                        ?
+                                            <span
+                                                className={styles['feed-item-comments']}
+                                                aria-label={t('comments')}
+                                                title={t('comments')}
+                                            >
+                                                <img src={'../icons/comments.svg'}></img>
+                                            </span>
                                         : ''
                                 }
                             </span>
@@ -108,7 +117,8 @@ export default function FeedListItem( props : FeedListItemProp ) {
                 >
                     <span
                         className={styles[`feed-item-comments`]}
-                        title={'Mark read'}
+                        title={t('feed_item_mark_read')}
+                        aria-label={t('feed_item_mark_read')}
                     >
                         <img
                             src={
@@ -126,7 +136,7 @@ export default function FeedListItem( props : FeedListItemProp ) {
                     onClick={(e) => props.onMoreOptionsClick( props.id, props.url, e )}
                 >
 
-                    <span title={'More options'}>⋮</span>
+                    <span title={t('feed_item_more_options')}>⋮</span>
                     {
                         (props.moreOptionsActiveId === props.id)
                             ?   <ContextPopup

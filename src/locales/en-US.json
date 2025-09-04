@@ -1,0 +1,57 @@
+{
+    "subscriptions" : "Subscriptions",
+    "all_feeds" : "All Feeds",
+    "refresh" : "Refresh",
+    "feed_bin" : "Feed Bin",
+    "favorites" : "Favorites",
+    "comments" : "Comments",
+
+    "hint_status_bar_show_left_panel" : "Show side panel",
+    "hint_status_bar_hide_left_panel" : "Hide side panel",
+
+    "subscription_more_options" : "More options",
+    "delete_subscription" : "Delete subscription",
+
+    "modal_add_subscriptions_title" : "Add new subscription",
+    "modal_add_subscriptions_button_add" : "Add",
+    "modal_add_subscriptions_url_placeholder" : "Enter the website's URL (for instance: example.com/rss)",
+    "modal_add_subscriptions_message_waiting" : "Waiting for input...",
+    "modal_add_subscriptions_message_no_feeds" : "No RSS feed found at provided URL",
+    "modal_add_subscriptions_message_invalid_url" : "Invalid URL. Please provide a valid url in the format: 'https://example.com'",
+    "modal_add_subscriptions_message_validating_url" : "Validating URL...",
+
+    "modal_confirm_empty_bin_title" : "Confirm deletion",
+    "modal_confirm_empty_bin_message" : "Permanently delete all items from the Feed Bin? This action cannot be undone.",
+
+    "modal_confirm_subscription_delete_title" : "Confirm subscription deletion",
+    "modal_confirm_subscription_delete_message" : "Delete subscription <strong>{{name}}</strong>?",
+
+    "modal_button_delete" : "Delete",
+    "modal_button_cancel" : "Cancel",
+
+    "today" : "Today",
+    "yesterday" : "Yesterday",
+    "this_week" : "This Week",
+    "last_week" : "Last Week",
+
+    "hint_mark_all_read" : "Mark all as read",
+    "hint_refresh" : "Refresh feed",
+    "hint_delete_all_permanently" : "Delete all items permanently",
+    "hint_move_read_to_bin" : "Move read items to feed bin",
+
+    "toolbar_new_feed" : "New Feed",
+    "toolbar_refresh_all" : "Refresh All",
+    "hint_toolbar_new_feed": "Add new feed subscription",
+    "hint_toolbar_refresh_all" : "Refresh all feeds",
+
+    "feed_item_restore" : "Restore feed item",
+    "feed_item_delete_permanently" : "Delete permanently",
+    "feed_item_move_feed_bin" : "Move to Feed Bin",
+    "feed_item_add_favorite" : "Move to favorites",
+    "feed_item_remove_favorite" : "Remove from favorites",
+    "feed_item_mark_read" : "Mark read",
+    "feed_item_more_options" : "More options",
+
+    "open_external_browser" : "Open in external browser",
+    "copy_link" : "Copy link"
+}

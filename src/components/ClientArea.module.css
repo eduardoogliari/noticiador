@@ -127,18 +127,21 @@
 
 }
 
-.feed-header-buttons {
+.feed-header-buttons-container {
     display: flex;
     flex-direction: row;
     gap: 5px;
+    cursor: pointer;
 }
 
-.feed-header-buttons button:disabled {
+.feed-header-buttons-container button:disabled {
     opacity: 0.7;
     filter: grayscale(100%);
 }
 
-
+.feed-header-button {
+    cursor: pointer;
+}
 
 @container (width < 200px) {
     .expandable-group-header {
