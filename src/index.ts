@@ -595,12 +595,6 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
 });
 
 // ------------------------------------------------------------------------------------------------------
-// function getSubscriptions() {
-//    const stmt = db.prepare('SELECT * FROM subscription WHERE deleted_at IS NULL');
-//    return stmt.all() as Subscription[];
-// }
-
-// ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
   const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ? AND in_feed_bin = 0 AND is_favorite = 0');
 
@@ -708,7 +702,6 @@ ipcMain.handle( 'set-read-multiple', ( event: IpcMainInvokeEvent, itemIds : numb
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'set-in-feed-bin', ( event: IpcMainInvokeEvent, itemIds : number[], value : boolean ) => {
-    // const stmt = db.prepare( 'UPDATE feed_item SET in_feed_bin = ? WHERE id = ?' );
     const stmt = db.prepare( `UPDATE feed_item SET in_feed_bin = ? WHERE id IN (${itemIds.map(() => '?').join(',')})` );
     stmt.run( value ? 1 : 0, itemIds );
 });

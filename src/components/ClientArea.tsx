@@ -438,7 +438,7 @@ export default function ClientArea() {
     }
 
     async function onMouseOverFeedItem(url : string) {
-        console.log( 'onMouseOverFeedItem: ', url );
+        // console.log( 'onMouseOverFeedItem: ', url );
         setHoveredUrl( url );
     }
 
