@@ -452,7 +452,7 @@ export default function ClientArea() {
                                                     title={item.title}
                                                     onClick={() => onClickMainOption(index)}
                                                 >
-                                                    <img width={'16px'} height={'16px'} src={item.icon}></img>
+                                                    <img src={item.icon}></img>
                                                     <span>{`${item.title} (${item.getCount()})`}</span>
                                                 </li>
                                             );
