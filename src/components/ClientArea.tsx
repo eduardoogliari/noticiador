@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
-import { NewSubscription, Subscription } from '../types/subscription';
-const isUrlHttp = require('is-url-http');
+import { Subscription } from '../types/subscription';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
 import StatusBar from './StatusBar';
@@ -207,7 +206,6 @@ export default function ClientArea() {
 
     async function clearHoveredUrl() {
         setHoveredUrl('');
-        console.log('clearHoveredUrl');
     }
 
     useEffect(() => {
