@@ -1,8 +1,8 @@
 {
   "name": "noticiador",
   "productName": "Noticiador",
-  "version": "0.1.0",
-  "description": "My Electron application description",
+  "version": "0.5.0",
+  "description": "RSS feed reader made with Electron",
   "main": ".webpack/main",
   "icon": "./src/assets/icons/icon.png",
   "scripts": {
