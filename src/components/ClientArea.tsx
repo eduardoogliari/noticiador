@@ -316,12 +316,10 @@ export default function ClientArea() {
 
 
     async function onFeedItemClick( itemId : number, url : string ) {
-        if( itemId != selectedItemId ) {
+        if( await window.electronApi.getWebviewURL() !== url ) {
             console.log( "onFeedItemClick: ", url );
-
             setSelectedItemId(itemId);
             markItemAsRead( itemId );
-
         }
         window.electronApi.setWebviewURL( url );
     }
