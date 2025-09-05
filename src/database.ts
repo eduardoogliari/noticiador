@@ -2,9 +2,9 @@ import { app } from 'electron';
 const path = require('path');
 const Database = require('better-sqlite3');
 
-const dbPath = path.join(app.getPath('userData'), 'feeds.sqlite');
-// const db = new Database(dbPath);
-const db = new Database(':memory:');
+const dbPath = path.join(app.getPath('userData'), 'noticiador.sqlite');
+const db = new Database(dbPath);
+// const db = new Database(':memory:');
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS category (
