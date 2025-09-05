@@ -208,11 +208,37 @@ export default function ClientArea() {
         setHoveredUrl('');
     }
 
+    // Initialization useEffect
     useEffect(() => {
-        return window.electronApi.onClosePopups(() => {
-            onCloseFeedOptionsPopup();
-            onCloseSubscriptionOptionsPopup();
-        });
+        ( async () => {
+            const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
+            setSubscriptions(subs);
+
+            window.rssAPI.onSubscriptionsChanged( async () => {
+                const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
+                setSubscriptions(subs);
+
+                setSelectedSubscriptionId(-1);
+                setSelectedSubscriptionOptionsId(-1);
+
+                setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
+            });
+
+            window.rssAPI.onFeedBinChanged( async () => {
+                const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
+                setFeedBinItems( binItems );
+            });
+
+            window.webAPI.onURLChanged((url) => {
+                console.log("navigated to", url);
+                setCurrentURL( url );
+            });
+
+            window.electronApi.onClosePopups(() => {
+                onCloseFeedOptionsPopup();
+                onCloseSubscriptionOptionsPopup();
+            });
+        })();
     }, []);
 
     useEffect(() => {
@@ -239,30 +265,6 @@ export default function ClientArea() {
             await updateFeedItemsFromDb();
         })();
     }, [feedRefreshKey]);
-
-    useEffect(() => {
-        window.rssAPI.onSubscriptionsChanged( async () => {
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
-            setSubscriptions(subs);
-
-            setSelectedSubscriptionId(-1);
-            setSelectedSubscriptionOptionsId(-1);
-
-            setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
-        });
-
-        window.rssAPI.onFeedBinChanged( async () => {
-            const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-            setFeedBinItems( binItems );
-        });
-    }, []);
-
-    useEffect(() => {
-        return window.webAPI.onURLChanged((url) => {
-            console.log("navigated to", url);
-            setCurrentURL( url );
-        });
-    }, []);
 
     useEffect(() => {
          if( selectedItemId != -1 ) {
@@ -304,53 +306,7 @@ export default function ClientArea() {
         );
 
         return () => resizeObserver.disconnect();
-  }, []);
-
-    useEffect(() => {
-        ( async () => {
-            const linkArr = [
-                'https://news.ycombinator.com/rss',
-                // 'https://alain.xyz',
-                'https://brevzin.github.io/',
-                'https://lobste.rs/rss',
-                // 'https://kevingal.com',
-                // 'https://www.vincentparizet.com/blog/',
-                // 'https://www.modernescpp.com',
-            ];
-
-            for( const url of linkArr ) {
-
-                if( isUrlHttp( url ) ) {
-                    const feedUrl = await window.rssAPI.findFeedURL( url );
-
-                    if( feedUrl ) {
-                        console.log(feedUrl);
-                        const title = await window.rssAPI.getFeedTitle( feedUrl );
-                        const faviconBlob = await window.rssAPI.getFavicon( url );
-
-                        const s : NewSubscription = { name: title, url: feedUrl,  last_updated: new Date().toISOString(), favicon: faviconBlob  };
-                        console.log( s );
-                        await window.rssAPI.addSubscriptions(
-                            [
-                                s
-                            ]
-                        )
-                    } else {
-                        console.warn(`No feed found for ${url}`);
-                    }
-                } else {
-                    console.warn(`No feed found for ${url}`);
-                }
-            }
-
-
-            const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
-            setSubscriptions(subs);
-
-            const favorites : FeedItem[] = await window.rssAPI.getFavorites();
-            setFavoriteItems( favorites );
-        })();
-    }, [] );
+    }, []);
 
     useEffect( () => {
         (async () => {
@@ -415,7 +371,6 @@ export default function ClientArea() {
     }
 
     function getFeedName( subId : number ) {
-
         if( selectedSubscriptionId != -1 ) {
             const foundItem = subscriptions.find( (item) => item.id == subId );
             if( foundItem ){
@@ -492,7 +447,7 @@ export default function ClientArea() {
                 {
                     showLeftPanel && (
                         <>
-                            <Panel id="left" className={styles['panel-left']} order={1} minSize={16}>
+                            <Panel id="left" className={styles['panel-left']} order={1} minSize={16} defaultSize={16}>
                                 <ul className={styles["main-options-list"]}>
                                     {
                                         mainOptions.map( (item, index) => {
