@@ -133,6 +133,9 @@ const createWindow = () : void => {
 
     mainWindow.contentView.addChildView( wcView );
 
+    // Needs to be called at least once to build the favicon data from the database
+    refreshFaviconBlobRecord();
+
     // Open the DevTools.
     // mainWindow.webContents.openDevTools( {mode:'detach', activate: false, title: 'main'} );
 
