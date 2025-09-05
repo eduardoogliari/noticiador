@@ -108,8 +108,9 @@
     display: flex;
     justify-content: start;
     align-content: center;
+    align-items: center;
     gap: 5px;
-    height: 25px;
+    height: 30px;
     padding: 3px;
     cursor: pointer;
     white-space: nowrap;
