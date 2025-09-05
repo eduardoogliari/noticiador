@@ -208,6 +208,11 @@ export default function ClientArea() {
     // Initialization useEffect
     useEffect(() => {
         ( async () => {
+            const showLeftPanel = await window.electronApi.getStoreKey('showLeftPanel');
+            if( typeof showLeftPanel  === "boolean" ) {
+                setShowLeftPanel( showLeftPanel );
+            }
+
             const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
             setSubscriptions(subs);
 
@@ -386,8 +391,10 @@ export default function ClientArea() {
         );
     }
 
-    function onToggleSidePanelClick() {
-        setShowLeftPanel(!showLeftPanel);
+    async function onToggleSidePanelClick() {
+        const value = !showLeftPanel;
+        setShowLeftPanel(value);
+        await window.electronApi.setStoreValue( 'showLeftPanel', value );
     }
 
     async function onMouseOverFeedItem(url : string) {

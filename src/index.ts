@@ -20,6 +20,7 @@ type SubscriptionFeedRecord = Record<string, NewFeedItem[]>;
 
 type StoreType = {
     rssCache : SubscriptionFeedRecord;
+    showLeftPanel : boolean;
 };
 const store = new Store<StoreType>();
 
@@ -366,6 +367,16 @@ ipcMain.on( "subscriptions-changed", () => {
 // ------------------------------------------------------------------------------------------------------
 ipcMain.on( "feed-bin-changed", () => {
     mainWindow.webContents.send( 'feed-bin-changed' );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'store-set', (event: IpcMainInvokeEvent, key : string, value : unknown ) => {
+    store.set( key, value );
+});
+
+// ------------------------------------------------------------------------------------------------------
+ipcMain.handle( 'store-get', (event: IpcMainInvokeEvent, key : string ) => {
+    return store.get( key );
 });
 
 // ------------------------------------------------------------------------------------------------------

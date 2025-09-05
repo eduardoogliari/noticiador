@@ -30,15 +30,19 @@ declare global {
         };
 
         electronApi: {
+            getStoreKey : (key : string) => Promise<unknown>;
+            setStoreValue : ( key : string, value : unknown ) => void;
+
             openInExternalBrowser    : (url : string) => void;
             copyToClipboard          : (text : string) => void;
+
             setWebviewBounds         : (x : number, y : number, width : number, height : number) => void;
             setWebviewURL            : (url : string) => void;
             getWebviewURL            : () => string;
+
             openModal: (data : ModalData) => void;
             closeModal: () => void;
             onClosePopups: ( callback: () => void ) => void;
-
             onModalData: ( callback: (data : ModalData) => void ) => void;
         };
 

@@ -31,6 +31,9 @@ contextBridge.exposeInMainWorld('rssAPI', {
 });
 
 contextBridge.exposeInMainWorld('electronApi', {
+    getStoreKey : (key : string) => ipcRenderer.invoke( 'store-get', key ),
+    setStoreValue : ( key : string, value : unknown ) => ipcRenderer.invoke( 'store-set', key, value ),
+
   openInExternalBrowser    : (url : string) => ipcRenderer.invoke( 'open-external-browser', url ),
   copyToClipboard          : (text : string) => ipcRenderer.invoke( 'copy-to-clipboard', text ),
   setWebviewBounds         : (x : number, y : number, width : number, height : number) => ipcRenderer.send( 'set-webview-bounds', x, y, width, height ),
