@@ -267,7 +267,15 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
 
     modalWindow.webContents.on( 'did-finish-load', () => {
         modalWindow.webContents.send( 'modal-data', data );
-        modalWindow.center();
+
+        const parentRect =  modalWindow.getParentWindow()?.getBounds();
+        const modalRect = modalWindow.getBounds();
+
+        const x : number = parentRect.x + (parentRect.width / 2) - (modalRect.width / 2);
+        const y : number = parentRect.y + (parentRect.height / 2) - (modalRect.height / 2);
+
+        modalWindow.setPosition( x, y );
+
         modalWindow.show();
     });
 });
