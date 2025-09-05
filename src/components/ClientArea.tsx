@@ -562,7 +562,7 @@ export default function ClientArea() {
                                             ? '../icons/bin_empty.svg'
                                             : (feedBinButtonDisabled)
                                                 ? '../icons/bin_disabled.svg'
-                                                : '../icons/bin.svg'
+                                                : '../icons/bin_check.svg'
                                     }
                                 >
                                 </img>
