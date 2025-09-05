@@ -120,9 +120,6 @@ export default function ClientArea() {
     async function updateFeedItemsFromDb() {
         syncSelectedSubscriptionFeedItems();
         syncAllFeedItems();
-
-        const binItems : FeedItem[] = await window.rssAPI.getFeedBinItems();
-        setFeedBinItems( binItems );
     }
 
     async function showAllFeeds() {
