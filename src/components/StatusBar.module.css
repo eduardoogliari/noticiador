@@ -7,6 +7,9 @@
     border-top: 1px solid black;
     padding: 5px 5px;
     font-size: small;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
 
     > button {
         font-size: x-small;
