@@ -275,7 +275,7 @@ ipcMain.on( 'open-modal', ( _, data : ModalData ) => {
         const x : number = parentRect.x + (parentRect.width / 2) - (modalRect.width / 2);
         const y : number = parentRect.y + (parentRect.height / 2) - (modalRect.height / 2);
 
-        modalWindow.setPosition( x, y );
+        modalWindow.setBounds( { x: x, y: y } );
 
         modalWindow.show();
     });
