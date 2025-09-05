@@ -24,8 +24,15 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ['darwin']),
+    new MakerSquirrel({
+        name: 'Noticiador',
+        description: 'RSS feed reader made with Electron',
+        authors: 'Eduardo Ogliari',
+        setupIcon: path.resolve(__dirname, "src/assets/icons/icon.ico"),
+    }, ['win32']),
+    new MakerZIP({
+
+    }, ['win32']),
     // new MakerRpm({}),
     new MakerDeb({
       options: {
