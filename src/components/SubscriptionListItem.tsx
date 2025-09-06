@@ -55,7 +55,13 @@ export default function SubscriptionListItem( props : SubscriptionListItemProp )
             {
                 (props.subscriptionsBeingRefreshed.has(props.id))
                     ? <span><img width={'12px'} height={'12px'} src={'../icons/reload.svg'}></img></span>
-                    : <span>({props.feedCount})</span>
+                    :   <span>(
+                            {
+                                (props.feedCount > 999)
+                                    ? '999+'
+                                    : props.feedCount
+                            }
+                        )</span>
             }
             </span>
 
