@@ -13,6 +13,8 @@ import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 const path = require('path');
 
+const description = 'RSS feed reader made with Electron';
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar : {
@@ -26,18 +28,26 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({
         name: 'Noticiador',
-        description: 'RSS feed reader made with Electron',
+        description: description,
         authors: 'Eduardo Ogliari',
         setupIcon: path.resolve(__dirname, "src/assets/icons/icon.ico"),
     }, ['win32']),
     new MakerZIP({
 
-    }, ['win32']),
-    // new MakerRpm({}),
+    }, ['win32', 'linux']),
+    // new MakerRpm({
+    //   options: {
+    //     icon: path.resolve(__dirname, "src/assets/icons/icon.png"),
+    //     name: 'Noticiador',
+    //     description: description,
+    //     productName: 'Noticiador',
+    //   }
+    // }),
     new MakerDeb({
       options: {
         name: 'Noticiador',
         icon: path.resolve(__dirname, "src/assets/icons/icon.png"),
+        description: description,
       }
     })
   ],
