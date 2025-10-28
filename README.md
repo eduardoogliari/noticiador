@@ -1,4 +1,5 @@
-# <img src="https://github.com/eduardoogliari/noticiador/blob/main/src/assets/icons/icon.png" alt="Logo" style="width:32px;"> Noticiador
+# <img src="https://raw.githubusercontent.com/eduardoogliari/noticiador/refs/heads/main/src/assets/icons/icon.png" alt="Logo" width="32"> Noticiador
+
 Um leitor de feeds RSS desenvolvido com Electron Forge + Typescript + React.
 
 ![Janela](screen.png)
