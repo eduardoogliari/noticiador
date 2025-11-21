@@ -98,12 +98,12 @@ export default function ClientArea() {
 
     async function markItemAsRead( itemId : number ) {
         await window.rssAPI.setRead( itemId, true );
-        updateFeedItemsFromDb();
+        await updateFeedItemsFromDb();
     }
 
     async function markMultipleItemsAsRead( itemIds : number[] ) {
         await window.rssAPI.setReadMultiple( itemIds, true );
-        updateFeedItemsFromDb();
+        await updateFeedItemsFromDb();
     }
 
     async function setInFeedBin( itemIds : number[], value : boolean ) {
@@ -138,8 +138,8 @@ export default function ClientArea() {
     }
 
     async function updateFeedItemsFromDb() {
-        syncSelectedSubscriptionFeedItems();
-        syncAllFeedItems();
+        await syncSelectedSubscriptionFeedItems();
+        await syncAllFeedItems();
     }
 
     function showAllFeeds() {
@@ -169,21 +169,21 @@ export default function ClientArea() {
         console.log( 'regenerateFavicons()  subs: ', subs );
         for( const s of subs ) {
             if( !faviconCache[s.id] ) {
-            try {
-                const buffer = await window.rssAPI.getFaviconData(s.id);
-                if( buffer ) {
-                    const uint8       = new Uint8Array(buffer);
-                    const blob        = new Blob([uint8.buffer], {type: 'image/png'});
-                    const faviconData = URL.createObjectURL(blob);
+                try {
+                    const buffer = await window.rssAPI.getFaviconData(s.id);
+                    if( buffer ) {
+                        const uint8       = new Uint8Array(buffer);
+                        const blob        = new Blob([uint8.buffer], {type: 'image/png'});
+                        const faviconData = URL.createObjectURL(blob);
 
-                    favicons[s.id] = faviconData;
+                        favicons[s.id] = faviconData;
 
-                    console.log( `Created favicon for sub id ${s.id} (${s.name})` );
+                        console.log( `Created favicon for sub id ${s.id} (${s.name})` );
+                    }
+                } catch(err) {
+                    console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
                 }
-            } catch(err) {
-                console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
             }
-        }
         }
         setFaviconCache( prev => ({ ...prev,  ...favicons }) );
     }
@@ -344,7 +344,7 @@ export default function ClientArea() {
             setSelectedItemId(itemId);
             markItemAsRead( itemId );
         }
-        window.electronApi.setWebviewURL( url );
+        await window.electronApi.setWebviewURL( url );
     }
 
     async function setIsFeedFavorite( itemId : number, value : boolean ) {
@@ -408,10 +408,10 @@ export default function ClientArea() {
         const option = getMainOptionFromView(selectedMenuOption);
         return (
             (option) ?
-            <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
+                <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
                     <img width={'24px'} height={'24px'} src={option.icon}></img>
                     <span>{option.title}</span>
-            </span>
+                </span>
             : null
         );
     }
@@ -436,7 +436,8 @@ export default function ClientArea() {
     async function onCommentsClick(itemId : number, url : string, commentsUrl: string, event: React.MouseEvent) {
         event.stopPropagation();
 
-        if( await window.electronApi.getWebviewURL() !== commentsUrl ) {
+        const webviewURL = await window.electronApi.getWebviewURL();
+        if(  webviewURL!== commentsUrl ) {
             // Different item's comment button
             setCommentsActiveId( itemId );
             window.electronApi.setWebviewURL( commentsUrl );
