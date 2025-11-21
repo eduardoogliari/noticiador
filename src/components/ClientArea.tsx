@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
@@ -35,8 +35,8 @@ export default function ClientArea() {
     const [favoriteItems, setFavoriteItems]                                 = useState<FeedItem[]>([]);
     const [feedBinItems, setFeedBinItems]                                   = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                                   = useState<Record<number, string>>({});
-    const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
-    const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
+    // const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
+    // const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
     const [subscriptionNameRecord, setSubscriptionNameRecord]                 = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                               = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
@@ -61,6 +61,27 @@ export default function ClientArea() {
         { title: t('favorites'), type: MenuOptionView.Favorites, itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
         { title: t('feed_bin'), type: MenuOptionView.Bin, itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
+
+    const subscriptionFeedCount : Record<number, number> = useMemo(() => {
+        const result: Record<number, number> = {};
+        for( const i of allFeedItems ) {
+            const sub = i.sub_id;
+            result[sub] = (result[sub] ?? 0) + 1;
+        }
+        return result;
+    }, [allFeedItems]);
+
+    const subscriptionUnreadCount : Record<number, number> = useMemo(() => {
+        const result : Record<number,number> = {};
+        for( const i of allFeedItems ) {
+            if( !i.is_read ) {
+                const sub = i.sub_id;
+                result[sub] = (result[sub] ?? 0) + 1;
+            }
+        }
+        return result;
+    }, [allFeedItems]);
+
     function getMainOptionFromView( type : MenuOptionView ) {
         for( const option of mainOptions ) {
             if( option.type === type ) {
@@ -114,23 +135,6 @@ export default function ClientArea() {
 
         const items = await window.rssAPI.getFeeds(allSubs);
         setAllFeedItems(items);
-
-        const subFeedCount : Record<number,number> = {};
-        for( const i of items ) {
-            if( !subFeedCount[i.sub_id] ) { subFeedCount[i.sub_id] = 0;  }
-            subFeedCount[i.sub_id]++;
-        }
-        setSubscriptionFeedCount(subFeedCount);
-
-        const subUnreadCount : Record<number,number> = {};
-        for( const i of items ) {
-            if( !subUnreadCount[i.sub_id] ) {  subUnreadCount[i.sub_id] = 0;  }
-
-            if( !i.is_read ) {
-                subUnreadCount[i.sub_id]++;
-            }
-        }
-        setSubscriptionUnreadCount( subUnreadCount );
     }
 
     async function updateFeedItemsFromDb() {
@@ -502,7 +506,7 @@ export default function ClientArea() {
                                     onCloseSubOptions={onCloseSubscriptionOptionsPopup}
                                     subscriptionsBeingRefreshed={subscriptionsBeingRefreshed}
                                     subscriptionUnreadCount={subscriptionUnreadCount}
-                                    subscriptionFeedCount={subscriptionFeedCount}
+                                    subscriptionFeedCount={subscriptionFeedCount ?? {}}
                                 ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>
