@@ -138,23 +138,23 @@ export default function ClientArea() {
         syncAllFeedItems();
     }
 
-    async function showAllFeeds() {
+    function showAllFeeds() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
-    async function openInExternalBrowser( url : string ) {
+    function openInExternalBrowser( url : string ) {
         window.electronApi.openInExternalBrowser(url);
     }
 
-    async function copyToClipboard( text : string ) {
+    function copyToClipboard( text : string ) {
         window.electronApi.copyToClipboard(text);
     }
 
-    async function showFavorites() {
+    function showFavorites() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
-    async function showFeedBin() {
+    function showFeedBin() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -207,19 +207,19 @@ export default function ClientArea() {
         }
     }
 
-    async function onClickAddSubscription() {
+    function onClickAddSubscription() {
         window.electronApi.openModal( { type: ModalType.AddSubscription, data: { title: t('modal_add_subscriptions_title') } } );
     }
 
-    async function onCloseSubscriptionOptionsPopup() {
+    function onCloseSubscriptionOptionsPopup() {
         setSelectedSubscriptionOptionsId(-1);
     }
 
-    async function onCloseFeedOptionsPopup() {
+    function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
 
-    async function clearHoveredUrl() {
+    function clearHoveredUrl() {
         setHoveredUrl('');
     }
 
@@ -350,7 +350,7 @@ export default function ClientArea() {
         setFavoriteItems(items);
     }
 
-    async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
+    function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
         event.stopPropagation();
 
         if( moreOptionsActiveId === itemId ) {
@@ -360,12 +360,12 @@ export default function ClientArea() {
         }
     }
 
-    async function onMarkReadClick( itemId : number, event: React.MouseEvent ) {
+    function onMarkReadClick( itemId : number, event: React.MouseEvent ) {
         event.stopPropagation();
         markItemAsRead( itemId );
     }
 
-    async function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
+    function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
         event.stopPropagation();
         setSelectedSubscriptionOptionsId(subId);
     }
@@ -418,7 +418,7 @@ export default function ClientArea() {
         await window.electronApi.setStoreValue( 'showLeftPanel', value );
     }
 
-    async function onMouseOverFeedItem(url : string) {
+    function onMouseOverFeedItem(url : string) {
         // console.log( 'onMouseOverFeedItem: ', url );
         setHoveredUrl( url );
     }
