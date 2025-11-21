@@ -615,20 +615,20 @@ ipcMain.handle('refresh-feeds', async ( event: IpcMainInvokeEvent, subs : Subscr
 
 // ------------------------------------------------------------------------------------------------------
 ipcMain.handle( 'get-feeds', ( event: IpcMainInvokeEvent, subs : Subscription[] ) => {
-  const stmt = db.prepare('SELECT * FROM feed_item WHERE sub_id = ? AND in_feed_bin = 0 AND is_favorite = 0');
+    if (subs.length === 0) return [];
 
-  let items : FeedItem[] = [];
-  for( const s of subs ) {
-    items = items.concat( stmt.all(s.id) as FeedItem[] );
-  }
+    const placeholders = subs.map(() => '?').join(',');
 
-  items.sort( (a, b) => {
-    const aTime = a.pub_date ? new Date(a.pub_date).getTime() : -Infinity;
-    const bTime = b.pub_date ? new Date(b.pub_date).getTime() : -Infinity;
-    if( aTime === bTime ) { return 0; }
-    return bTime - aTime;
-  });
-  return items;
+    const stmt = db.prepare(`
+        SELECT *
+        FROM feed_item
+        WHERE sub_id IN (${placeholders})
+            AND in_feed_bin = 0
+            AND is_favorite = 0
+        ORDER BY pub_date DESC
+    `);
+
+    return stmt.all(...subs.map(s => s.id)) as FeedItem[];
 });
 
 // ------------------------------------------------------------------------------------------------------
