@@ -11,12 +11,20 @@ import { ModalType } from '../types/modal-type';
 import styles from './ClientArea.module.css';
 import {useTranslation} from 'react-i18next';
 
+enum MenuOptionView {
+    All,
+    Favorites,
+    Bin,
+    Subscriptions
+}
+
 type MainOptionInfo = {
     title : string;
     icon : string;
     itemSource : FeedItem[];
     onClick: () => void;
     getCount: () => number;
+    type : MenuOptionView;
 };
 
 export default function ClientArea() {
@@ -32,7 +40,7 @@ export default function ClientArea() {
     const [subscriptionNameRecord, setSubscriptionNameRecord]                 = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                               = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
-    const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
+    // const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
     const [selectedSubscriptionOptionsId, setSelectedSubscriptionOptionsId] = useState(-1);
     const [currentURL, setCurrentURL]                                       = useState('');
     const [commentsActiveId, setCommentsActiveId]                           = useState(-1);
@@ -43,20 +51,28 @@ export default function ClientArea() {
     const [scrollToTopKey, setScrollToTopKey]                               = useState(0);
     const [feedRefreshKey, setFeedRefreshKey]                               = useState(0);
     const [hoveredUrl, setHoveredUrl] = useState('');
+    const [selectedMenuOption, setSelectedMenuOption] = useState<MenuOptionView>( MenuOptionView.All );
 
-    const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
-    const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
+    const refreshButtonDisabled = selectedMenuOption === MenuOptionView.Bin || selectedMenuOption === MenuOptionView.Favorites;
+    const feedBinButtonDisabled = (selectedMenuOption === MenuOptionView.Bin) && (selectedMenuOption === MenuOptionView.Bin && feedBinItems.length === 0) || (selectedMenuOption === MenuOptionView.Favorites);
 
     const mainOptions : MainOptionInfo[] = [
-        { title: t('all_feeds'), itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
-        { title: t('favorites'), itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
-        { title: t('feed_bin'), itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
+        { title: t('all_feeds'), type: MenuOptionView.All, itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
+        { title: t('favorites'), type: MenuOptionView.Favorites, itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
+        { title: t('feed_bin'), type: MenuOptionView.Bin, itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
+    function getMainOptionFromView( type : MenuOptionView ) {
+        for( const option of mainOptions ) {
+            if( option.type === type ) {
+                return option;
+            }
+        }
+        return null;
+    }
 
     function getCurrentlyVisibleFeedItems() : FeedItem[] {
-        return (selectedMainOptionIndex >= 0)
-                    ? mainOptions[selectedMainOptionIndex].itemSource
-                    : feedItems;
+        const option = getMainOptionFromView(selectedMenuOption);
+        return option?.itemSource ?? feedItems;
     }
 
     async function markItemAsRead( itemId : number ) {
@@ -220,10 +236,10 @@ export default function ClientArea() {
                 const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
                 setSubscriptions(subs);
 
-                setSelectedSubscriptionId(-1);
-                setSelectedSubscriptionOptionsId(-1);
+                // setSelectedSubscriptionId(-1);
+                // setSelectedSubscriptionOptionsId(-1);
 
-                setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
+                // setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
             });
 
             window.rssAPI.onFeedBinChanged( async () => {
@@ -355,13 +371,14 @@ export default function ClientArea() {
 
     async function onSubscriptionItemClick( subId : number ) {
         if( subId != selectedSubscriptionId ) {
-            const foundItem = subscriptions.find( (item) => item.id == subId );
+            const foundItem = subscriptions.find( (item) => item.id === subId );
             if( foundItem ){
                 console.log( "Clicked on SUB" + foundItem.url );
 
                 const items = await window.rssAPI.getFeeds([foundItem]);
 
-                setSelectedMainOptionIndex(-1);
+                setSelectedMenuOption( MenuOptionView.Subscriptions );
+                // setSelectedMainOptionIndex(-1);
                 setSelectedSubscriptionId(subId);
                 setFeedItems(items);
 
@@ -371,8 +388,8 @@ export default function ClientArea() {
     }
 
     function getFeedName( subId : number ) {
-        if( selectedSubscriptionId != -1 ) {
-            const foundItem = subscriptions.find( (item) => item.id == subId );
+        if( selectedSubscriptionId !== -1 ) {
+            const foundItem = subscriptions.find( (item) => item.id === subId );
             if( foundItem ){
                 return (
                     <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
@@ -382,12 +399,15 @@ export default function ClientArea() {
                 );
             }
         }
-        const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
+        // const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
+        const option = getMainOptionFromView(selectedMenuOption);
         return (
+            (option) ?
             <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
-                <img width={'24px'} height={'24px'} src={mainOptions[index].icon}></img>
-                <span>{mainOptions[index].title}</span>
+                    <img width={'24px'} height={'24px'} src={option.icon}></img>
+                    <span>{option.title}</span>
             </span>
+            : null
         );
     }
 
@@ -402,13 +422,10 @@ export default function ClientArea() {
         setHoveredUrl( url );
     }
 
-    async function onClickMainOption( index : number ) {
-        const wrappedIndex = index % mainOptions.length;
-        setSelectedMainOptionIndex( wrappedIndex );
+    async function onClickMainOption( option : MainOptionInfo ) {
+        setSelectedMenuOption( option.type );
         setSelectedSubscriptionId(-1);
-
-        console.log(wrappedIndex);
-        await mainOptions[wrappedIndex].onClick();
+        await option.onClick();
     }
 
     async function onCommentsClick(itemId : number, url : string, commentsUrl: string, event: React.MouseEvent) {
@@ -455,9 +472,9 @@ export default function ClientArea() {
                                         mainOptions.map( (item, index) => {
                                             return (
                                                 <li key={index}
-                                                    className={`${styles['main-options-list-item']} ${selectedMainOptionIndex === index ? styles.selected : ''}`}
+                                                    className={`${styles['main-options-list-item']} ${selectedMenuOption === item.type ? styles.selected : ''}`}
                                                     title={item.title}
-                                                    onClick={() => onClickMainOption(index)}
+                                                    onClick={() => onClickMainOption(item)}
                                                 >
                                                     <img src={item.icon}></img>
                                                     <span>{`${item.title} (${item.getCount()})`}</span>
@@ -504,7 +521,7 @@ export default function ClientArea() {
                                 className={styles['feed-header-button']}
                                 title={t('hint_refresh')}
                                 onClick={() => {
-                                    if( selectedSubscriptionId === -1 && selectedMainOptionIndex === 0 ) {
+                                    if( selectedMenuOption === MenuOptionView.All ) {
                                         updateFeeds(subscriptions);
                                     } else {
                                         const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
@@ -537,13 +554,13 @@ export default function ClientArea() {
                             <button
                                 className={styles['feed-header-button']}
                                 title={
-                                    (selectedMainOptionIndex === 2 )
+                                    (selectedMenuOption === MenuOptionView.Bin )
                                         ? t('hint_delete_all_permanently')
                                         : t('hint_move_read_to_bin')
                                 }
 
                                 onClick={() => {
-                                    if( selectedMainOptionIndex === 2 ) {
+                                    if( selectedMenuOption === MenuOptionView.Bin ) {
                                         window.electronApi.openModal( { type: ModalType.ConfirmEmptyBin, data: { title: t('modal_confirm_empty_bin_title') } } )
 
                                     } else {
@@ -560,7 +577,7 @@ export default function ClientArea() {
                                 <img
                                     className={styles['feed-header-button-icon']}
                                     src={
-                                        (selectedMainOptionIndex === 2)
+                                        (selectedMenuOption === MenuOptionView.Bin)
                                             ? '../icons/bin_empty.svg'
                                             : (feedBinButtonDisabled)
                                                 ? '../icons/bin_disabled.svg'
