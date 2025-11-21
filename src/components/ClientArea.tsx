@@ -79,6 +79,15 @@ export default function ClientArea() {
         return result;
     }, [allFeedItems]);
 
+    const feedItemsMap : Record<number, FeedItem> = useMemo(() => {
+        const result : Record<number, FeedItem> = {};
+
+        for( const item of allFeedItems ) {
+            result[item.id] = item;
+        }
+        return result;
+    }, [allFeedItems]);
+
     function getMainOptionFromView( type : MenuOptionView ) {
         for( const option of mainOptions ) {
             if( option.type === type ) {
@@ -283,7 +292,8 @@ export default function ClientArea() {
 
     useEffect(() => {
          if( selectedItemId != -1 ) {
-                const foundItem = getCurrentlyVisibleFeedItems().find( (item) => item.id === selectedItemId );
+                // const foundItem = getCurrentlyVisibleFeedItems().find( (item) => item.id === selectedItemId );
+                const foundItem = feedItemsMap[selectedItemId];
                 if( foundItem ) {
                     if( foundItem.comments_url === currentURL ) {
                         setCommentsActiveId( foundItem.id );
