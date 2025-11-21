@@ -35,12 +35,9 @@ export default function ClientArea() {
     const [favoriteItems, setFavoriteItems]                                 = useState<FeedItem[]>([]);
     const [feedBinItems, setFeedBinItems]                                   = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                                   = useState<Record<number, string>>({});
-    // const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
-    // const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
     const [subscriptionNameRecord, setSubscriptionNameRecord]                 = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                               = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
-    // const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
     const [selectedSubscriptionOptionsId, setSelectedSubscriptionOptionsId] = useState(-1);
     const [currentURL, setCurrentURL]                                       = useState('');
     const [commentsActiveId, setCommentsActiveId]                           = useState(-1);
@@ -241,11 +238,6 @@ export default function ClientArea() {
             window.rssAPI.onSubscriptionsChanged( async () => {
                 const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
                 setSubscriptions(subs);
-
-                // setSelectedSubscriptionId(-1);
-                // setSelectedSubscriptionOptionsId(-1);
-
-                // setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
             });
 
             window.rssAPI.onFeedBinChanged( async () => {
