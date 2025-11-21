@@ -292,7 +292,6 @@ export default function ClientArea() {
 
     useEffect(() => {
          if( selectedItemId != -1 ) {
-                // const foundItem = getCurrentlyVisibleFeedItems().find( (item) => item.id === selectedItemId );
                 const foundItem = feedItemsMap[selectedItemId];
                 if( foundItem ) {
                     if( foundItem.comments_url === currentURL ) {
