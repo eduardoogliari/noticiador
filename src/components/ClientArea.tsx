@@ -164,6 +164,7 @@ export default function ClientArea() {
 
         console.log( 'regenerateFavicons()  subs: ', subs );
         for( const s of subs ) {
+            if( !faviconCache[s.id] ) {
             try {
                 const buffer = await window.rssAPI.getFaviconData(s.id);
                 if( buffer ) {
@@ -179,7 +180,8 @@ export default function ClientArea() {
                 console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
             }
         }
-        return favicons;
+        }
+        setFaviconCache( prev => ({ ...prev,  ...favicons }) );
     }
 
     async function updateFeeds( subs : Subscription[] ) {
@@ -261,8 +263,7 @@ export default function ClientArea() {
 
     useEffect(() => {
         ( async () => {
-            const favicons = await regenerateFavicons();
-            setFaviconCache(favicons);
+            await regenerateFavicons();
 
             const items = await window.rssAPI.getFavorites();
             setFavoriteItems(items);
