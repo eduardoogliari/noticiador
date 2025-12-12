@@ -5,7 +5,7 @@ import FeedList from './FeedList';
 import { Subscription } from '../types/subscription';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
-import StatusBar from './StatusBar';
+import StatusBar, {StatusBarHandle} from './StatusBar';
 import { SubscriptionFilter } from '../types/subscription-filter';
 import { ModalType } from '../types/modal-type';
 import styles from './ClientArea.module.css';
@@ -47,7 +47,7 @@ export default function ClientArea() {
     const containerRef                                                      = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                               = useState(0);
     const [feedRefreshKey, setFeedRefreshKey]                               = useState(0);
-    const [hoveredUrl, setHoveredUrl] = useState('');
+    const statusBarRef = useRef<StatusBarHandle>(null);
     const [selectedMenuOption, setSelectedMenuOption] = useState<MenuOptionView>( MenuOptionView.All );
 
     const refreshButtonDisabled = selectedMenuOption === MenuOptionView.Bin || selectedMenuOption === MenuOptionView.Favorites;
@@ -230,7 +230,7 @@ export default function ClientArea() {
     }
 
     function clearHoveredUrl() {
-        setHoveredUrl('');
+        statusBarRef.current?.clearHoveredUrl();
     }
 
     // Initialization useEffect
@@ -424,8 +424,7 @@ export default function ClientArea() {
     }
 
     function onMouseOverFeedItem(url : string) {
-        // console.log( 'onMouseOverFeedItem: ', url );
-        setHoveredUrl( url );
+        statusBarRef.current?.setHoveredUrl(url);
     }
 
     async function onClickMainOption( option : MainOptionInfo ) {
@@ -631,7 +630,7 @@ export default function ClientArea() {
             <StatusBar
                 onToggleSidePanelClick={onToggleSidePanelClick}
                 isHidden={!showLeftPanel}
-                hoveredUrl={hoveredUrl}
+                ref={statusBarRef}
             ></StatusBar>
         </div>
     );

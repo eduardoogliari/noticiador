@@ -104,9 +104,8 @@ export default function FeedListItem( props : FeedListItemProp ) {
                                 className={`${styles['feed-item-options-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}
                                 onClick={(e) => props.onCommentsClick( props.id, props.url, props.commentsUrl, e )}
                                 onMouseOver={ (e) => {
-                                    e.stopPropagation();
-                                    props.onMouseOverFeedItem( props.commentsUrl )}
-                                }
+                                    props.onMouseOverFeedItem( props.commentsUrl )
+                                }}
                             >
                                 {
                                     props.commentsUrl
