@@ -1,7 +1,24 @@
 .feed-date-list {
-    list-style: none;
-    margin: 0;
     padding: 0px 0px;
     height: 100%;
-    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.feed-date-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    user-select: none;
+
+    padding: 5px 10px;
+    color: rgb(255, 255, 255);
+    text-shadow:  2px 2px 1px rgb(82, 82, 82);
+    margin: 0;
+
+    border-top: 1px solid rgb(215, 215, 215);
+    border-left: 1px solid rgb(215, 215, 215);
+    border-bottom: 1px solid rgb(43, 43, 43);
+    border-right: 1px solid rgb(43, 43, 43);
+
+    background-color: rgb(125, 125, 125);
 }
