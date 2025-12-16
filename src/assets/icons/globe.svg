@@ -2,116 +2,166 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="102.83705mm"
+   width="102.83706mm"
    height="103.23336mm"
-   viewBox="0 0 102.83705 103.23336"
+   viewBox="0 0 102.83706 103.23336"
    version="1.1"
    id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="globe.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.55767396"
+     inkscape:cx="253.73248"
+     inkscape:cy="503.87864"
+     inkscape:window-width="1600"
+     inkscape:window-height="828"
+     inkscape:window-x="1152"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:page
+       x="0"
+       y="-9.6208286e-14"
+       width="102.83706"
+       height="103.23335"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
   <defs
      id="defs1">
     <linearGradient
-       id="linearGradient2">
+       id="linearGradient12"
+       inkscape:collect="always">
       <stop
-         style="stop-color:#1459fb;stop-opacity:1;"
+         style="stop-color:#0055b0;stop-opacity:1;"
          offset="0"
-         id="stop2" />
+         id="stop12" />
       <stop
-         style="stop-color:#dc034b;stop-opacity:1;"
+         style="stop-color:#43c7ff;stop-opacity:1;"
          offset="1"
-         id="stop3" />
+         id="stop13" />
     </linearGradient>
     <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient3"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
+       id="linearGradient13"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
-       xlink:href="#linearGradient2"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
+       id="linearGradient2"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
+       id="linearGradient3"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
        id="linearGradient4"
        gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
     <linearGradient
-       xlink:href="#linearGradient2"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
        id="linearGradient5"
        gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
     <linearGradient
-       xlink:href="#linearGradient2"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
        id="linearGradient6"
        gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
     <linearGradient
-       xlink:href="#linearGradient2"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
        id="linearGradient7"
        gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
     <linearGradient
-       xlink:href="#linearGradient2"
+       inkscape:collect="always"
+       xlink:href="#linearGradient12"
        id="linearGradient8"
        gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient9"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient10"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
   </defs>
   <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-63.424665,-62.723579)">
+     transform="translate(-53.461403,-69.365749)">
     <g
        id="g3"
-       style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient3);stroke-width:7;stroke-dasharray:none;stroke-opacity:1">
+       style="fill:none;fill-opacity:1;stroke:url(#linearGradient13);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="../noticiador/src/assets/icons/globe.svg"
+       inkscape:export-xdpi="7.9037662"
+       inkscape:export-ydpi="7.9037662"
+       transform="translate(-9.9632588,6.6421725)">
       <g
          id="g2"
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient7);stroke-width:7;stroke-dasharray:none;stroke-opacity:1">
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient5);stroke-width:7;stroke-dasharray:none;stroke-opacity:1">
         <circle
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient4);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient2);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="path1-3"
            cx="114.84319"
            cy="114.31403"
            r="47.91853" />
         <ellipse
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient5);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient3);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="path1"
            cx="115.28913"
            cy="114.34025"
            rx="31.674047"
-           ry="48.116676" />
+           ry="48.116676"
+           inkscape:export-filename="../noticiador/src/assets/icons/path1.png"
+           inkscape:export-xdpi="7.9037662"
+           inkscape:export-ydpi="7.9037662" />
         <rect
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient6);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient4);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="rect1"
            width="0.4902966"
            height="94.33831"
@@ -119,21 +169,21 @@
            y="66.921959" />
       </g>
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient8);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient6);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2"
          width="94.101616"
          height="0.75087327"
          x="68.493401"
          y="113.95171" />
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient9);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient7);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2-3"
          width="69.328537"
          height="0.87283325"
          x="80.213943"
          y="84.258263" />
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient10);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient8);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2-3-5"
          width="67.758965"
          height="0.88262939"
