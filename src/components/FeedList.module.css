@@ -12,13 +12,16 @@
 
     padding: 5px 10px;
     color: rgb(255, 255, 255);
-    text-shadow:  2px 2px 1px rgb(82, 82, 82);
+    text-shadow:  2px 2px 1px rgb(13, 53, 80);
     margin: 0;
 
-    border-top: 1px solid rgb(215, 215, 215);
-    border-left: 1px solid rgb(215, 215, 215);
-    border-bottom: 1px solid rgb(43, 43, 43);
-    border-right: 1px solid rgb(43, 43, 43);
 
-    background-color: rgb(125, 125, 125);
+    border: 1px solid #24587db5;
+
+    background: linear-gradient(90deg, #4984ac 0%, #badff6 100%);
+
+    box-shadow:
+        inset 1px 1px 0 rgba(255, 255, 255, 0.6),
+        inset -1px -1px 0 rgba(98, 124, 171, 0.532),
+        1px 1px 3px rgba(5, 49, 77, 0.491);
 }
