@@ -1,15 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { FeedItem } from '../types/feed-item';
 import FeedList from './FeedList';
 import { Subscription } from '../types/subscription';
 import SubscriptionsList from './SubscriptionsList';
 import Toolbar from './Toolbar';
-import StatusBar from './StatusBar';
+import StatusBar, {StatusBarHandle} from './StatusBar';
 import { SubscriptionFilter } from '../types/subscription-filter';
 import { ModalType } from '../types/modal-type';
 import styles from './ClientArea.module.css';
 import {useTranslation} from 'react-i18next';
+
+enum MenuOptionView {
+    All,
+    Favorites,
+    Bin,
+    Subscriptions
+}
 
 type MainOptionInfo = {
     title : string;
@@ -17,6 +24,7 @@ type MainOptionInfo = {
     itemSource : FeedItem[];
     onClick: () => void;
     getCount: () => number;
+    type : MenuOptionView;
 };
 
 export default function ClientArea() {
@@ -27,12 +35,9 @@ export default function ClientArea() {
     const [favoriteItems, setFavoriteItems]                                 = useState<FeedItem[]>([]);
     const [feedBinItems, setFeedBinItems]                                   = useState<FeedItem[]>([]);
     const [faviconCache, setFaviconCache]                                   = useState<Record<number, string>>({});
-    const [subscriptionUnreadCount, setSubscriptionUnreadCount]             = useState<Record<number, number>>({});
-    const [subscriptionFeedCount, setSubscriptionFeedCount]                 = useState<Record<number, number>>({});
     const [subscriptionNameRecord, setSubscriptionNameRecord]                 = useState<Record<number, string>>({});
     const [selectedItemId, setSelectedItemId]                               = useState(-1);
     const [selectedSubscriptionId, setSelectedSubscriptionId]               = useState(-1);
-    const [selectedMainOptionIndex, setSelectedMainOptionIndex]             = useState(0);
     const [selectedSubscriptionOptionsId, setSelectedSubscriptionOptionsId] = useState(-1);
     const [currentURL, setCurrentURL]                                       = useState('');
     const [commentsActiveId, setCommentsActiveId]                           = useState(-1);
@@ -42,31 +47,69 @@ export default function ClientArea() {
     const containerRef                                                      = useRef<HTMLDivElement>(null);
     const [scrollToTopKey, setScrollToTopKey]                               = useState(0);
     const [feedRefreshKey, setFeedRefreshKey]                               = useState(0);
-    const [hoveredUrl, setHoveredUrl] = useState('');
+    const statusBarRef = useRef<StatusBarHandle>(null);
+    const [selectedMenuOption, setSelectedMenuOption] = useState<MenuOptionView>( MenuOptionView.All );
 
-    const refreshButtonDisabled = (selectedSubscriptionId === -1 && selectedMainOptionIndex !== 0) || subscriptionsBeingRefreshed.has( selectedSubscriptionId );
-    const feedBinButtonDisabled = selectedMainOptionIndex === 1 || (selectedMainOptionIndex === 2 && feedBinItems.length === 0);
+    const refreshButtonDisabled = selectedMenuOption === MenuOptionView.Bin || selectedMenuOption === MenuOptionView.Favorites;
+    const feedBinButtonDisabled = (selectedMenuOption === MenuOptionView.Bin) && (selectedMenuOption === MenuOptionView.Bin && feedBinItems.length === 0) || (selectedMenuOption === MenuOptionView.Favorites);
 
     const mainOptions : MainOptionInfo[] = [
-        { title: t('all_feeds'), itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
-        { title: t('favorites'), itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
-        { title: t('feed_bin'), itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
+        { title: t('all_feeds'), type: MenuOptionView.All, itemSource: allFeedItems, icon: '../icons/globe.svg', onClick: showAllFeeds, getCount: () =>  allFeedItems.length },
+        { title: t('favorites'), type: MenuOptionView.Favorites, itemSource: favoriteItems, icon: '../icons/favorite.svg', onClick: showFavorites, getCount: () => favoriteItems.length },
+        { title: t('feed_bin'), type: MenuOptionView.Bin, itemSource: feedBinItems, icon: '../icons/bin.svg', onClick: showFeedBin, getCount: () => feedBinItems.length },
     ];
 
+    const subscriptionFeedCount : Record<number, number> = useMemo(() => {
+        const result: Record<number, number> = {};
+        for( const i of allFeedItems ) {
+            const sub = i.sub_id;
+            result[sub] = (result[sub] ?? 0) + 1;
+        }
+        return result;
+    }, [allFeedItems]);
+
+    const subscriptionUnreadCount : Record<number, number> = useMemo(() => {
+        const result : Record<number,number> = {};
+        for( const i of allFeedItems ) {
+            if( !i.is_read ) {
+                const sub = i.sub_id;
+                result[sub] = (result[sub] ?? 0) + 1;
+            }
+        }
+        return result;
+    }, [allFeedItems]);
+
+    const feedItemsMap : Record<number, FeedItem> = useMemo(() => {
+        const result : Record<number, FeedItem> = {};
+
+        for( const item of allFeedItems ) {
+            result[item.id] = item;
+        }
+        return result;
+    }, [allFeedItems]);
+
+    function getMainOptionFromView( type : MenuOptionView ) {
+        for( const option of mainOptions ) {
+            if( option.type === type ) {
+                return option;
+            }
+        }
+        return null;
+    }
+
     function getCurrentlyVisibleFeedItems() : FeedItem[] {
-        return (selectedMainOptionIndex >= 0)
-                    ? mainOptions[selectedMainOptionIndex].itemSource
-                    : feedItems;
+        const option = getMainOptionFromView(selectedMenuOption);
+        return option?.itemSource ?? feedItems;
     }
 
     async function markItemAsRead( itemId : number ) {
         await window.rssAPI.setRead( itemId, true );
-        updateFeedItemsFromDb();
+        await updateFeedItemsFromDb();
     }
 
     async function markMultipleItemsAsRead( itemIds : number[] ) {
         await window.rssAPI.setReadMultiple( itemIds, true );
-        updateFeedItemsFromDb();
+        await updateFeedItemsFromDb();
     }
 
     async function setInFeedBin( itemIds : number[], value : boolean ) {
@@ -98,47 +141,30 @@ export default function ClientArea() {
 
         const items = await window.rssAPI.getFeeds(allSubs);
         setAllFeedItems(items);
-
-        const subFeedCount : Record<number,number> = {};
-        for( const i of items ) {
-            if( !subFeedCount[i.sub_id] ) { subFeedCount[i.sub_id] = 0;  }
-            subFeedCount[i.sub_id]++;
-        }
-        setSubscriptionFeedCount(subFeedCount);
-
-        const subUnreadCount : Record<number,number> = {};
-        for( const i of items ) {
-            if( !subUnreadCount[i.sub_id] ) {  subUnreadCount[i.sub_id] = 0;  }
-
-            if( !i.is_read ) {
-                subUnreadCount[i.sub_id]++;
-            }
-        }
-        setSubscriptionUnreadCount( subUnreadCount );
     }
 
     async function updateFeedItemsFromDb() {
-        syncSelectedSubscriptionFeedItems();
-        syncAllFeedItems();
+        await syncSelectedSubscriptionFeedItems();
+        await syncAllFeedItems();
     }
 
-    async function showAllFeeds() {
+    function showAllFeeds() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
-    async function openInExternalBrowser( url : string ) {
+    function openInExternalBrowser( url : string ) {
         window.electronApi.openInExternalBrowser(url);
     }
 
-    async function copyToClipboard( text : string ) {
+    function copyToClipboard( text : string ) {
         window.electronApi.copyToClipboard(text);
     }
 
-    async function showFavorites() {
+    function showFavorites() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
-    async function showFeedBin() {
+    function showFeedBin() {
         setScrollToTopKey( (prev) => prev+1 );
     }
 
@@ -148,22 +174,24 @@ export default function ClientArea() {
 
         console.log( 'regenerateFavicons()  subs: ', subs );
         for( const s of subs ) {
-            try {
-                const buffer = await window.rssAPI.getFaviconData(s.id);
-                if( buffer ) {
-                    const uint8       = new Uint8Array(buffer);
-                    const blob        = new Blob([uint8.buffer], {type: 'image/png'});
-                    const faviconData = URL.createObjectURL(blob);
+            if( !faviconCache[s.id] ) {
+                try {
+                    const buffer = await window.rssAPI.getFaviconData(s.id);
+                    if( buffer ) {
+                        const uint8       = new Uint8Array(buffer);
+                        const blob        = new Blob([uint8.buffer], {type: 'image/png'});
+                        const faviconData = URL.createObjectURL(blob);
 
-                    favicons[s.id] = faviconData;
+                        favicons[s.id] = faviconData;
 
-                    console.log( `Created favicon for sub id ${s.id} (${s.name})` );
+                        console.log( `Created favicon for sub id ${s.id} (${s.name})` );
+                    }
+                } catch(err) {
+                    console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
                 }
-            } catch(err) {
-                console.error( `Failed at regenerateFavicons() for sub id ${s.id} (${s.name})`, err );
             }
         }
-        return favicons;
+        setFaviconCache( prev => ({ ...prev,  ...favicons }) );
     }
 
     async function updateFeeds( subs : Subscription[] ) {
@@ -189,20 +217,20 @@ export default function ClientArea() {
         }
     }
 
-    async function onClickAddSubscription() {
+    function onClickAddSubscription() {
         window.electronApi.openModal( { type: ModalType.AddSubscription, data: { title: t('modal_add_subscriptions_title') } } );
     }
 
-    async function onCloseSubscriptionOptionsPopup() {
+    function onCloseSubscriptionOptionsPopup() {
         setSelectedSubscriptionOptionsId(-1);
     }
 
-    async function onCloseFeedOptionsPopup() {
+    function onCloseFeedOptionsPopup() {
         setMoreOptionsActiveId(-1);
     }
 
-    async function clearHoveredUrl() {
-        setHoveredUrl('');
+    function clearHoveredUrl() {
+        statusBarRef.current?.clearHoveredUrl();
     }
 
     // Initialization useEffect
@@ -219,11 +247,6 @@ export default function ClientArea() {
             window.rssAPI.onSubscriptionsChanged( async () => {
                 const subs : Subscription[] = await window.rssAPI.getSubscriptions(SubscriptionFilter.ActiveOnly);
                 setSubscriptions(subs);
-
-                setSelectedSubscriptionId(-1);
-                setSelectedSubscriptionOptionsId(-1);
-
-                setSelectedMainOptionIndex( selectedMainOptionIndex < 0 ? 0 : selectedMainOptionIndex);
             });
 
             window.rssAPI.onFeedBinChanged( async () => {
@@ -245,8 +268,7 @@ export default function ClientArea() {
 
     useEffect(() => {
         ( async () => {
-            const favicons = await regenerateFavicons();
-            setFaviconCache(favicons);
+            await regenerateFavicons();
 
             const items = await window.rssAPI.getFavorites();
             setFavoriteItems(items);
@@ -270,7 +292,7 @@ export default function ClientArea() {
 
     useEffect(() => {
          if( selectedItemId != -1 ) {
-                const foundItem = getCurrentlyVisibleFeedItems().find( (item) => item.id === selectedItemId );
+                const foundItem = feedItemsMap[selectedItemId];
                 if( foundItem ) {
                     if( foundItem.comments_url === currentURL ) {
                         setCommentsActiveId( foundItem.id );
@@ -323,7 +345,7 @@ export default function ClientArea() {
             setSelectedItemId(itemId);
             markItemAsRead( itemId );
         }
-        window.electronApi.setWebviewURL( url );
+        await window.electronApi.setWebviewURL( url );
     }
 
     async function setIsFeedFavorite( itemId : number, value : boolean ) {
@@ -333,7 +355,7 @@ export default function ClientArea() {
         setFavoriteItems(items);
     }
 
-    async function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
+    function onMoreOptionsClick( itemId : number, url: string, event: React.MouseEvent ) {
         event.stopPropagation();
 
         if( moreOptionsActiveId === itemId ) {
@@ -343,25 +365,26 @@ export default function ClientArea() {
         }
     }
 
-    async function onMarkReadClick( itemId : number, event: React.MouseEvent ) {
+    function onMarkReadClick( itemId : number, event: React.MouseEvent ) {
         event.stopPropagation();
         markItemAsRead( itemId );
     }
 
-    async function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
+    function onSubscriptionOptionsClick( subId : number, event: React.MouseEvent ) {
         event.stopPropagation();
         setSelectedSubscriptionOptionsId(subId);
     }
 
     async function onSubscriptionItemClick( subId : number ) {
         if( subId != selectedSubscriptionId ) {
-            const foundItem = subscriptions.find( (item) => item.id == subId );
+            const foundItem = subscriptions.find( (item) => item.id === subId );
             if( foundItem ){
                 console.log( "Clicked on SUB" + foundItem.url );
 
                 const items = await window.rssAPI.getFeeds([foundItem]);
 
-                setSelectedMainOptionIndex(-1);
+                setSelectedMenuOption( MenuOptionView.Subscriptions );
+                // setSelectedMainOptionIndex(-1);
                 setSelectedSubscriptionId(subId);
                 setFeedItems(items);
 
@@ -371,8 +394,8 @@ export default function ClientArea() {
     }
 
     function getFeedName( subId : number ) {
-        if( selectedSubscriptionId != -1 ) {
-            const foundItem = subscriptions.find( (item) => item.id == subId );
+        if( selectedSubscriptionId !== -1 ) {
+            const foundItem = subscriptions.find( (item) => item.id === subId );
             if( foundItem ){
                 return (
                     <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
@@ -382,12 +405,15 @@ export default function ClientArea() {
                 );
             }
         }
-        const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
+        // const index = (selectedMainOptionIndex >= 0) ? selectedMainOptionIndex : 0;
+        const option = getMainOptionFromView(selectedMenuOption);
         return (
-            <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
-                <img width={'24px'} height={'24px'} src={mainOptions[index].icon}></img>
-                <span>{mainOptions[index].title}</span>
-            </span>
+            (option) ?
+                <span style={{display: 'flex', alignItems: 'end', gap: '10px'}}>
+                    <img width={'24px'} height={'24px'} src={option.icon}></img>
+                    <span>{option.title}</span>
+                </span>
+            : null
         );
     }
 
@@ -397,24 +423,21 @@ export default function ClientArea() {
         await window.electronApi.setStoreValue( 'showLeftPanel', value );
     }
 
-    async function onMouseOverFeedItem(url : string) {
-        // console.log( 'onMouseOverFeedItem: ', url );
-        setHoveredUrl( url );
+    function onMouseOverFeedItem(url : string) {
+        statusBarRef.current?.setHoveredUrl(url);
     }
 
-    async function onClickMainOption( index : number ) {
-        const wrappedIndex = index % mainOptions.length;
-        setSelectedMainOptionIndex( wrappedIndex );
+    async function onClickMainOption( option : MainOptionInfo ) {
+        setSelectedMenuOption( option.type );
         setSelectedSubscriptionId(-1);
-
-        console.log(wrappedIndex);
-        await mainOptions[wrappedIndex].onClick();
+        await option.onClick();
     }
 
     async function onCommentsClick(itemId : number, url : string, commentsUrl: string, event: React.MouseEvent) {
         event.stopPropagation();
 
-        if( await window.electronApi.getWebviewURL() !== commentsUrl ) {
+        const webviewURL = await window.electronApi.getWebviewURL();
+        if(  webviewURL!== commentsUrl ) {
             // Different item's comment button
             setCommentsActiveId( itemId );
             window.electronApi.setWebviewURL( commentsUrl );
@@ -455,9 +478,9 @@ export default function ClientArea() {
                                         mainOptions.map( (item, index) => {
                                             return (
                                                 <li key={index}
-                                                    className={`${styles['main-options-list-item']} ${selectedMainOptionIndex === index ? styles.selected : ''}`}
+                                                    className={`${styles['main-options-list-item']} ${selectedMenuOption === item.type ? styles.selected : ''}`}
                                                     title={item.title}
-                                                    onClick={() => onClickMainOption(index)}
+                                                    onClick={() => onClickMainOption(item)}
                                                 >
                                                     <img src={item.icon}></img>
                                                     <span>{`${item.title} (${item.getCount()})`}</span>
@@ -484,7 +507,7 @@ export default function ClientArea() {
                                     onCloseSubOptions={onCloseSubscriptionOptionsPopup}
                                     subscriptionsBeingRefreshed={subscriptionsBeingRefreshed}
                                     subscriptionUnreadCount={subscriptionUnreadCount}
-                                    subscriptionFeedCount={subscriptionFeedCount}
+                                    subscriptionFeedCount={subscriptionFeedCount ?? {}}
                                 ></SubscriptionsList>
 
                                 {/* <ExpandableGroup title='Subscriptions'>
@@ -504,7 +527,7 @@ export default function ClientArea() {
                                 className={styles['feed-header-button']}
                                 title={t('hint_refresh')}
                                 onClick={() => {
-                                    if( selectedSubscriptionId === -1 && selectedMainOptionIndex === 0 ) {
+                                    if( selectedMenuOption === MenuOptionView.All ) {
                                         updateFeeds(subscriptions);
                                     } else {
                                         const foundItem = subscriptions.find( (item) => item.id == selectedSubscriptionId );
@@ -537,13 +560,13 @@ export default function ClientArea() {
                             <button
                                 className={styles['feed-header-button']}
                                 title={
-                                    (selectedMainOptionIndex === 2 )
+                                    (selectedMenuOption === MenuOptionView.Bin )
                                         ? t('hint_delete_all_permanently')
                                         : t('hint_move_read_to_bin')
                                 }
 
                                 onClick={() => {
-                                    if( selectedMainOptionIndex === 2 ) {
+                                    if( selectedMenuOption === MenuOptionView.Bin ) {
                                         window.electronApi.openModal( { type: ModalType.ConfirmEmptyBin, data: { title: t('modal_confirm_empty_bin_title') } } )
 
                                     } else {
@@ -560,7 +583,7 @@ export default function ClientArea() {
                                 <img
                                     className={styles['feed-header-button-icon']}
                                     src={
-                                        (selectedMainOptionIndex === 2)
+                                        (selectedMenuOption === MenuOptionView.Bin)
                                             ? '../icons/bin_empty.svg'
                                             : (feedBinButtonDisabled)
                                                 ? '../icons/bin_disabled.svg'
@@ -607,7 +630,7 @@ export default function ClientArea() {
             <StatusBar
                 onToggleSidePanelClick={onToggleSidePanelClick}
                 isHidden={!showLeftPanel}
-                hoveredUrl={hoveredUrl}
+                ref={statusBarRef}
             ></StatusBar>
         </div>
     );

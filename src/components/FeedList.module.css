@@ -1,7 +1,27 @@
 .feed-date-list {
-    list-style: none;
-    margin: 0;
     padding: 0px 0px;
     height: 100%;
-    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.feed-date-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    user-select: none;
+
+    padding: 5px 10px;
+    color: rgb(255, 255, 255);
+    text-shadow:  2px 2px 1px rgb(13, 53, 80);
+    margin: 0;
+
+
+    border: 1px solid #24587db5;
+
+    background: linear-gradient(90deg, #4984ac 0%, #badff6 100%);
+
+    box-shadow:
+        inset 1px 1px 0 rgba(255, 255, 255, 0.6),
+        inset -1px -1px 0 rgba(98, 124, 171, 0.532),
+        1px 1px 3px rgba(5, 49, 77, 0.491);
 }

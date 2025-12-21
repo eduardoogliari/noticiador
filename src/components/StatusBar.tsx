@@ -1,14 +1,30 @@
 import { useTranslation } from 'react-i18next';
 import styles from './StatusBar.module.css';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+
+export type StatusBarHandle = {
+  clearHoveredUrl: () => void;
+  setHoveredUrl: (url: string) => void;
+};
 
 export type StatusBarProp = {
     onToggleSidePanelClick: () => void;
     isHidden: boolean;
-    hoveredUrl : string;
 };
 
-export default function StatusBar( props: StatusBarProp ) {
+const StatusBar = forwardRef<StatusBarHandle, StatusBarProp>((props, ref) => {
     const { t } = useTranslation();
+
+    const [url, setURL] = useState("");
+
+    useImperativeHandle(ref, () => ({
+        clearHoveredUrl() {
+            setURL("");
+        },
+        setHoveredUrl(url: string) {
+            setURL(url);
+        }
+    }));
 
     return (
         <div className={styles['status-bar']}>
@@ -26,7 +42,9 @@ export default function StatusBar( props: StatusBarProp ) {
 
             <span className='v-separator'></span>
 
-            <span className={styles['status-bar-url']}>{props.hoveredUrl}</span>
+            <span className={styles['status-bar-url']}>{url}</span>
         </div>
     );
-}
+});
+
+export default StatusBar;

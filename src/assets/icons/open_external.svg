@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="102.83706mm"
-   height="104.05806mm"
-   viewBox="0 0 102.83706 104.05806"
+   width="102.83705mm"
+   height="103.23336mm"
+   viewBox="0 0 102.83705 103.23336"
    version="1.1"
    id="svg1"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -12,81 +12,6 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1">
-    <linearGradient
-       id="linearGradient2">
-      <stop
-         style="stop-color:#1459fb;stop-opacity:1;"
-         offset="0"
-         id="stop2" />
-      <stop
-         style="stop-color:#dc034b;stop-opacity:1;"
-         offset="1"
-         id="stop3" />
-    </linearGradient>
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient3"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient1"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient4"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient5"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient6"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient7"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient8"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
-    <linearGradient
-       xlink:href="#linearGradient2"
-       id="linearGradient9"
-       gradientUnits="userSpaceOnUse"
-       x1="63.824665"
-       y1="114.34025"
-       x2="174.91971"
-       y2="39.528122" />
     <linearGradient
        xlink:href="#linearGradient8-6"
        id="linearGradient9-3"
@@ -114,32 +39,101 @@
        y1="170.68645"
        x2="149.93262"
        y2="170.68645" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient13"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-8.655915,8.1847613)" />
+    <linearGradient
+       id="linearGradient12">
+      <stop
+         style="stop-color:#0055b0;stop-opacity:1;"
+         offset="0"
+         id="stop12" />
+      <stop
+         style="stop-color:#43c7ff;stop-opacity:1;"
+         offset="1"
+         id="stop13" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient15"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient16"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient17"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient18"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient19"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511"
+       gradientTransform="translate(-8.655915,8.1847613)" />
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient20"
+       gradientUnits="userSpaceOnUse"
+       x1="111.67459"
+       y1="115.02518"
+       x2="149.98769"
+       y2="73.139511"
+       gradientTransform="translate(-8.655915,8.1847613)" />
   </defs>
   <g
      id="layer1"
-     transform="translate(-53.461403,-69.365747)">
+     transform="translate(-54.76875,-70.908336)">
     <g
-       id="g3"
-       style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient3);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
-       transform="translate(-9.9632588,6.6421725)">
+       id="g20">
       <g
          id="g2"
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient6);stroke-width:7;stroke-dasharray:none;stroke-opacity:1">
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient18);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         transform="translate(-8.655915,8.1847613)">
         <circle
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient1);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient15);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="path1-3"
            cx="114.84319"
            cy="114.31403"
            r="47.91853" />
         <ellipse
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient4);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient16);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="path1"
            cx="115.28913"
            cy="114.34025"
            rx="31.674047"
            ry="48.116676" />
         <rect
-           style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient5);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:url(#linearGradient17);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
            id="rect1"
            width="0.4902966"
            height="94.33831"
@@ -147,26 +141,26 @@
            y="66.921959" />
       </g>
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient7);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient19);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2"
          width="94.101616"
          height="0.75087327"
-         x="68.493401"
-         y="113.95171" />
+         x="59.837486"
+         y="122.13647" />
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient8);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient20);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2-3"
          width="69.328537"
          height="0.87283325"
-         x="80.213943"
-         y="84.258263" />
+         x="71.558029"
+         y="92.443024" />
       <rect
-         style="fill:none;fill-opacity:0.788334;stroke:url(#linearGradient9);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:none;fill-opacity:1;stroke:url(#linearGradient13);stroke-width:7;stroke-dasharray:none;stroke-opacity:1"
          id="rect2-3-5"
          width="67.758965"
          height="0.88262939"
-         x="80.855019"
-         y="144.36272" />
+         x="72.199104"
+         y="152.54749" />
     </g>
     <g
        id="path11"

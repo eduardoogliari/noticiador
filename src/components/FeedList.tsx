@@ -1,9 +1,13 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FeedItem } from "../types/feed-item";
-import FeedListDateHeader from "./FeedListDateHeader";
 import { startOfWeek, endOfWeek, subDays, isSameDay } from 'date-fns';
 import styles from './FeedList.module.css';
 import { useTranslation } from "react-i18next";
+import { GroupedVirtuoso } from 'react-virtuoso'
+import FeedListItem from "./FeedListItem";
+import FeedListItemPlaceholder from "./FeedListItemPlaceholder";
+
+
 
 const today            = new Date();
 const yesterday        = subDays( today, 1 );
@@ -37,32 +41,36 @@ export type FeedListProp = {
 export default function FeedList( props : FeedListProp ) {
     const { t, i18n } = useTranslation();
     const listRef = useRef(null);
+    const [isScrolling, setIsScrolling] = useState(false);
 
-    const itemsMap : Record<string, FeedItem[]> = { 'today': [], 'yesterday' : [], 'this_week' : [], 'last_week' : [] };
 
-    for( const i of props.feedItems ) {
-        if (i.pub_date) {
-            const d = new Date(i.pub_date);
-            if (isSameDay(d, today)) {
-                itemsMap['today'].push(i);
-            } else if (isSameDay(d, yesterday)) {
-                itemsMap['yesterday'].push(i);
-            } else if (d >= currentWeekBegin && d <= currentWeekEnd) {
-                itemsMap['this_week'].push(i);
-            } else if (d >= lastWeekBegin && d <= lastWeekEnd) {
-                itemsMap['last_week'].push(i);
-            } else {
-                // const localizedMonthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(d);
-                const localizedMonthName = new Intl.DateTimeFormat( i18n.language, { month: 'long' }).format(d);
-                const dateKey = `${localizedMonthName}, ${d.getFullYear()}`;
+    const itemsMap : Record<string, FeedItem[]> = useMemo( () => {
+        const map: Record<string, FeedItem[]> = { today: [], yesterday: [], this_week: [], last_week: [] };
 
-                if (!itemsMap[dateKey]) {
-                    itemsMap[dateKey] = [];
+        for( const i of props.feedItems ) {
+            if (i.pub_date) {
+                const d = new Date(i.pub_date);
+                if (isSameDay(d, today)) {
+                    map['today'].push(i);
+                } else if (isSameDay(d, yesterday)) {
+                    map['yesterday'].push(i);
+                } else if (d >= currentWeekBegin && d <= currentWeekEnd) {
+                    map['this_week'].push(i);
+                } else if (d >= lastWeekBegin && d <= lastWeekEnd) {
+                    map['last_week'].push(i);
+                } else {
+                    const localizedMonthName = new Intl.DateTimeFormat( i18n.language, { month: 'long' }).format(d);
+                    const dateKey = `${localizedMonthName}, ${d.getFullYear()}`;
+
+                    if (!map[dateKey]) {
+                        map[dateKey] = [];
+                    }
+                    map[dateKey].push(i);
                 }
-                itemsMap[dateKey].push(i);
             }
         }
-    }
+        return map;
+    }, [props.feedItems, i18n.language] );
 
     useEffect(() => {
         if (listRef.current) {
@@ -70,37 +78,125 @@ export default function FeedList( props : FeedListProp ) {
         }
     }, [props.scrollToTopKey]);
 
+
+
+
+    const orderedFeedItems: FeedItem[] = useMemo(() => {
+        const items: FeedItem[] = [];
+
+        // Order static keys by this particular order
+        const fixed = ["today", "yesterday", "this_week", "last_week"];
+        for (const key of fixed) {
+            if (itemsMap[key]?.length) {
+                items.push(...itemsMap[key]);
+            }
+        }
+
+        // After that comes the dynamic keys with arbitrary dates (e.g. September, 2025)
+        const dynamicKeys = Object.keys(itemsMap).filter(
+            key => !fixed.includes(key) && itemsMap[key].length > 0
+        );
+
+        dynamicKeys.sort((a, b) => {
+            const da = new Date(itemsMap[a][0].pub_date).getTime();
+            const db = new Date(itemsMap[b][0].pub_date).getTime();
+            return db - da; // newest first
+        });
+
+        // Add them to the list
+        for (const key of dynamicKeys) {
+            items.push(...itemsMap[key]);
+        }
+
+        return items;
+    }, [itemsMap]);
+
+    const groupHeaders : string[] = useMemo( () => {
+        const headers : string[] = [];
+        for (const key in itemsMap) {
+            if (itemsMap.hasOwnProperty(key)) {
+                if( itemsMap[key].length > 0) {
+                    headers.push( key );
+                }
+            }
+        }
+        return headers;
+    }, [itemsMap] );
+
+    const groupCounts : number[] = useMemo( () => {
+        const counts : number[] = [];
+        for (const key in itemsMap) {
+            if (itemsMap.hasOwnProperty(key)) {
+                if( itemsMap[key].length > 0) {
+                    counts.push( itemsMap[key].length );
+                }
+            }
+        }
+        return counts;
+    }, [itemsMap] );
+
     return (
-        <ul ref={listRef} className={styles["feed-date-list"]}>
-            {
-                Object.entries(itemsMap).filter( ([key, value]) => value.length > 0 ).map( ([key, value]) => {
-                    return (
-                        <li key={key}>
-                            <FeedListDateHeader
-                                faviconCache={props.faviconCache}
-                                feedItems={value}
-                                subscriptionNameRecord={props.subscriptionNameRecord}
-                                onClick={props.onClick}
+        <GroupedVirtuoso
+            defaultItemHeight={60}
+            ref={listRef}
+            context={{ isScrolling }}
+            isScrolling={setIsScrolling}
+            increaseViewportBy={200}
+            onMouseLeave={() => props.clearHoveredUrl()}
+            className={styles["feed-date-list"]}
+            groupCounts={groupCounts}
+            groupContent={(index) => {
+                return (
+                    <h3 className={styles["feed-date-header"]}>{t(groupHeaders[index])}</h3>
+                );
+            }}
+            itemContent={(index, groupIndex) => {
+                const item = orderedFeedItems[index];
+
+                return (
+
+                    (item) ?
+                        (isScrolling)
+                            ? <FeedListItemPlaceholder
+                                id={item.id}
+                                key={item.id}
+                                title={item.title}
+                                favicon={props.faviconCache[item.sub_id]}
+                                isRead={item.is_read}
+                                isSelected={item.id === props.selectedItemId}
+                                commentsActiveId={props.commentsActiveId}
+                              />
+                            : <FeedListItem
+                                id={item.id}
+                                key={item.id}
+                                title={item.title}
+                                subName={props.subscriptionNameRecord[item.sub_id] ?? ''}
+                                url={item.url}
+                                commentsUrl={item.comments_url}
+                                summary={item.summary}
+                                favicon={props.faviconCache[item.sub_id]}
+                                isSelected={item.id === props.selectedItemId}
+                                onClick={ props.onClick }
+                                isFavorite={item.is_favorite}
+                                isRead={item.is_read}
                                 setIsFeedFavorite={props.setIsFeedFavorite}
                                 deleteFeedItems={props.deleteFeedItems}
-                                name={t(key)}
-                                selectedItemId={props.selectedItemId}
                                 onMoreOptionsClick={props.onMoreOptionsClick}
-                                onMarkReadClick={props.onMarkReadClick}
                                 onCommentsClick={props.onCommentsClick}
-                                commentsActiveId={props.commentsActiveId}
-                                moreOptionsActiveId={props.moreOptionsActiveId}
+                                onMarkReadClick={props.onMarkReadClick}
                                 onCloseFeedOptionsPopup={props.onCloseFeedOptionsPopup}
                                 onMouseOverFeedItem={props.onMouseOverFeedItem}
-                                clearHoveredUrl={props.clearHoveredUrl}
+                                commentsActiveId={props.commentsActiveId}
+                                moreOptionsActiveId={props.moreOptionsActiveId}
                                 openInExternalBrowser={props.openInExternalBrowser}
                                 copyToClipboard={props.copyToClipboard}
                                 setInFeedBin={props.setInFeedBin}
-                            ></FeedListDateHeader>
-                        </li>
-                    )
-                })
-            }
-        </ul>
+                                inFeedBin={item.in_feed_bin}
+                            ></FeedListItem>
+
+                    : <div style={{height: 60}}></div>
+                )
+            }}
+        />
     );
 }
