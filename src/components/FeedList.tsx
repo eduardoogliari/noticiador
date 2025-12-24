@@ -165,6 +165,7 @@ export default function FeedList( props : FeedListProp ) {
                                 isRead={item.is_read}
                                 isSelected={item.id === props.selectedItemId}
                                 commentsActiveId={props.commentsActiveId}
+                                commentsUrl={item.comments_url}
                               />
                             : <FeedListItem
                                 id={item.id}

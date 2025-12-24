@@ -7,6 +7,7 @@ export type FeedListItemPlaceholderProp = {
     favicon                 : string;
     isRead                  : boolean;
     commentsActiveId        : number;
+    commentsUrl             ?: string;
 };
 
 export default function FeedListItemPlaceholder( props : FeedListItemPlaceholderProp ) {
@@ -25,12 +26,18 @@ export default function FeedListItemPlaceholder( props : FeedListItemPlaceholder
             }
             <div className={styles["feed-item-title"]}>{props.title}</div>
 
+
             <div className={`${styles['feed-item-options-container']}`}>
-                <div className={`${styles['feed-item-options-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}>
-                    <div className={styles['feed-item-option']}>
-                        <img src={'../icons/comments.svg'}></img>
-                    </div>
-                </div>
+                 {
+                    (props.commentsUrl)
+                        ?
+                        <div className={`${styles['feed-item-options-container']} ${props.commentsActiveId === props.id ? styles.selected : ''}`}>
+                            <div className={styles['feed-item-option']}>
+                                <img src={'../icons/comments.svg'}></img>
+                            </div>
+                        </div>
+                        : <></>
+                }
 
                 <div className={`${styles[`feed-item-options-container`]}`}>
                     <div className={styles[`feed-item-option`]}>
